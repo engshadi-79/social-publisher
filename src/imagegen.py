@@ -1,10 +1,13 @@
 """توليد خلفية تعبّر عن معنى المنشور: Cloudflare Workers AI ثم Pollinations."""
 import base64
+import io
 import os
+import time
 import urllib.parse
 from pathlib import Path
 
 import requests
+from PIL import Image
 
 from config import MEDIA_DIR, TEMPLATES
 
@@ -41,11 +44,25 @@ def _pollinations(prompt: str, seed: int | None, size: tuple[int, int]) -> bytes
     if seed is not None:
         q["seed"] = seed
     url = f"https://image.pollinations.ai/prompt/{urllib.parse.quote(prompt)}?{urllib.parse.urlencode(q)}"
-    r = requests.get(url, timeout=180)
-    r.raise_for_status()
-    if "image" not in r.headers.get("content-type", ""):
-        raise RuntimeError("Pollinations لم يُرجع صورة")
-    return r.content
+    last = None
+    for attempt in range(3):
+        try:
+            r = requests.get(url, timeout=180)
+            r.raise_for_status()
+            if "image" not in r.headers.get("content-type", ""):
+                raise RuntimeError("Pollinations لم يُرجع صورة")
+            break
+        except Exception as e:  # noqa: BLE001
+            last = e
+            time.sleep(10 * (attempt + 1))
+    else:
+        raise last
+    # المجاني يضع علامة في الزاوية السفلية؛ نقصّ الشريط السفلي لإزالتها
+    img = Image.open(io.BytesIO(r.content)).convert("RGB")
+    img = img.crop((0, 0, img.width, int(img.height * 0.92)))
+    buf = io.BytesIO()
+    img.save(buf, "PNG")
+    return buf.getvalue()
 
 
 def ensure_background(post: dict, regen: bool = False, seed: int | None = None):
