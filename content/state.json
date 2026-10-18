@@ -14,5 +14,12 @@
       "platform_post_id": "18136005406564141",
       "published_at": "2026-10-18T16:01:44+00:00"
     }
+  },
+  "2026-10-18-test2": {
+    "threads": {
+      "attempts": 1,
+      "error": "PublishError: THREADS_USER_ID/THREADS_TOKEN غير مضبوطين",
+      "status": "retry"
+    }
   }
 }
