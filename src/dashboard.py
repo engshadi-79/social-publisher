@@ -13,16 +13,28 @@ from render import Renderer
 
 LABELS = {"facebook": "فيسبوك", "instagram": "إنستغرام", "threads": "ثريدز", "telegram": "تيليجرام"}
 SITE = OUT_DIR / "dashboard"
+DAYS = ["الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت", "الأحد"]
+MONTHS = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"]
+
+
+def when_ar(d):
+    h = d.hour % 12 or 12
+    part = "صباحاً" if d.hour < 12 else "مساءً"
+    return f"يوم {DAYS[d.weekday()]} {d.day} {MONTHS[d.month - 1]} الساعة {h}:{d.minute:02d} {part}"
+
+
+def join_ar(names):
+    return " و".join(names)
 
 
 def _chip(name, text, st, scheduled_txt):
     status = st.get("status")
     if status == "published":
-        txt, cls, hint = "نُشر", "published", st.get("published_at", "")
+        txt, cls, hint = "✅ نُشر", "published", st.get("published_at", "")
     elif status == "failed":
-        txt, cls, hint = "فشل", "failed", "فشل بعد كل المحاولات"
+        txt, cls, hint = "❌ لم ينجح", "failed", "فشل بعد كل المحاولات"
     elif status == "retry":
-        txt, cls, hint = f"ستُعاد ({st.get('attempts', 0)}/3)", "retry", ""
+        txt, cls, hint = "🔁 ستُعاد المحاولة", "retry", ""
     else:
         txt, cls, hint = scheduled_txt, "", ""
     url = None
@@ -38,22 +50,30 @@ def build(posts, state, now):
         when = parse_when(p["publish_at"])
         st = state.get(p["id"], {})
         past = when <= now
-        chips = [_chip(n, t, st.get(n, {}), "بانتظار الموعد" if past else "مجدول")
+        chips = [_chip(n, t, st.get(n, {}), "⏳ ينتظر دوره" if past else "⏳ ينتظر موعده")
                  for n, t in p["platforms"].items()]
         statuses = [c["status"] for c in chips]
         all_done = all(s == "published" for s in statuses)
         if not p["approved"]:
-            group, badge, badge_txt = "draft", "draft", "مسودة"
+            group, badge, badge_txt = "draft", "draft", "بانتظار موافقتك"
         elif "failed" in statuses or "retry" in statuses:
             group = "failed"
-            badge, badge_txt = ("failed", "فيه خطأ") if "failed" in statuses else ("retry", "إعادة محاولة")
+            badge, badge_txt = ("failed", "حدثت مشكلة") if "failed" in statuses else ("retry", "ستُعاد المحاولة")
         elif all_done:
-            group, badge, badge_txt = "published", "published", "منشور"
+            group, badge, badge_txt = "published", "published", "تم النشر"
         elif past:
-            group, badge, badge_txt = "upcoming", "due", "بانتظار النشر"
+            group, badge, badge_txt = "upcoming", "due", "سيُنشر خلال دقائق"
         else:
-            group, badge, badge_txt = "upcoming", "scheduled", "مجدول"
-        items.append({
+            group, badge, badge_txt = "upcoming", "scheduled", "سيُنشر في موعده"
+        pl = join_ar(LABELS[n] for n in p["platforms"])
+        line = {
+            "draft": f"لن يُنشر حتى توافق عليه. الموعد المقترح: {when_ar(when)}. المنصات: {pl}.",
+            "published": f"نُشر على: {pl}.",
+            "failed": f"حدثت مشكلة عند النشر ({pl}). التفاصيل أدناه.",
+            "upcoming": (f"حان موعده وسيُنشر خلال دقائق على: {pl}." if past
+                         else f"سيُنشر {when_ar(when)} على: {pl}."),
+        }[group]
+        items.append({"line": line, "when_ar": when_ar(when),
             "id": p["id"], "template": p["template"], "title": p["image"]["title"],
             "when": when, "when_txt": when.strftime("%Y-%m-%d %H:%M"), "chips": chips,
             "group": group, "badge": badge, "badge_txt": badge_txt,
@@ -65,6 +85,18 @@ def build(posts, state, now):
     rest = [i for i in items if i["group"] != "upcoming"][::-1]
     ordered = upcoming + rest
     counts = {g: sum(1 for i in items if i["group"] == g) for g in ("upcoming", "published", "draft", "failed")}
+    parts = []
+    if upcoming:
+        parts.append(f"يوجد {counts['upcoming']} منشور مجدول، وأقربها {upcoming[0]['when_ar']}.")
+    else:
+        parts.append("لا يوجد أي منشور مجدول حالياً.")
+    if counts["draft"]:
+        parts.append(f"{counts['draft']} منشور ينتظر موافقتك ولن يُنشر قبلها.")
+    if counts["failed"]:
+        parts.append(f"⚠️ {counts['failed']} منشور فيه مشكلة وتحتاج نظرة.")
+    if counts["published"]:
+        parts.append(f"تم نشر {counts['published']} منشور حتى الآن.")
+    counts["summary"] = " ".join(parts)
     return ordered, counts, (upcoming[0] if upcoming else None)
 
 

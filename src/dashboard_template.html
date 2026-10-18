@@ -5,89 +5,83 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>لوحة النشر</title>
 <style>
-:root{--bg:#f4f7fa;--card:#fff;--ink:#0b1f3a;--mute:#5d6b7c;--line:#e2e8ef;--teal:#0f9d8f;--ok:#0f9d58;--warn:#c27c0e;--bad:#c5372c;--draft:#7a869a;--chip:#eef3f8}
+:root{--bg:#f4f7fa;--card:#fff;--ink:#0b1f3a;--mute:#5d6b7c;--line:#e2e8ef;--teal:#0f9d8f;--ok:#0f9d58;--warn:#b86e00;--bad:#c5372c;--draft:#6b778a;--chip:#eef3f8}
 @media (prefers-color-scheme:dark){:root{--bg:#0d1520;--card:#15202e;--ink:#e8eef5;--mute:#93a1b3;--line:#243245;--teal:#2dd4bf;--ok:#4ade80;--warn:#fbbf24;--bad:#f87171;--draft:#93a1b3;--chip:#1c2a3b}}
 *{box-sizing:border-box;margin:0}
-body{background:var(--bg);color:var(--ink);font-family:"Cairo","Segoe UI",Tahoma,sans-serif;line-height:1.6}
-.wrap{max-width:1100px;margin:0 auto;padding:24px 16px 60px}
-header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:18px}
-h1{font-size:1.6rem}.sub{color:var(--mute);font-size:.9rem}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:18px}
-.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
-.stat b{display:block;font-size:1.7rem;line-height:1.2}.stat span{color:var(--mute);font-size:.85rem}
-.next{background:var(--card);border:1px solid var(--line);border-inline-start:4px solid var(--teal);border-radius:12px;padding:12px 16px;margin-bottom:18px}
+body{background:var(--bg);color:var(--ink);font-family:"Cairo","Segoe UI",Tahoma,sans-serif;line-height:1.7;font-size:17px}
+.wrap{max-width:1000px;margin:0 auto;padding:22px 16px 60px}
+h1{font-size:1.7rem;margin-bottom:4px}
+.upd{color:var(--mute);font-size:.85rem;margin-bottom:16px}
+.summary{background:var(--card);border:1px solid var(--line);border-inline-start:5px solid var(--teal);border-radius:12px;padding:16px 18px;font-size:1.1rem;margin-bottom:12px}
+.how{background:var(--chip);border-radius:12px;padding:12px 16px;margin-bottom:20px;color:var(--mute);font-size:.92rem}
+.how b{color:var(--ink)}
 .tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
-.tabs button{font:inherit;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:6px 16px;cursor:pointer}
+.tabs button{font:inherit;font-size:.95rem;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:6px 16px;cursor:pointer}
 .tabs button[aria-pressed=true]{background:var(--teal);color:#06201d;border-color:var(--teal);font-weight:700}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px}
-.post{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
-.post img{width:100%;aspect-ratio:1/1;object-fit:cover;background:var(--chip);display:block}
-.post.t-story img,.post.t-tip img,.post.t-announcement img{aspect-ratio:4/5}
-.body{padding:12px 14px;display:flex;flex-direction:column;gap:8px;flex:1}
-.top{display:flex;justify-content:space-between;gap:8px;align-items:center}
-.badge{font-size:.78rem;padding:2px 10px;border-radius:999px;color:#fff;white-space:nowrap}
-.b-published{background:var(--ok)}.b-retry{background:var(--warn)}.b-failed{background:var(--bad)}.b-scheduled{background:var(--teal);color:#06201d}.b-due{background:var(--warn)}.b-draft{background:var(--draft)}
-.title{font-weight:700}.when{color:var(--mute);font-size:.85rem}
+.list{display:flex;flex-direction:column;gap:14px}
+.post{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;gap:0}
+.post img{width:150px;min-width:150px;object-fit:cover;background:var(--chip);display:block}
+.body{padding:14px 16px;display:flex;flex-direction:column;gap:8px;flex:1;min-width:0}
+.badge{align-self:flex-start;font-size:.82rem;padding:1px 12px;border-radius:999px;color:#fff}
+.b-published{background:var(--ok)}.b-retry,.b-due{background:var(--warn)}.b-failed{background:var(--bad)}.b-scheduled{background:var(--teal);color:#06201d}.b-draft{background:var(--draft)}
+.title{font-weight:700;font-size:1.1rem}
+.line{color:var(--ink)}
 .plats{display:flex;flex-wrap:wrap;gap:6px}
-.chip{font-size:.8rem;background:var(--chip);border-radius:8px;padding:2px 9px;border:1px solid var(--line)}
-.chip.published{border-color:var(--ok);color:var(--ok)}.chip.failed{border-color:var(--bad);color:var(--bad)}.chip.retry{border-color:var(--warn);color:var(--warn)}
-.chip a{color:inherit}
-.err{color:var(--bad);font-size:.8rem;word-break:break-word}
-details{font-size:.85rem;color:var(--mute)}summary{cursor:pointer}
+.chip{font-size:.85rem;background:var(--chip);border-radius:8px;padding:2px 10px;border:1px solid var(--line)}
+.chip.published{border-color:var(--ok)}.chip.failed{border-color:var(--bad)}.chip.retry{border-color:var(--warn)}
+.chip a{color:var(--teal);font-weight:700}
+.err{color:var(--bad);font-size:.85rem;word-break:break-word}
+details{font-size:.88rem;color:var(--mute)}summary{cursor:pointer}
 details p{margin-top:6px;white-space:pre-wrap;color:var(--ink)}details b{color:var(--teal)}
 .empty{color:var(--mute);padding:30px;text-align:center}
-footer{margin-top:28px;color:var(--mute);font-size:.82rem}
+@media (max-width:560px){.post{flex-direction:column}.post img{width:100%;height:210px}}
 </style>
 </head>
 <body>
 <div class="wrap">
-<header><h1>لوحة النشر</h1><span class="sub">آخر تحديث: <bdi dir="ltr">{{ updated }}</bdi> (توقيت <bdi dir="ltr">{{ tz }}</bdi>)</span></header>
+<h1>لوحة النشر</h1>
+<div class="upd">آخر تحديث: <bdi dir="ltr">{{ updated }}</bdi></div>
 
-<div class="stats">
-  <div class="stat"><b>{{ counts.upcoming }}</b><span>قادمة</span></div>
-  <div class="stat"><b>{{ counts.published }}</b><span>منشورة</span></div>
-  <div class="stat"><b>{{ counts.draft }}</b><span>مسودات بانتظار الموافقة</span></div>
-  <div class="stat"><b>{{ counts.failed }}</b><span>فيها خطأ</span></div>
+<div class="summary">{{ counts.summary }}</div>
+
+<div class="how">
+  <b>كيف تقرأ هذه الصفحة؟</b> كل بطاقة هي منشور واحد: الصورة التي ستظهر، وتحتها متى سيُنشر وعلى أي منصة.
+  علامة ✅ تعني أنه نُشر، و⏳ تعني أنه ينتظر موعده، و❌ تعني أن النشر لم ينجح.
+  المنشور الذي مكتوب عليه «بانتظار موافقتك» <b>لن يُنشر</b> حتى تطلب مني الموافقة عليه.
 </div>
 
-{% if next_post %}
-<div class="next">⏱️ <b>المنشور القادم:</b> {{ next_post.title }} — <bdi dir="ltr">{{ next_post.when_txt }}</bdi>
- <span class="sub">({{ next_post.platforms_txt }})</span></div>
-{% endif %}
-
 <div class="tabs" id="tabs">
-  {% for key,label in [("all","الكل"),("upcoming","قادمة"),("published","منشورة"),("draft","مسودات"),("failed","فيها خطأ")] %}
+  {% for key,label in [("all","الكل"),("upcoming","سيُنشر"),("published","تم نشره"),("draft","بانتظار موافقتك"),("failed","فيه مشكلة")] %}
   <button data-f="{{ key }}" aria-pressed="{{ 'true' if key=='all' else 'false' }}">{{ label }}</button>
   {% endfor %}
 </div>
 
-<div class="grid" id="grid">
+<div class="list" id="grid">
 {% for p in posts %}
-<article class="post t-{{ p.template }}" data-s="{{ p.group }}">
+<article class="post" data-s="{{ p.group }}">
   <img loading="lazy" src="images/thumb-{{ p.id }}.jpg" alt="{{ p.title }}">
   <div class="body">
-    <div class="top"><span class="badge b-{{ p.badge }}">{{ p.badge_txt }}</span><span class="when"><bdi dir="ltr">{{ p.when_txt }}</bdi></span></div>
+    <span class="badge b-{{ p.badge }}">{{ p.badge_txt }}</span>
     <div class="title">{{ p.title }}</div>
+    <div class="line">{{ p.line }}</div>
     <div class="plats">
       {% for c in p.chips %}
-      <span class="chip {{ c.status }}" title="{{ c.hint }}">{% if c.url %}<a href="{{ c.url }}" target="_blank" rel="noopener">{{ c.label }}</a>{% else %}{{ c.label }}{% endif %} · {{ c.txt }}</span>
+      <span class="chip {{ c.status }}">{% if c.url %}<a href="{{ c.url }}" target="_blank" rel="noopener">{{ c.label }}</a>{% else %}{{ c.label }}{% endif %}: {{ c.txt }}</span>
       {% endfor %}
     </div>
     {% for c in p.chips if c.error %}<div class="err">{{ c.label }}: {{ c.error }}</div>{% endfor %}
-    <details><summary>نصوص المنصات</summary>
+    <details><summary>عرض نص المنشور على كل منصة</summary>
       {% for c in p.chips %}<p><b>{{ c.label }}</b><br>{{ c.text }}</p>{% endfor %}
     </details>
   </div>
 </article>
 {% endfor %}
 </div>
-<div class="empty" id="empty" hidden>لا توجد منشورات في هذا التصنيف.</div>
-
-<footer>هذه اللوحة للعرض فقط وتتجدّد تلقائياً بعد كل نشر أو تعديل على الطابور. للموافقة على منشور أو تعديله اطلب ذلك من Claude Code (approved: true).</footer>
+<div class="empty" id="empty" hidden>لا توجد منشورات هنا.</div>
 </div>
 <script>
 const tabs=document.querySelectorAll('#tabs button'),posts=document.querySelectorAll('.post'),empty=document.getElementById('empty');
-function show(f){let n=0;posts.forEach(p=>{const ok=f==='all'||p.dataset.s.split(' ').includes(f);p.hidden=!ok;if(ok)n++});empty.hidden=n>0;tabs.forEach(b=>b.setAttribute('aria-pressed',b.dataset.f===f))}
+function show(f){let n=0;posts.forEach(p=>{const ok=f==='all'||p.dataset.s===f;p.hidden=!ok;if(ok)n++});empty.hidden=n>0;tabs.forEach(b=>b.setAttribute('aria-pressed',b.dataset.f===f))}
 tabs.forEach(b=>b.onclick=()=>show(b.dataset.f));
 </script>
 </body>

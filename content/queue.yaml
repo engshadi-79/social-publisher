@@ -1,48 +1,31 @@
 - id: 2026-10-20-001
   approved: false
-  publish_at: "2026-10-20 18:00"
+  publish_at: 2026-10-20 18:00
   template: tip
   image:
-    title: "ابدأ يومك بخطة من ثلاث مهام"
-    body: "اكتب أهم ثلاث مهام قبل أن تفتح الهاتف، ثم أنجزها بالترتيب."
-    visual_prompt: "a tidy desk with an open planner and morning coffee, soft window light, calm navy and teal tones, minimal, empty space at top, no text, no letters, no words, no watermark"
+    title: ابدأ يومك بخطة من ثلاث مهام
+    body: اكتب أهم ثلاث مهام قبل أن تفتح الهاتف، ثم أنجزها بالترتيب.
+    visual_prompt: a tidy desk with an open planner and morning coffee, soft window light, calm navy and teal tones, minimal, empty space at top, no text, no letters, no words, no watermark
     seed: 42
   platforms:
-    facebook: "ابدأ يومك بخطة من ثلاث مهام فقط ✅\nاكتبها قبل أن تفتح الهاتف وأنجزها بالترتيب.\n#تنظيم_الوقت #إنتاجية"
-    instagram: "ابدأ يومك بخطة من ثلاث مهام فقط ✅\n#تنظيم_الوقت #إنتاجية"
-    threads: "ابدأ يومك بثلاث مهام فقط، اكتبها قبل أن تفتح الهاتف."
-    telegram: "💡 نصيحة اليوم: ابدأ يومك بخطة من ثلاث مهام فقط."
+    facebook: 'ابدأ يومك بخطة من ثلاث مهام فقط ✅
+
+      اكتبها قبل أن تفتح الهاتف وأنجزها بالترتيب.
+
+      #تنظيم_الوقت #إنتاجية'
+    instagram: 'ابدأ يومك بخطة من ثلاث مهام فقط ✅
+
+      #تنظيم_الوقت #إنتاجية'
+    threads: ابدأ يومك بثلاث مهام فقط، اكتبها قبل أن تفتح الهاتف.
+    telegram: '💡 نصيحة اليوم: ابدأ يومك بخطة من ثلاث مهام فقط.'
 - id: 2026-10-21-001
   approved: false
-  publish_at: "2026-10-21 12:00"
+  publish_at: 2026-10-21 12:00
   template: quote
   image:
-    title: "الاستمرار أهم من الكمال"
-    body: "خطوة صغيرة كل يوم"
-    visual_prompt: "a quiet mountain path at sunrise, calm navy and teal tones, soft light, empty space in the center, no text, no letters, no words, no watermark"
+    title: الاستمرار أهم من الكمال
+    body: خطوة صغيرة كل يوم
+    visual_prompt: a quiet mountain path at sunrise, calm navy and teal tones, soft light, empty space in the center, no text, no letters, no words, no watermark
   platforms:
-    telegram: "«الاستمرار أهم من الكمال» — خطوة صغيرة كل يوم."
-    threads: "الاستمرار أهم من الكمال. خطوة صغيرة كل يوم."
-- id: 2026-10-18-test1
-  approved: true
-  publish_at: "2026-10-18 10:00"
-  template: quote
-  image:
-    title: "اختبار نشر تلقائي"
-    body: "سيُحذف هذا المنشور بعد التجربة"
-    visual_prompt: "a calm sunrise over a quiet city skyline, soft navy and teal tones, minimal, empty space in the center, no text, no letters, no words, no watermark"
-    seed: 7
-  platforms:
-    facebook: "اختبار نشر تلقائي — سيُحذف هذا المنشور بعد التجربة."
-    instagram: "اختبار نشر تلقائي — سيُحذف هذا المنشور بعد التجربة."
-- id: 2026-10-18-test2
-  approved: true
-  publish_at: "2026-10-18 10:00"
-  template: tip
-  image:
-    title: "اختبار نشر على ثريدز"
-    body: "سيُحذف هذا المنشور بعد التجربة"
-    visual_prompt: "a tidy desk with an open notebook and a cup of tea, soft morning window light, calm navy and teal tones, minimal, empty space at top, no text, no letters, no words, no watermark"
-    seed: 11
-  platforms:
-    threads: "اختبار نشر تلقائي على ثريدز — سيُحذف هذا المنشور بعد التجربة."
+    telegram: «الاستمرار أهم من الكمال» — خطوة صغيرة كل يوم.
+    threads: الاستمرار أهم من الكمال. خطوة صغيرة كل يوم.
