@@ -39,6 +39,9 @@
 ## 5) Cloudflare (خلفيات الذكاء الاصطناعي، مجاني بلا بطاقة)
 dash.cloudflare.com ← Workers AI ← انسخ Account ID → `CF_ACCOUNT_ID`، وأنشئ API Token بصلاحية **Workers AI** فقط → `CF_API_TOKEN`. بدونهما يُستعمل Pollinations ثم خلفية متدرجة (لا يتوقف النشر).
 
+## Gemini (خلفيات أعلى جودة، مدفوع)
+إن وُجد سرّ `GEMINI_API_KEY` صار Gemini المزوّد الأول للخلفيات (نموذج `gemini-nano-banana-2.1`، نحو 0.03 دولار للصورة ولا حصة مجانية لتوليد الصور)، ويبقى Cloudflare ثم Pollinations احتياطاً. لإعادة توليد الخلفيات بعد تفعيله: شغّل workflow باسم `preview` واكتب `all` في خانة regen.
+
 ## 6) أسرار GitHub
 Settings ← Secrets and variables ← Actions ← New repository secret، لكل مما يلي:
 

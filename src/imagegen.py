@@ -12,6 +12,12 @@ from PIL import Image
 from config import MEDIA_DIR, TEMPLATES
 
 CF_MODEL = "@cf/black-forest-labs/flux-1-schnell"
+GEMINI_MODEL = os.environ.get("GEMINI_IMAGE_MODEL", "gemini-nano-banana-2.1")
+ASPECT = {(1080, 1080): "1:1", (1080, 1350): "4:5", (1080, 1920): "9:16"}
+class NotConfigured(Exception):
+    """مزوّد غير مفعّل (لا مفتاح): يُتخطّى بصمت."""
+
+
 SUFFIX = "no text, no letters, no words, no watermark"
 
 
@@ -24,10 +30,53 @@ def _prompt(post: dict) -> str:
     return p if SUFFIX in p else f"{p.rstrip('.,')}, {SUFFIX}"
 
 
+def _find_image(node):
+    """يبحث في ردّ Gemini عن أول كتلة صورة ويرجع base64 (البنية الدقيقة تختلف بين الإصدارات)."""
+    if isinstance(node, dict):
+        if node.get("type") == "image" and isinstance(node.get("data"), str):
+            return node["data"]
+        inline = node.get("inlineData") or node.get("inline_data")
+        if isinstance(inline, dict) and isinstance(inline.get("data"), str):
+            return inline["data"]
+        for v in node.values():
+            found = _find_image(v)
+            if found:
+                return found
+    elif isinstance(node, list):
+        for v in node:
+            found = _find_image(v)
+            if found:
+                return found
+    return None
+
+
+def _gemini(prompt: str, size: tuple[int, int]) -> bytes:
+    key = os.environ.get("GEMINI_API_KEY")
+    if not key:
+        raise NotConfigured("GEMINI_API_KEY")
+    r = requests.post(
+        "https://generativelanguage.googleapis.com/v1beta/interactions",
+        headers={"x-goog-api-key": key, "Content-Type": "application/json"}, timeout=180,
+        json={"model": GEMINI_MODEL,
+              "input": [{"type": "text", "text": prompt}],
+              "response_format": {"type": "image", "mime_type": "image/jpeg",
+                                  "aspect_ratio": ASPECT.get(size, "1:1"), "image_size": "1K"}})
+    if r.status_code >= 400:
+        try:
+            msg = r.json().get("error", {}).get("message", r.text)
+        except Exception:  # noqa: BLE001
+            msg = r.text
+        raise RuntimeError(f"HTTP {r.status_code}: {str(msg)[:200]}")
+    data = _find_image(r.json())
+    if not data:
+        raise RuntimeError("لا توجد صورة في ردّ Gemini")
+    return base64.b64decode(data)
+
+
 def _cloudflare(prompt: str, seed: int | None) -> bytes:
     acc, tok = os.environ.get("CF_ACCOUNT_ID"), os.environ.get("CF_API_TOKEN")
     if not (acc and tok):
-        raise RuntimeError("CF_ACCOUNT_ID/CF_API_TOKEN غير مضبوطين")
+        raise NotConfigured("CF")
     body = {"prompt": prompt, "steps": 8}
     if seed is not None:
         body["seed"] = seed
@@ -76,13 +125,16 @@ def ensure_background(post: dict, regen: bool = False, seed: int | None = None):
     seed = seed if seed is not None else post["image"].get("seed")
     prompt = _prompt(post)
     size = TEMPLATES[post["template"]]
-    for name, fn in (("Cloudflare", lambda: _cloudflare(prompt, seed)),
+    for name, fn in (("Gemini", lambda: _gemini(prompt, size)),
+                     ("Cloudflare", lambda: _cloudflare(prompt, seed)),
                      ("Pollinations", lambda: _pollinations(prompt, seed, size))):
         try:
             data = fn()
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(data)
             return path, warnings
+        except NotConfigured:
+            continue
         except Exception as e:  # noqa: BLE001
             warnings.append(f"{name} فشل: {type(e).__name__}: {str(e)[:150]}")
     warnings.append("استُعملت خلفية متدرجة بديلة")

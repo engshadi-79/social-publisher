@@ -11,7 +11,7 @@ from render import Renderer
 def main() -> int:
     sys.stdout.reconfigure(encoding="utf-8")
     ap = argparse.ArgumentParser()
-    ap.add_argument("--regen", metavar="POST_ID", help="أعد توليد خلفية منشور واحد")
+    ap.add_argument("--regen", metavar="POST_ID", help="أعد توليد خلفية منشور (أو all لكل المنشورات غير المنشورة)")
     ap.add_argument("--seed", type=int, help="seed مختلف مع --regen")
     ap.add_argument("--all", action="store_true", help="شمل المنشورات المنشورة سابقاً")
     ap.add_argument("--no-gen", action="store_true", help="لا تولّد خلفيات (استعمل الموجود فقط)")
@@ -24,9 +24,11 @@ def main() -> int:
     if fatal(errs):
         return 1
     state = load_state()
-    posts = [p for p in queue if args.all or args.regen == p["id"] or
+    posts = [p for p in queue if args.all or args.regen in ("all", p["id"]) or
              not all(state.get(p["id"], {}).get(n, {}).get("status") == "published" for n in p["platforms"])]
-    if args.regen:
+    if args.regen == "all":
+        pass
+    elif args.regen:
         posts = [p for p in queue if p["id"] == args.regen]
         if not posts:
             print("لا يوجد منشور بهذا المعرّف")
@@ -37,7 +39,7 @@ def main() -> int:
                 bg = imagegen.bg_path(p["id"])
                 bg, warns = (bg if bg.exists() else None), []
             else:
-                bg, warns = imagegen.ensure_background(p, regen=p["id"] == args.regen, seed=args.seed)
+                bg, warns = imagegen.ensure_background(p, regen=args.regen == "all" or p["id"] == args.regen, seed=args.seed)
             out = r.render(p, OUT_DIR / f"{p['id']}.png", bg)
             print(f"{p['id']}: {out}" + ("" if bg else "  (خلفية متدرجة)"))
             for w in warns:
