@@ -35,3 +35,14 @@
   platforms:
     facebook: "اختبار نشر تلقائي — سيُحذف هذا المنشور بعد التجربة."
     instagram: "اختبار نشر تلقائي — سيُحذف هذا المنشور بعد التجربة."
+- id: 2026-10-18-test2
+  approved: true
+  publish_at: "2026-10-18 10:00"
+  template: tip
+  image:
+    title: "اختبار نشر على ثريدز"
+    body: "سيُحذف هذا المنشور بعد التجربة"
+    visual_prompt: "a tidy desk with an open notebook and a cup of tea, soft morning window light, calm navy and teal tones, minimal, empty space at top, no text, no letters, no words, no watermark"
+    seed: 11
+  platforms:
+    threads: "اختبار نشر تلقائي على ثريدز — سيُحذف هذا المنشور بعد التجربة."
