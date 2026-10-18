@@ -66,6 +66,8 @@ def _gemini(prompt: str, size: tuple[int, int]) -> bytes:
             msg = r.json().get("error", {}).get("message", r.text)
         except Exception:  # noqa: BLE001
             msg = r.text
+        if r.status_code == 429 and "Free Tier" in str(msg):
+            raise NotConfigured("Gemini: المشروع على الطبقة المجانية، لا توليد صور")
         raise RuntimeError(f"HTTP {r.status_code}: {str(msg)[:200]}")
     data = _find_image(r.json())
     if not data:
