@@ -14,5 +14,14 @@
       "platform_post_id": "18136005406564141",
       "published_at": "2026-10-18T16:01:44+00:00"
     }
+  },
+  "2026-10-18-test2": {
+    "threads": {
+      "attempts": 0,
+      "status": "published",
+      "platform_post_id": "17873639118649655",
+      "error": null,
+      "published_at": "2026-10-18T16:50:36+00:00"
+    }
   }
 }
