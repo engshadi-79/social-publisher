@@ -23,3 +23,15 @@
   platforms:
     telegram: "«الاستمرار أهم من الكمال» — خطوة صغيرة كل يوم."
     threads: "الاستمرار أهم من الكمال. خطوة صغيرة كل يوم."
+- id: 2026-10-18-test1
+  approved: true
+  publish_at: "2026-10-18 10:00"
+  template: quote
+  image:
+    title: "اختبار نشر تلقائي"
+    body: "سيُحذف هذا المنشور بعد التجربة"
+    visual_prompt: "a calm sunrise over a quiet city skyline, soft navy and teal tones, minimal, empty space in the center, no text, no letters, no words, no watermark"
+    seed: 7
+  platforms:
+    facebook: "اختبار نشر تلقائي — سيُحذف هذا المنشور بعد التجربة."
+    instagram: "اختبار نشر تلقائي — سيُحذف هذا المنشور بعد التجربة."
