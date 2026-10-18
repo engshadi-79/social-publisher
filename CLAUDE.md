@@ -81,6 +81,8 @@ Extra secrets: `CF_ACCOUNT_ID`, `CF_API_TOKEN` (token with Workers AI permission
 ├── templates/                # Jinja2 HTML templates, one folder per design
 │   ├── quote/      (1080x1080)
 │   ├── announcement/ (1080x1350)
+│   ├── split/      (1080x1350)  photo on top, solid text panel below
+│   ├── photo/      (1080x1350)  full photo, light gradient, text at the bottom
 │   ├── tip/        (1080x1350)
 │   └── story/      (1080x1920)
 ├── content/
@@ -168,14 +170,27 @@ Extra secrets: `CF_ACCOUNT_ID`, `CF_API_TOKEN` (token with Workers AI permission
 ## Secrets (GitHub Actions)
 `FB_PAGE_ID`, `FB_PAGE_TOKEN`, `IG_USER_ID`, `THREADS_USER_ID`, `THREADS_TOKEN`,
 `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHANNEL_ID`, `TELEGRAM_OWNER_CHAT_ID`, `GH_PAT`,
-optional `GEMINI_API_KEY`.
+optional `GEMINI_API_KEY` (paid API tier only), optional `PEXELS_API_KEY` (free, real photos).
 
 ## Weekly content workflow (done by Claude Code with the owner)
 When the owner says "جهّز منشورات الأسبوع" (prepare this week's posts):
-1. Ask for the topic/project and number of posts if not given.
-2. Write new entries into `content/queue.yaml` with `approved: false`.
-3. Run `python src/preview.py` and show the rendered images.
-4. After the owner approves, set `approved: true`, commit, and push.
+1. Read `content/topics.yaml`. Write posts ONLY about the topics listed there, each entry with
+   `topic: <id>`. Never invent topics outside the list (the validator rejects them). If the list is
+   empty, ask the owner for topics first. Ask for the number of posts if not given.
+2. **Trending hashtags (research every time, never from memory):** use WebSearch to find the
+   Arabic hashtags that are trending *now* and relevant to each post's topic (Instagram, Threads,
+   Facebook, Telegram differ). Mix 2–3 current trending tags + 2–3 niche tags + the topic's
+   `hashtags_fixed`. Only use tags that actually relate to the post; never bait with unrelated trends.
+   Caveat to tell the owner: there is no official free trends API, so this is web research at
+   preparation time and trends may shift before the post goes out.
+3. Images (the owner wants REAL-looking photos, not AI-looking art):
+   - Prefer the `photo` or `split` template (photo is shown clearly, not hidden under a dark overlay).
+   - Set `image.photo_query`: 2–4 English keywords for a real stock photo (Pexels), e.g.
+     "woman planning day notebook window". Also keep `image.visual_prompt` as the AI fallback.
+   - Choose a different `seed` per post (it picks a different Pexels result).
+4. Write new entries into `content/queue.yaml` with `approved: false`.
+5. Run `python src/preview.py` and show the rendered images; the dashboard also shows them.
+6. After the owner approves, set `approved: true`, commit, and push.
 
 ## Build order
 1. Repo skeleton, requirements, config, queue schema + validator.

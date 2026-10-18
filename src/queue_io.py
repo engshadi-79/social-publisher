@@ -6,7 +6,7 @@ from zoneinfo import ZoneInfo
 
 import yaml
 
-from config import (BRAND_PATH, LIMITS, PLATFORMS, QUEUE_PATH, STATE_PATH,
+from config import (BRAND_PATH, TOPICS_PATH, LIMITS, PLATFORMS, QUEUE_PATH, STATE_PATH,
                     TEMPLATES, TIMEZONE)
 
 TZ = ZoneInfo(TIMEZONE)
@@ -48,12 +48,20 @@ def now_local() -> datetime:
     return datetime.now(TZ)
 
 
+def load_topic_ids() -> set[str]:
+    if not TOPICS_PATH.exists():
+        return set()
+    data = yaml.safe_load(TOPICS_PATH.read_text(encoding="utf-8")) or {}
+    return {str(t["id"]) for t in (data.get("topics") or []) if isinstance(t, dict) and t.get("id")}
+
+
 def validate(queue: list[dict]) -> list[str]:
     """يرجع قائمة بالأخطاء (فارغة = سليم)."""
     errors: list[str] = []
     if not isinstance(queue, list):
         return ["queue.yaml يجب أن يكون قائمة منشورات"]
     seen = set()
+    topic_ids = load_topic_ids()
     for i, p in enumerate(queue):
         tag = f"[#{i + 1} {p.get('id', '؟') if isinstance(p, dict) else '؟'}]"
         if not isinstance(p, dict):
@@ -76,8 +84,10 @@ def validate(queue: list[dict]) -> list[str]:
         img = p.get("image")
         if not isinstance(img, dict) or not img.get("title"):
             errors.append(f"{tag} image.title مطلوب")
-        elif not img.get("visual_prompt"):
+        elif not (img.get("visual_prompt") or img.get("photo_query")):
             errors.append(f"{tag} image.visual_prompt مفقود (سيُستعمل خلفية متدرجة فقط)")
+        if topic_ids and p.get("topic") not in topic_ids:
+            errors.append(f"{tag} الموضوع «{p.get('topic')}» خارج القائمة المسموحة في topics.yaml ({', '.join(sorted(topic_ids))})")
         plats = p.get("platforms")
         if not isinstance(plats, dict) or not plats:
             errors.append(f"{tag} platforms فارغة")

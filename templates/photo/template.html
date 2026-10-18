@@ -1,0 +1,17 @@
+{% extends "_base.html" %}
+{% block style %}
+.overlay { background: linear-gradient(180deg, rgba(11,31,58,0) 0%, rgba(11,31,58,0) 38%, rgba(11,31,58,.78) 66%, rgba(11,31,58,.95) 100%); }
+.frame { padding: 90px 80px 60px; }
+.text { --base: 42px; --m: auto 0 0; }
+.title { font-size: 2.1em; text-shadow: 0 2px 14px rgba(0,0,0,.45); }
+.body { opacity: .92; }
+.mark { width: 90px; height: 8px; background: var(--accent); border-radius: 4px; margin-bottom: 26px; }
+.footer { border-top: 0; padding-top: 22px; }
+{% endblock %}
+{% block content %}
+<div class="text"><div class="inner">
+  <div class="mark"></div>
+  <div class="title">{{ title }}</div>
+  {% if body %}<div class="body">{{ body }}</div>{% endif %}
+</div></div>
+{% endblock %}

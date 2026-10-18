@@ -12,6 +12,7 @@ PLATFORM_DELAY_SEC = 5           # فاصل بين المنصات
 QUEUE_PATH = ROOT / "content" / "queue.yaml"
 STATE_PATH = ROOT / "content" / "state.json"
 MEDIA_DIR = ROOT / "content" / "media"
+TOPICS_PATH = ROOT / "content" / "topics.yaml"
 BRAND_PATH = ROOT / "brand" / "brand.yaml"
 TEMPLATES_DIR = ROOT / "templates"
 OUT_DIR = ROOT / "out"
@@ -22,6 +23,8 @@ TEMPLATES = {
     "announcement": (1080, 1350),
     "tip": (1080, 1350),
     "story": (1080, 1920),
+    "split": (1080, 1350),
+    "photo": (1080, 1350),
 }
 
 PLATFORMS = ("facebook", "instagram", "threads", "telegram")

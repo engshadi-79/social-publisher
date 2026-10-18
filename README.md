@@ -39,6 +39,14 @@
 ## 5) Cloudflare (خلفيات الذكاء الاصطناعي، مجاني بلا بطاقة)
 dash.cloudflare.com ← Workers AI ← انسخ Account ID → `CF_ACCOUNT_ID`، وأنشئ API Token بصلاحية **Workers AI** فقط → `CF_API_TOKEN`. بدونهما يُستعمل Pollinations ثم خلفية متدرجة (لا يتوقف النشر).
 
+## صور حقيقية مجاناً (Pexels)
+للحصول على صور فوتوغرافية حقيقية بدل صور الذكاء الاصطناعي: سجّل مجاناً في pexels.com/api (فوري وبلا بطاقة)، وانسخ المفتاح، ثم:
+`gh secret set PEXELS_API_KEY -R engshadi-79/social-publisher`
+ويستعمله النظام تلقائياً للمنشورات التي فيها `image.photo_query`. القالبان الجديدان `photo` و`split` يُظهران الصورة بوضوح.
+
+## المواضيع
+حدّد المواضيع المسموحة في `content/topics.yaml`. أي منشور خارجها يُرفض.
+
 ## Gemini (خلفيات أعلى جودة، مدفوع)
 إن وُجد سرّ `GEMINI_API_KEY` صار Gemini المزوّد الأول للخلفيات (نموذج `gemini-nano-banana-2.1`، نحو 0.03 دولار للصورة ولا حصة مجانية لتوليد الصور)، ويبقى Cloudflare ثم Pollinations احتياطاً. لإعادة توليد الخلفيات بعد تفعيله: شغّل workflow باسم `preview` واكتب `all` في خانة regen.
 

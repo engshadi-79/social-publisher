@@ -19,6 +19,7 @@ class NotConfigured(Exception):
 
 
 SUFFIX = "no text, no letters, no words, no watermark"
+REALISM = "photorealistic, real photograph, natural lighting, shot on a DSLR camera, sharp focus"
 
 
 def bg_path(post_id: str) -> Path:
@@ -27,7 +28,28 @@ def bg_path(post_id: str) -> Path:
 
 def _prompt(post: dict) -> str:
     p = post["image"].get("visual_prompt", "").strip()
+    if "photo" not in p.lower():
+        p = f"{p.rstrip('.,')}, {REALISM}"
     return p if SUFFIX in p else f"{p.rstrip('.,')}, {SUFFIX}"
+
+
+def _pexels(query: str, size: tuple[int, int], pick: int) -> bytes:
+    """صورة فوتوغرافية حقيقية مجانية من Pexels (ترخيص يسمح بالنشر دون إسناد)."""
+    key = os.environ.get("PEXELS_API_KEY")
+    if not key:
+        raise NotConfigured("PEXELS_API_KEY")
+    orient = "square" if size[0] == size[1] else "portrait"
+    r = requests.get("https://api.pexels.com/v1/search", timeout=30,
+                     headers={"Authorization": key},
+                     params={"query": query, "orientation": orient, "size": "large", "per_page": 15})
+    r.raise_for_status()
+    photos = r.json().get("photos", [])
+    if not photos:
+        raise RuntimeError(f"لا نتائج في Pexels لـ «{query}»")
+    ph = photos[pick % len(photos)]
+    img = requests.get(ph["src"].get("large2x") or ph["src"]["large"], timeout=60)
+    img.raise_for_status()
+    return img.content
 
 
 def _find_image(node):
@@ -122,14 +144,19 @@ def ensure_background(post: dict, regen: bool = False, seed: int | None = None):
     path = bg_path(post["id"])
     if path.exists() and not regen:
         return path, warnings
-    if not post["image"].get("visual_prompt"):
-        return None, ["لا يوجد visual_prompt — خلفية متدرجة"]
+    if not (post["image"].get("visual_prompt") or post["image"].get("photo_query")):
+        return None, ["لا يوجد visual_prompt ولا photo_query — خلفية متدرجة"]
     seed = seed if seed is not None else post["image"].get("seed")
-    prompt = _prompt(post)
+    prompt = _prompt(post) if post["image"].get("visual_prompt") else "a calm abstract background"
     size = TEMPLATES[post["template"]]
-    for name, fn in (("Gemini", lambda: _gemini(prompt, size)),
-                     ("Cloudflare", lambda: _cloudflare(prompt, seed)),
-                     ("Pollinations", lambda: _pollinations(prompt, seed, size))):
+    chain = []
+    query = post["image"].get("photo_query")
+    if query:
+        chain.append(("Pexels", lambda: _pexels(query, size, seed or 0)))
+    chain += [("Gemini", lambda: _gemini(prompt, size)),
+              ("Cloudflare", lambda: _cloudflare(prompt, seed)),
+              ("Pollinations", lambda: _pollinations(prompt, seed, size))]
+    for name, fn in chain:
         try:
             data = fn()
             path.parent.mkdir(parents=True, exist_ok=True)
