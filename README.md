@@ -46,6 +46,9 @@ Settings ← Secrets and variables ← Actions ← New repository secret، لك�
 
 لا تضع أي سرّ في الملفات. المنصة التي لا سرّ لها تفشل بوضوح وتصلك رسالة بالخطأ؛ احذف مفتاحها من `platforms` لتجاهلها.
 
+## لوحة التحكم
+تُنشر تلقائياً على `https://<حسابك>.github.io/social-publisher/` وتتجدّد بعد كل نشر أو تعديل على `queue.yaml` (workflow اسمه `dashboard`). تعرض القادمة والمنشورة والمسودات والفاشلة بصورها وحالة كل منصة. للعرض فقط؛ الموافقة تتم بتعديل `approved` في الطابور.
+
 ## الاستعمال اليومي
 ```bash
 pip install -r requirements.txt && playwright install chromium
