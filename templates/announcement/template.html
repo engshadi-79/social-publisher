@@ -1,0 +1,12 @@
+{% extends "_base.html" %}
+{% block style %}
+.text { --base: 42px; --m: 0 0 auto; }
+.title { font-size: 2.2em; }
+{% endblock %}
+{% block content %}
+<div class="badge">إعلان</div>
+<div class="text"><div class="inner">
+  <div class="title">{{ title }}</div>
+  {% if body %}<div class="body">{{ body }}</div>{% endif %}
+</div></div>
+{% endblock %}

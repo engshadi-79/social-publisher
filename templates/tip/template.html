@@ -1,0 +1,13 @@
+{% extends "_base.html" %}
+{% block style %}
+.text { --base: 42px; --m: auto 0 0; }
+.card { background: rgba(11,31,58,.78); border-right: 10px solid var(--teal); border-radius: 28px; padding: 48px 52px; }
+.card .body { margin-top: .5em; }
+{% endblock %}
+{% block content %}
+<div class="badge" style="margin-top:auto;margin-bottom:28px">نصيحة</div>
+<div class="text"><div class="inner"><div class="card">
+  <div class="title">{{ title }}</div>
+  {% if body %}<div class="body">{{ body }}</div>{% endif %}
+</div></div></div>
+{% endblock %}

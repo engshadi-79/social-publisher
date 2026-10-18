@@ -1,0 +1,14 @@
+{% extends "_base.html" %}
+{% block style %}
+.frame { padding: 250px 84px 230px; }
+.text { --base: 50px; --m: 0 0 auto; }
+.title { font-size: 2em; }
+.footer { font-size: 34px; }
+{% endblock %}
+{% block content %}
+<div class="badge">{{ brand.name }}</div>
+<div class="text"><div class="inner">
+  <div class="title">{{ title }}</div>
+  {% if body %}<div class="body">{{ body }}</div>{% endif %}
+</div></div>
+{% endblock %}

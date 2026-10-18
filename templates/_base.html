@@ -1,0 +1,54 @@
+<!doctype html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="utf-8">
+<style>
+{% for f in fonts %}
+@font-face { font-family: "BrandFont"; src: url("{{ f.uri }}"); font-weight: {{ f.weight }}; font-style: normal; }
+{% endfor %}
+:root { --navy: {{ brand.colors.navy }}; --teal: {{ brand.colors.teal }}; --light: {{ brand.colors.light }}; --accent: {{ brand.colors.accent }}; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: {{ w }}px; height: {{ h }}px; overflow: hidden; }
+body { font-family: "BrandFont", "Cairo", "Segoe UI", Tahoma, sans-serif; color: var(--light); direction: rtl; }
+.canvas { position: relative; width: {{ w }}px; height: {{ h }}px; overflow: hidden;
+  background: linear-gradient(155deg, var(--navy) 0%, #0f3a4f 55%, var(--teal) 140%); }
+.bg { position: absolute; inset: 0; background-size: cover; background-position: center; }
+.overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11,31,58,.55) 0%, rgba(11,31,58,.72) 100%); }
+.frame { position: absolute; inset: 0; display: flex; flex-direction: column; padding: 90px 84px 70px; }
+.text { flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column; font-size: calc(var(--base) * var(--k, 1)); }
+.inner { margin: var(--m, auto 0); }
+.title { font-weight: 800; line-height: 1.35; font-size: 1.9em; }
+.body { margin-top: .6em; line-height: 1.7; font-weight: 400; opacity: .94; font-size: 1em; }
+.footer { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-top: 28px;
+  border-top: 3px solid rgba(255,255,255,.25); font-size: 30px; }
+.brand { display: flex; align-items: center; gap: 18px; font-weight: 700; }
+.brand img { height: 64px; width: auto; }
+.handle { color: var(--accent); font-weight: 700; direction: ltr; }
+.badge { align-self: flex-start; background: var(--teal); color: var(--navy); font-weight: 800;
+  padding: 8px 30px; border-radius: 999px; font-size: 34px; margin-bottom: 28px; }
+{% block style %}{% endblock %}
+</style>
+</head>
+<body>
+<div class="canvas">
+  {% if bg %}<div class="bg" style="background-image:url('{{ bg }}')"></div>{% endif %}
+  <div class="overlay"></div>
+  <div class="frame">
+    {% block content %}{% endblock %}
+    <div class="footer">
+      <div class="brand">{% if logo %}<img src="{{ logo }}" alt="">{% endif %}<span>{{ brand.name }}</span></div>
+      <div class="handle">{{ brand.handle }}</div>
+    </div>
+  </div>
+</div>
+<script>
+(async () => {
+  await document.fonts.ready;
+  const box = document.querySelector('.text'), inner = document.querySelector('.inner');
+  let k = 1;
+  while (inner.offsetHeight > box.clientHeight && k > 0.35) { k -= 0.03; box.style.setProperty('--k', k.toFixed(2)); }
+  window.__ready = true;
+})();
+</script>
+</body>
+</html>

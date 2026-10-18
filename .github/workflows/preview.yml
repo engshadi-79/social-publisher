@@ -1,0 +1,38 @@
+name: preview
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: playwright install --with-deps chromium
+      - name: Render previews
+        working-directory: src
+        env:
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        run: python preview.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: previews
+          path: out/*.png
+      - name: Commit generated backgrounds
+        run: |
+          git config user.name "publisher-bot"
+          git config user.email "publisher-bot@users.noreply.github.com"
+          git add content/media
+          if ! git diff --cached --quiet; then
+            git commit -m "bot: backgrounds [skip ci]"
+            git pull --rebase origin "${GITHUB_REF_NAME}"
+            git push
+          fi

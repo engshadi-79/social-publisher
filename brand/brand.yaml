@@ -1,0 +1,10 @@
+name: "اسم العلامة"
+handle: "@your_handle"
+footer: "تابعنا لمزيد من المحتوى"
+logo: brand/logo.png          # اختياري: إن لم يوجد يظهر الاسم فقط
+font: Cairo
+colors:
+  navy: "#0B1F3A"
+  teal: "#14B8A6"
+  light: "#F5F9FC"
+  accent: "#F4B942"

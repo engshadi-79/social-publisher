@@ -1,0 +1,25 @@
+- id: 2026-10-20-001
+  approved: false
+  publish_at: "2026-10-20 18:00"
+  template: tip
+  image:
+    title: "ابدأ يومك بخطة من ثلاث مهام"
+    body: "اكتب أهم ثلاث مهام قبل أن تفتح الهاتف، ثم أنجزها بالترتيب."
+    visual_prompt: "a tidy desk with an open planner and morning coffee, soft window light, calm navy and teal tones, minimal, empty space at top, no text, no letters, no words, no watermark"
+    seed: 42
+  platforms:
+    facebook: "ابدأ يومك بخطة من ثلاث مهام فقط ✅\nاكتبها قبل أن تفتح الهاتف وأنجزها بالترتيب.\n#تنظيم_الوقت #إنتاجية"
+    instagram: "ابدأ يومك بخطة من ثلاث مهام فقط ✅\n#تنظيم_الوقت #إنتاجية"
+    threads: "ابدأ يومك بثلاث مهام فقط، اكتبها قبل أن تفتح الهاتف."
+    telegram: "💡 نصيحة اليوم: ابدأ يومك بخطة من ثلاث مهام فقط."
+- id: 2026-10-21-001
+  approved: false
+  publish_at: "2026-10-21 12:00"
+  template: quote
+  image:
+    title: "الاستمرار أهم من الكمال"
+    body: "خطوة صغيرة كل يوم"
+    visual_prompt: "a quiet mountain path at sunrise, calm navy and teal tones, soft light, empty space in the center, no text, no letters, no words, no watermark"
+  platforms:
+    telegram: "«الاستمرار أهم من الكمال» — خطوة صغيرة كل يوم."
+    threads: "الاستمرار أهم من الكمال. خطوة صغيرة كل يوم."
