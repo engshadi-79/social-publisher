@@ -7,6 +7,7 @@ on:
     branches: [main]
     paths:
       - content/queue.yaml
+      - content/topics.yaml
       - brand/**
       - templates/**
       - src/dashboard*

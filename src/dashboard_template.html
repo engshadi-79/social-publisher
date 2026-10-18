@@ -34,6 +34,17 @@ h1{font-size:1.7rem;margin-bottom:4px}
 details{font-size:.88rem;color:var(--mute)}summary{cursor:pointer}
 details p{margin-top:6px;white-space:pre-wrap;color:var(--ink)}details b{color:var(--teal)}
 .empty{color:var(--mute);padding:30px;text-align:center}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:14px}
+.panel h2{font-size:1.15rem;margin-bottom:8px}
+.tp{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line)}
+.tp small{color:var(--mute);display:block}
+label{display:block;font-size:.92rem;margin:10px 0 3px}
+input,textarea{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+button.act{font:inherit;background:var(--teal);color:#06201d;border:0;border-radius:8px;padding:8px 18px;cursor:pointer;font-weight:700;margin-top:12px}
+button.del{font:inherit;background:transparent;color:var(--bad);border:1px solid var(--bad);border-radius:8px;padding:2px 12px;cursor:pointer}
+.msg{margin-top:10px;font-size:.92rem}.msg.ok{color:var(--ok)}.msg.no{color:var(--bad)}
+.hint{color:var(--mute);font-size:.88rem}
+ol{padding-inline-start:20px;color:var(--mute);font-size:.9rem}
 @media (max-width:560px){.post{flex-direction:column}.post img{width:100%;height:210px}}
 </style>
 </head>
@@ -51,10 +62,50 @@ details p{margin-top:6px;white-space:pre-wrap;color:var(--ink)}details b{color:v
 </div>
 
 <div class="tabs" id="tabs">
-  {% for key,label in [("all","الكل"),("upcoming","سيُنشر"),("published","تم نشره"),("draft","بانتظار موافقتك"),("failed","فيه مشكلة")] %}
+  {% for key,label in [("all","الكل"),("upcoming","سيُنشر"),("published","تم نشره"),("draft","بانتظار موافقتك"),("failed","فيه مشكلة"),("topics","المواضيع")] %}
   <button data-f="{{ key }}" aria-pressed="{{ 'true' if key=='all' else 'false' }}">{{ label }}</button>
   {% endfor %}
 </div>
+
+<section id="topicsPanel" hidden>
+  <div class="panel">
+    <h2>المواضيع المسموح بنشرها</h2>
+    <p class="hint">لا يُنشر منشور معتمد خارج هذه القائمة. {% if not topics %}القائمة فارغة حالياً، فلا قيد على المواضيع إلى أن تضيف أول موضوع.{% endif %}</p>
+    <div id="topicList">
+    {% for t in topics %}
+    <div class="tp"><div><b>{{ t.name }}</b><small>{{ t.description }}</small>
+      <small>الجمهور: {{ t.audience or "—" }} · النبرة: {{ t.tone or "—" }}</small>
+      <small>{{ (t.hashtags_fixed or [])|join("  ") }}</small></div>
+      <button class="del" data-del="{{ t.id }}">حذف</button></div>
+    {% endfor %}
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>إضافة موضوع</h2>
+    <label>اسم الموضوع *</label><input id="fName" placeholder="مثل: الهندسة المدنية">
+    <label>ماذا يتناول؟</label><textarea id="fDesc" rows="2" placeholder="مثل: نصائح عملية للمهندسين الشباب"></textarea>
+    <label>الجمهور</label><input id="fAud" placeholder="مثل: مهندسون وطلاب">
+    <label>نبرة الكلام</label><input id="fTone" placeholder="مثل: مهنية وودّية">
+    <label>هاشتاجات ثابتة (اختياري، افصل بمسافة)</label><input id="fTags" placeholder="#هندسة #مهندسين">
+    <button class="act" id="fAdd">إضافة الموضوع</button>
+    <div class="msg" id="fMsg"></div>
+  </div>
+
+  <div class="panel">
+    <h2>ربط GitHub (مرة واحدة)</h2>
+    <p class="hint">الإضافة والحذف يحتاجان إذناً بالتعديل على المستودع. يبقى المفتاح في متصفحك فقط، ولا يُرسل إلا إلى GitHub.</p>
+    <ol>
+      <li>افتح <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">إنشاء مفتاح جديد</a> (Fine-grained).</li>
+      <li>اختر أطول مدة انتهاء، و<b>Only select repositories</b> ثم <b>social-publisher</b>.</li>
+      <li>Permissions ← Repository ← <b>Contents: Read and write</b>، ثم أنشئه وانسخه.</li>
+      <li>الصقه هنا واضغط حفظ.</li>
+    </ol>
+    <label>المفتاح</label><input id="tok" type="password" autocomplete="off" placeholder="github_pat_...">
+    <label style="display:flex;gap:8px;align-items:center"><input id="remember" type="checkbox" style="width:auto"> تذكّر المفتاح على هذا الجهاز</label>
+    <button class="act" id="tokSave">حفظ المفتاح</button><span class="msg" id="tokMsg"></span>
+  </div>
+</section>
 
 <div class="list" id="grid">
 {% for p in posts %}
@@ -81,8 +132,9 @@ details p{margin-top:6px;white-space:pre-wrap;color:var(--ink)}details b{color:v
 </div>
 <script>
 const tabs=document.querySelectorAll('#tabs button'),posts=document.querySelectorAll('.post'),empty=document.getElementById('empty');
-function show(f){let n=0;posts.forEach(p=>{const ok=f==='all'||p.dataset.s===f;p.hidden=!ok;if(ok)n++});empty.hidden=n>0;tabs.forEach(b=>b.setAttribute('aria-pressed',b.dataset.f===f))}
+function show(f){const tp=f==='topics';document.getElementById('topicsPanel').hidden=!tp;document.getElementById('grid').hidden=tp;let n=0;posts.forEach(p=>{const ok=!tp&&(f==='all'||p.dataset.s===f);p.hidden=!ok;if(ok)n++});empty.hidden=tp||n>0;tabs.forEach(b=>b.setAttribute('aria-pressed',b.dataset.f===f))}
 tabs.forEach(b=>b.onclick=()=>show(b.dataset.f));
 </script>
+<script>{{ topics_js|safe }}</script>
 </body>
 </html>

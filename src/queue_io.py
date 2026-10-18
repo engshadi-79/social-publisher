@@ -87,7 +87,9 @@ def validate(queue: list[dict]) -> list[str]:
         elif not (img.get("visual_prompt") or img.get("photo_query")):
             errors.append(f"{tag} image.visual_prompt مفقود (سيُستعمل خلفية متدرجة فقط)")
         if topic_ids and p.get("topic") not in topic_ids:
-            errors.append(f"{tag} الموضوع «{p.get('topic')}» خارج القائمة المسموحة في topics.yaml ({', '.join(sorted(topic_ids))})")
+            # المسودة لا توقف النشر؛ أما المنشور المعتمد خارج القائمة فيُرفض
+            note = "" if p.get("approved") is True else " (مسودة)"
+            errors.append(f"{tag} الموضوع «{p.get('topic')}» خارج القائمة المسموحة في topics.yaml ({', '.join(sorted(topic_ids))}){note}")
         plats = p.get("platforms")
         if not isinstance(plats, dict) or not plats:
             errors.append(f"{tag} platforms فارغة")
@@ -104,4 +106,4 @@ def validate(queue: list[dict]) -> list[str]:
 
 
 def fatal(errors: list[str]) -> list[str]:
-    return [e for e in errors if "visual_prompt مفقود" not in e]
+    return [e for e in errors if "visual_prompt مفقود" not in e and not e.endswith("(مسودة)")]
