@@ -45,6 +45,8 @@ button.del{font:inherit;background:transparent;color:var(--bad);border:1px solid
 .msg{margin-top:10px;font-size:.92rem}.msg.ok{color:var(--ok)}.msg.no{color:var(--bad)}
 .hint{color:var(--mute);font-size:.88rem}
 ol{padding-inline-start:20px;color:var(--mute);font-size:.9rem}
+select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+.acts{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.acts button.act{margin-top:0;padding:5px 14px}
 @media (max-width:560px){.post{flex-direction:column}.post img{width:100%;height:210px}}
 </style>
 </head>
@@ -62,7 +64,7 @@ ol{padding-inline-start:20px;color:var(--mute);font-size:.9rem}
 </div>
 
 <div class="tabs" id="tabs">
-  {% for key,label in [("all","الكل"),("upcoming","سيُنشر"),("published","تم نشره"),("draft","بانتظار موافقتك"),("failed","فيه مشكلة"),("topics","المواضيع")] %}
+  {% for key,label in [("all","الكل"),("upcoming","سيُنشر"),("published","تم نشره"),("draft","بانتظار موافقتك"),("failed","فيه مشكلة"),("topics","المواضيع"),("addpost","إضافة منشور")] %}
   <button data-f="{{ key }}" aria-pressed="{{ 'true' if key=='all' else 'false' }}">{{ label }}</button>
   {% endfor %}
 </div>
@@ -92,18 +94,41 @@ ol{padding-inline-start:20px;color:var(--mute);font-size:.9rem}
     <div class="msg" id="fMsg"></div>
   </div>
 
+</section>
+
+<section id="postPanel" hidden>
   <div class="panel">
-    <h2>ربط GitHub (مرة واحدة)</h2>
-    <p class="hint">الإضافة والحذف يحتاجان إذناً بالتعديل على المستودع. يبقى المفتاح في متصفحك فقط، ولا يُرسل إلا إلى GitHub.</p>
-    <ol>
-      <li>افتح <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">إنشاء مفتاح جديد</a> (Fine-grained).</li>
-      <li>اختر أطول مدة انتهاء، و<b>Only select repositories</b> ثم <b>social-publisher</b>.</li>
-      <li>Permissions ← Repository ← <b>Contents: Read and write</b>، ثم أنشئه وانسخه.</li>
-      <li>الصقه هنا واضغط حفظ.</li>
-    </ol>
-    <label>المفتاح</label><input id="tok" type="password" autocomplete="off" placeholder="github_pat_...">
-    <label style="display:flex;gap:8px;align-items:center"><input id="remember" type="checkbox" style="width:auto"> تذكّر المفتاح على هذا الجهاز</label>
-    <button class="act" id="tokSave">حفظ المفتاح</button><span class="msg" id="tokMsg"></span>
+    <h2>إضافة منشور جديد</h2>
+    <p class="hint">يُحفظ كمسودة، وخلال دقيقتين تراه بصورته في «بانتظار موافقتك»، ثم توافق عليه من بطاقته.</p>
+    {% if topics %}
+    <label>الموضوع *</label>
+    <select id="pTopic"><option value="">— اختر —</option>{% for t in topics %}<option value="{{ t.id }}">{{ t.name }}</option>{% endfor %}</select>
+    {% endif %}
+    <label>شكل الصورة</label>
+    <select id="pTemplate">
+      <option value="photo">صورة كاملة والنص أسفلها (مقترح)</option>
+      <option value="split">الصورة أعلى ولوحة نص أسفلها</option>
+      <option value="tip">نصيحة (بطاقة)</option>
+      <option value="quote">اقتباس</option>
+      <option value="announcement">إعلان</option>
+      <option value="story">ستوري (عمودي)</option>
+    </select>
+    <label>العنوان الذي يظهر على الصورة *</label><input id="pTitle" placeholder="جملة قصيرة وواضحة">
+    <label>نص صغير تحت العنوان (اختياري)</label><input id="pBody">
+    <label>كلمات إنجليزية للصورة الحقيقية * <span class="hint">(2 إلى 4 كلمات)</span></label><input id="pQuery" dir="ltr" placeholder="civil engineer construction site">
+    <label>وصف بديل للصورة بالإنجليزية (اختياري)</label><textarea id="pVP" dir="ltr" rows="2"></textarea>
+    <label>موعد النشر *</label><input id="pWhen" type="datetime-local">
+    <label>المنصات</label>
+    <div style="display:flex;flex-wrap:wrap;gap:14px">
+      <label style="display:flex;gap:6px;align-items:center;margin:0"><input id="pl_facebook" type="checkbox" checked style="width:auto"> فيسبوك</label>
+      <label style="display:flex;gap:6px;align-items:center;margin:0"><input id="pl_instagram" type="checkbox" checked style="width:auto"> إنستغرام</label>
+      <label style="display:flex;gap:6px;align-items:center;margin:0"><input id="pl_threads" type="checkbox" checked style="width:auto"> ثريدز</label>
+      <label style="display:flex;gap:6px;align-items:center;margin:0"><input id="pl_telegram" type="checkbox" style="width:auto"> تيليجرام</label>
+    </div>
+    <label>نص المنشور (مع الهاشتاجات) *</label><textarea id="pText" rows="5"></textarea>
+    <div class="hint" id="pCount">0 حرفاً</div>
+    <button class="act" id="pAdd">حفظ كمسودة</button>
+    <div class="msg" id="pMsg"></div>
   </div>
 </section>
 
@@ -121,6 +146,13 @@ ol{padding-inline-start:20px;color:var(--mute);font-size:.9rem}
       {% endfor %}
     </div>
     {% for c in p.chips if c.error %}<div class="err">{{ c.label }}: {{ c.error }}</div>{% endfor %}
+    <div class="acts">
+      {% if p.group == "draft" %}<button class="act" data-act="approve" data-id="{{ p.id }}">✅ موافقة على النشر</button>
+      <button class="del" data-act="del" data-id="{{ p.id }}">حذف</button>
+      {% elif p.group == "upcoming" %}<button class="del" data-act="unapprove" data-id="{{ p.id }}">إلغاء الموافقة</button>
+      <button class="del" data-act="del" data-id="{{ p.id }}">حذف</button>{% endif %}
+      <span class="actmsg msg"></span>
+    </div>
     <details><summary>عرض نص المنشور على كل منصة</summary>
       {% for c in p.chips %}<p><b>{{ c.label }}</b><br>{{ c.text }}</p>{% endfor %}
     </details>
@@ -129,10 +161,25 @@ ol{padding-inline-start:20px;color:var(--mute);font-size:.9rem}
 {% endfor %}
 </div>
 <div class="empty" id="empty" hidden>لا توجد منشورات هنا.</div>
+
+  <div class="panel">
+  <h2>ربط GitHub (مرة واحدة — للإضافة والموافقة والحذف)</h2>
+  <p class="hint">الإضافة والحذف يحتاجان إذناً بالتعديل على المستودع. يبقى المفتاح في متصفحك فقط، ولا يُرسل إلا إلى GitHub.</p>
+  <ol>
+    <li>افتح <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">إنشاء مفتاح جديد</a> (Fine-grained).</li>
+    <li>اختر أطول مدة انتهاء، و<b>Only select repositories</b> ثم <b>social-publisher</b>.</li>
+    <li>Permissions ← Repository ← <b>Contents: Read and write</b>، ثم أنشئه وانسخه.</li>
+    <li>الصقه هنا واضغط حفظ.</li>
+  </ol>
+  <label>المفتاح</label><input id="tok" type="password" autocomplete="off" placeholder="github_pat_...">
+  <label style="display:flex;gap:8px;align-items:center"><input id="remember" type="checkbox" style="width:auto"> تذكّر المفتاح على هذا الجهاز</label>
+  <button class="act" id="tokSave">حفظ المفتاح</button><span class="msg" id="tokMsg"></span>
+</div>
+
 </div>
 <script>
 const tabs=document.querySelectorAll('#tabs button'),posts=document.querySelectorAll('.post'),empty=document.getElementById('empty');
-function show(f){const tp=f==='topics';document.getElementById('topicsPanel').hidden=!tp;document.getElementById('grid').hidden=tp;let n=0;posts.forEach(p=>{const ok=!tp&&(f==='all'||p.dataset.s===f);p.hidden=!ok;if(ok)n++});empty.hidden=tp||n>0;tabs.forEach(b=>b.setAttribute('aria-pressed',b.dataset.f===f))}
+function show(f){const tp=f==='topics'||f==='addpost';document.getElementById('topicsPanel').hidden=f!=='topics';document.getElementById('postPanel').hidden=f!=='addpost';document.getElementById('grid').hidden=tp;let n=0;posts.forEach(p=>{const ok=!tp&&(f==='all'||p.dataset.s===f);p.hidden=!ok;if(ok)n++});empty.hidden=tp||n>0;tabs.forEach(b=>b.setAttribute('aria-pressed',b.dataset.f===f))}
 tabs.forEach(b=>b.onclick=()=>show(b.dataset.f));
 </script>
 <script>{{ topics_js|safe }}</script>

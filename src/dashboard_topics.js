@@ -1,11 +1,12 @@
-// ---- إدارة المواضيع عبر GitHub API (يُدرَج داخل اللوحة) ----
-const REPO = "__REPO__", FILE = "content/topics.yaml";
+// ---- إدارة المواضيع والمنشورات عبر GitHub API (يُدرَج داخل اللوحة) ----
+const REPO = "__REPO__", TFILE = "content/topics.yaml", QFILE = "content/queue.yaml";
 const getTok = () => { try { return localStorage.getItem("gh_tok") || sessionStorage.getItem("gh_tok") || ""; } catch (e) { return ""; } };
 const setTok = (v, keep) => { try { sessionStorage.setItem("gh_tok", v); keep ? localStorage.setItem("gh_tok", v) : localStorage.removeItem("gh_tok"); } catch (e) {} };
 const b64d = (b) => new TextDecoder().decode(Uint8Array.from(atob(b.replace(/\n/g, "")), (c) => c.charCodeAt(0)));
 const b64e = (s) => { let bin = ""; new TextEncoder().encode(s).forEach((x) => (bin += String.fromCharCode(x))); return btoa(bin); };
 const q = (s) => JSON.stringify(s);
 
+// ---------- المواضيع ----------
 function addBlock(text, t) {
   const tags = (t.tags || []).map(q).join(", ");
   const block = "  - id: " + q(t.id) + "\n    name: " + q(t.name) + "\n    description: " + q(t.description) +
@@ -27,6 +28,39 @@ function removeBlock(text, id) {
   return x;
 }
 
+// ---------- المنشورات (queue.yaml) ----------
+const idOf = (l) => l.replace(/^- id:\s*"?/, "").replace(/"?\s*$/, "");
+function postRange(lines, id) {
+  const s = lines.findIndex((l) => /^- id:/.test(l) && idOf(l) === id);
+  if (s < 0) throw new Error("لم أجد المنشور في الطابور (ربما حُذف).");
+  let e = lines.length;
+  for (let i = s + 1; i < lines.length; i++) if (/^- id:/.test(lines[i])) { e = i; break; }
+  return [s, e];
+}
+function setApproved(text, id, val) {
+  const lines = text.split("\n"), [s, e] = postRange(lines, id);
+  for (let i = s; i < e; i++) if (/^  approved:/.test(lines[i])) { lines[i] = "  approved: " + val; return lines.join("\n"); }
+  throw new Error("بنية المنشور غير متوقعة.");
+}
+function removePost(text, id) {
+  const lines = text.split("\n"), [s, e] = postRange(lines, id);
+  lines.splice(s, e - s);
+  return lines.join("\n");
+}
+function addPost(text, p) {
+  let b = "- id: " + q(p.id) + "\n  approved: false\n  publish_at: " + q(p.when) + "\n  template: " + p.template + "\n";
+  if (p.topic) b += "  topic: " + q(p.topic) + "\n";
+  b += "  image:\n    title: " + q(p.title) + "\n    body: " + q(p.body) + "\n";
+  if (p.query) b += "    photo_query: " + q(p.query) + "\n";
+  if (p.vp) b += "    visual_prompt: " + q(p.vp) + "\n";
+  b += "    seed: " + p.seed + "\n  platforms:\n";
+  for (const k of p.platforms) b += "    " + k + ": " + q(p.text) + "\n";
+  let x = text.replace(/^\[\][ \t]*$/m, "");
+  if (x.length && !x.endsWith("\n")) x += "\n";
+  return x + b;
+}
+
+// ---------- GitHub ----------
 async function gh(path, opt) {
   const r = await fetch("https://api.github.com/repos/" + REPO + "/" + path, Object.assign({}, opt, {
     headers: { Authorization: "Bearer " + getTok(), Accept: "application/vnd.github+json", "Content-Type": "application/json" } }));
@@ -35,12 +69,12 @@ async function gh(path, opt) {
   if (!r.ok) throw new Error("تعذّر الاتصال بـ GitHub (" + r.status + ").");
   return r.json();
 }
-
-async function edit(fn, msg) {
-  if (!getTok()) throw new Error("ألصق مفتاح GitHub أولاً في قسم «ربط GitHub» أدناه.");
-  const f = await gh("contents/" + FILE);
+async function edit(fn, msg, file) {
+  file = file || TFILE;
+  if (!getTok()) throw new Error("ألصق مفتاح GitHub أولاً في قسم «ربط GitHub» أسفل الصفحة.");
+  const f = await gh("contents/" + file);
   const text = fn(b64d(f.content));
-  await gh("contents/" + FILE, { method: "PUT", body: JSON.stringify({ message: msg, content: b64e(text), sha: f.sha }) });
+  await gh("contents/" + file, { method: "PUT", body: JSON.stringify({ message: msg, content: b64e(text), sha: f.sha }) });
 }
 
 const $ = (id) => document.getElementById(id);
@@ -52,6 +86,7 @@ $("tokSave").onclick = () => {
   say($("tokMsg"), "تم حفظ المفتاح في هذا المتصفح.", true);
 };
 
+// ---- مواضيع ----
 $("fAdd").onclick = async () => {
   const m = $("fMsg"), v = (i) => $(i).value.trim();
   if (!v("fName")) { say(m, "اكتب اسم الموضوع.", false); return; }
@@ -59,17 +94,55 @@ $("fAdd").onclick = async () => {
   const t = { id: "t" + Date.now().toString(36), name: v("fName"), description: v("fDesc"), audience: v("fAud"), tone: v("fTone"), tags };
   try {
     say(m, "جارٍ الحفظ…", true);
-    await edit((x) => addBlock(x, t), "topics: add " + t.id);
+    await edit((x) => addBlock(x, t), "topics: add " + t.id, TFILE);
     say(m, "تمت الإضافة ✅ ستظهر في القائمة بعد دقيقة تقريباً (تُحدَّث اللوحة تلقائياً).", true);
     ["fName", "fDesc", "fAud", "fTone", "fTags"].forEach((i) => ($(i).value = ""));
   } catch (e) { say(m, e.message, false); }
 };
-
 $("topicList").onclick = async (e) => {
   const id = e.target.dataset && e.target.dataset.del;
   if (!id || !confirm("حذف هذا الموضوع؟")) return;
   try {
-    await edit((x) => removeBlock(x, id), "topics: remove " + id);
+    await edit((x) => removeBlock(x, id), "topics: remove " + id, TFILE);
     e.target.closest(".tp").remove(); say($("fMsg"), "تم الحذف ✅", true);
   } catch (err) { say($("fMsg"), err.message, false); }
 };
+
+// ---- منشورات: إضافة ----
+const updCount = () => { const n = $("pText").value.length; $("pCount").textContent = n + " حرفاً" + (n > 500 && $("pl_threads").checked ? " — ثريدز حدّه 500!" : ""); };
+$("pText").oninput = updCount; $("pl_threads").onchange = updCount;
+$("pAdd").onclick = async () => {
+  const m = $("pMsg"), v = (i) => $(i).value.trim();
+  const plats = ["facebook", "instagram", "threads", "telegram"].filter((k) => $("pl_" + k).checked);
+  const when = v("pWhen").replace("T", " ");
+  const err = !v("pTitle") ? "اكتب عنوان الصورة." : !v("pText") ? "اكتب نص المنشور." : !plats.length ? "اختر منصة واحدة على الأقل." :
+    !when ? "اختر موعد النشر." : !(v("pQuery") || v("pVP")) ? "اكتب كلمات إنجليزية للصورة (مثل: engineer construction site)." :
+    ($("pTopic") && !v("pTopic")) ? "اختر الموضوع." :
+    (plats.includes("threads") && v("pText").length > 500) ? "نص ثريدز يجب ألا يتجاوز 500 حرف." :
+    (plats.includes("instagram") && v("pText").length > 2200) ? "نص إنستغرام يجب ألا يتجاوز 2200 حرف." : "";
+  if (err) { say(m, err, false); return; }
+  const d = when.slice(0, 10);
+  const p = { id: d + "-w" + Date.now().toString(36).slice(-4), when, template: $("pTemplate").value, topic: $("pTopic") ? v("pTopic") : "",
+    title: v("pTitle"), body: v("pBody"), query: v("pQuery"), vp: v("pVP"), seed: 1 + Math.floor(Math.random() * 90), platforms: plats, text: v("pText") };
+  try {
+    say(m, "جارٍ الحفظ…", true);
+    await edit((x) => addPost(x, p), "queue: add " + p.id, QFILE);
+    say(m, "أُضيف كمسودة ✅ خلال دقيقتين تظهر بصورتها في «بانتظار موافقتك» لتراجعها ثم توافق.", true);
+    ["pTitle", "pBody", "pQuery", "pVP", "pText"].forEach((i) => ($(i).value = "")); updCount();
+  } catch (e2) { say(m, e2.message, false); }
+};
+
+// ---- منشورات: موافقة / إلغاء / حذف (أزرار البطاقات) ----
+document.addEventListener("click", async (e) => {
+  const b = e.target.closest("[data-act]"); if (!b) return;
+  const id = b.dataset.id, act = b.dataset.act, out = b.closest(".post").querySelector(".actmsg");
+  if (act === "del" && !confirm("حذف هذا المنشور من الطابور؟")) return;
+  try {
+    say(out, "جارٍ الحفظ…", true);
+    if (act === "approve") await edit((x) => setApproved(x, id, "true"), "queue: approve " + id, QFILE);
+    if (act === "unapprove") await edit((x) => setApproved(x, id, "false"), "queue: unapprove " + id, QFILE);
+    if (act === "del") await edit((x) => removePost(x, id), "queue: remove " + id, QFILE);
+    say(out, act === "approve" ? "تمت الموافقة ✅ سيُنشر في موعده (يفحص النظام كل 30 دقيقة)." : act === "unapprove" ? "أُلغيت الموافقة ✅" : "حُذف ✅", true);
+    b.parentElement.querySelectorAll("button").forEach((x) => (x.disabled = true));
+  } catch (err) { say(out, err.message, false); }
+});
