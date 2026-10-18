@@ -40,7 +40,8 @@ def upload(files: list[Path]) -> dict[str, str]:
             shutil.copy2(f, tmp / "images" / f.name)
         _git("add", "-A", cwd=tmp)
         if _git("status", "--porcelain", cwd=tmp).stdout.strip():
-            _git("commit", "-m", "images [skip ci]", cwd=tmp)
+            _git("-c", "user.name=publisher-bot", "-c", "user.email=publisher-bot@users.noreply.github.com",
+                 "commit", "-m", "images [skip ci]", cwd=tmp)
             _git("push", "origin", "HEAD:refs/heads/gh-pages", cwd=tmp)
     finally:
         _git("worktree", "remove", "--force", str(tmp), check=False)
