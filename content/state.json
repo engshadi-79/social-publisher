@@ -1,0 +1,14 @@
+{
+  "2026-10-18-test1": {
+    "facebook": {
+      "attempts": 1,
+      "error": "فشل الاستضافة: CalledProcessError: Command '['git', 'commit', '-m', 'images [skip ci]']' returned non-zero exit status 128.",
+      "status": "retry"
+    },
+    "instagram": {
+      "attempts": 1,
+      "error": "فشل الاستضافة: CalledProcessError: Command '['git', 'commit', '-m', 'images [skip ci]']' returned non-zero exit status 128.",
+      "status": "retry"
+    }
+  }
+}
