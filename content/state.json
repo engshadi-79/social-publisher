@@ -17,7 +17,7 @@
   },
   "2026-10-18-test2": {
     "threads": {
-      "attempts": 1,
+      "attempts": 2,
       "error": "PublishError: THREADS_USER_ID/THREADS_TOKEN غير مضبوطين",
       "status": "retry"
     }
