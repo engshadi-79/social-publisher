@@ -34,13 +34,24 @@ h1{font-size:1.7rem;margin-bottom:4px}
 details{font-size:.88rem;color:var(--mute)}summary{cursor:pointer}
 details p{margin-top:6px;white-space:pre-wrap;color:var(--ink)}details b{color:var(--teal)}
 .empty{color:var(--mute);padding:30px;text-align:center}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:14px}
+.panel h2{font-size:1.15rem;margin-bottom:8px}
+.tp{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line)}
+.tp small{color:var(--mute);display:block}
+label{display:block;font-size:.92rem;margin:10px 0 3px}
+input,textarea{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+button.act{font:inherit;background:var(--teal);color:#06201d;border:0;border-radius:8px;padding:8px 18px;cursor:pointer;font-weight:700;margin-top:12px}
+button.del{font:inherit;background:transparent;color:var(--bad);border:1px solid var(--bad);border-radius:8px;padding:2px 12px;cursor:pointer}
+.msg{margin-top:10px;font-size:.92rem}.msg.ok{color:var(--ok)}.msg.no{color:var(--bad)}
+.hint{color:var(--mute);font-size:.88rem}
+ol{padding-inline-start:20px;color:var(--mute);font-size:.9rem}
 @media (max-width:560px){.post{flex-direction:column}.post img{width:100%;height:210px}}
 </style>
 </head>
 <body>
 <div class="wrap">
 <h1>لوحة النشر</h1>
-<div class="upd">آخر تحديث: <bdi dir="ltr">2026-10-18 20:27</bdi></div>
+<div class="upd">آخر تحديث: <bdi dir="ltr">2026-10-18 20:36</bdi></div>
 
 <div class="summary">لا يوجد أي منشور مجدول حالياً. 2 منشور ينتظر موافقتك ولن يُنشر قبلها.</div>
 
@@ -62,7 +73,44 @@ details p{margin-top:6px;white-space:pre-wrap;color:var(--ink)}details b{color:v
   
   <button data-f="failed" aria-pressed="false">فيه مشكلة</button>
   
+  <button data-f="topics" aria-pressed="false">المواضيع</button>
+  
 </div>
+
+<section id="topicsPanel" hidden>
+  <div class="panel">
+    <h2>المواضيع المسموح بنشرها</h2>
+    <p class="hint">لا يُنشر منشور معتمد خارج هذه القائمة. القائمة فارغة حالياً، فلا قيد على المواضيع إلى أن تضيف أول موضوع.</p>
+    <div id="topicList">
+    
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>إضافة موضوع</h2>
+    <label>اسم الموضوع *</label><input id="fName" placeholder="مثل: الهندسة المدنية">
+    <label>ماذا يتناول؟</label><textarea id="fDesc" rows="2" placeholder="مثل: نصائح عملية للمهندسين الشباب"></textarea>
+    <label>الجمهور</label><input id="fAud" placeholder="مثل: مهندسون وطلاب">
+    <label>نبرة الكلام</label><input id="fTone" placeholder="مثل: مهنية وودّية">
+    <label>هاشتاجات ثابتة (اختياري، افصل بمسافة)</label><input id="fTags" placeholder="#هندسة #مهندسين">
+    <button class="act" id="fAdd">إضافة الموضوع</button>
+    <div class="msg" id="fMsg"></div>
+  </div>
+
+  <div class="panel">
+    <h2>ربط GitHub (مرة واحدة)</h2>
+    <p class="hint">الإضافة والحذف يحتاجان إذناً بالتعديل على المستودع. يبقى المفتاح في متصفحك فقط، ولا يُرسل إلا إلى GitHub.</p>
+    <ol>
+      <li>افتح <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">إنشاء مفتاح جديد</a> (Fine-grained).</li>
+      <li>اختر أطول مدة انتهاء، و<b>Only select repositories</b> ثم <b>social-publisher</b>.</li>
+      <li>Permissions ← Repository ← <b>Contents: Read and write</b>، ثم أنشئه وانسخه.</li>
+      <li>الصقه هنا واضغط حفظ.</li>
+    </ol>
+    <label>المفتاح</label><input id="tok" type="password" autocomplete="off" placeholder="github_pat_...">
+    <label style="display:flex;gap:8px;align-items:center"><input id="remember" type="checkbox" style="width:auto"> تذكّر المفتاح على هذا الجهاز</label>
+    <button class="act" id="tokSave">حفظ المفتاح</button><span class="msg" id="tokMsg"></span>
+  </div>
+</section>
 
 <div class="list" id="grid">
 
@@ -118,8 +166,84 @@ details p{margin-top:6px;white-space:pre-wrap;color:var(--ink)}details b{color:v
 </div>
 <script>
 const tabs=document.querySelectorAll('#tabs button'),posts=document.querySelectorAll('.post'),empty=document.getElementById('empty');
-function show(f){let n=0;posts.forEach(p=>{const ok=f==='all'||p.dataset.s===f;p.hidden=!ok;if(ok)n++});empty.hidden=n>0;tabs.forEach(b=>b.setAttribute('aria-pressed',b.dataset.f===f))}
+function show(f){const tp=f==='topics';document.getElementById('topicsPanel').hidden=!tp;document.getElementById('grid').hidden=tp;let n=0;posts.forEach(p=>{const ok=!tp&&(f==='all'||p.dataset.s===f);p.hidden=!ok;if(ok)n++});empty.hidden=tp||n>0;tabs.forEach(b=>b.setAttribute('aria-pressed',b.dataset.f===f))}
 tabs.forEach(b=>b.onclick=()=>show(b.dataset.f));
+</script>
+<script>// ---- إدارة المواضيع عبر GitHub API (يُدرَج داخل اللوحة) ----
+const REPO = "engshadi-79/social-publisher", FILE = "content/topics.yaml";
+const getTok = () => { try { return localStorage.getItem("gh_tok") || sessionStorage.getItem("gh_tok") || ""; } catch (e) { return ""; } };
+const setTok = (v, keep) => { try { sessionStorage.setItem("gh_tok", v); keep ? localStorage.setItem("gh_tok", v) : localStorage.removeItem("gh_tok"); } catch (e) {} };
+const b64d = (b) => new TextDecoder().decode(Uint8Array.from(atob(b.replace(/\n/g, "")), (c) => c.charCodeAt(0)));
+const b64e = (s) => { let bin = ""; new TextEncoder().encode(s).forEach((x) => (bin += String.fromCharCode(x))); return btoa(bin); };
+const q = (s) => JSON.stringify(s);
+
+function addBlock(text, t) {
+  const tags = (t.tags || []).map(q).join(", ");
+  const block = "  - id: " + q(t.id) + "\n    name: " + q(t.name) + "\n    description: " + q(t.description) +
+    "\n    audience: " + q(t.audience) + "\n    tone: " + q(t.tone) + "\n    hashtags_fixed: [" + tags + "]\n";
+  let x = text.replace(/^topics:[ \t]*\[\][ \t]*$/m, "topics:");
+  if (!x.endsWith("\n")) x += "\n";
+  return x + block;
+}
+
+function removeBlock(text, id) {
+  const out = []; let skip = false;
+  for (const l of text.split("\n")) {
+    if (/^  - id:/.test(l)) skip = l.replace(/^  - id:\s*"?/, "").replace(/"?\s*$/, "") === id;
+    else if (skip && /^\S/.test(l)) skip = false;
+    if (!skip) out.push(l);
+  }
+  let x = out.join("\n");
+  if (!/^  - id:/m.test(x)) x = x.replace(/^topics:[ \t]*$/m, "topics: []");
+  return x;
+}
+
+async function gh(path, opt) {
+  const r = await fetch("https://api.github.com/repos/" + REPO + "/" + path, Object.assign({}, opt, {
+    headers: { Authorization: "Bearer " + getTok(), Accept: "application/vnd.github+json", "Content-Type": "application/json" } }));
+  if ([401, 403, 404].includes(r.status)) throw new Error("المفتاح غير صالح أو صلاحيته ناقصة (يلزم Contents: Read and write على هذا المستودع).");
+  if ([409, 422].includes(r.status)) throw new Error("تعارض أثناء الحفظ، أعد المحاولة.");
+  if (!r.ok) throw new Error("تعذّر الاتصال بـ GitHub (" + r.status + ").");
+  return r.json();
+}
+
+async function edit(fn, msg) {
+  if (!getTok()) throw new Error("ألصق مفتاح GitHub أولاً في قسم «ربط GitHub» أدناه.");
+  const f = await gh("contents/" + FILE);
+  const text = fn(b64d(f.content));
+  await gh("contents/" + FILE, { method: "PUT", body: JSON.stringify({ message: msg, content: b64e(text), sha: f.sha }) });
+}
+
+const $ = (id) => document.getElementById(id);
+const say = (el, t, ok) => { el.textContent = t; el.className = "msg " + (ok ? "ok" : "no"); };
+
+$("tokSave").onclick = () => {
+  const v = $("tok").value.trim(); if (!v) return;
+  setTok(v, $("remember").checked); $("tok").value = "";
+  say($("tokMsg"), "تم حفظ المفتاح في هذا المتصفح.", true);
+};
+
+$("fAdd").onclick = async () => {
+  const m = $("fMsg"), v = (i) => $(i).value.trim();
+  if (!v("fName")) { say(m, "اكتب اسم الموضوع.", false); return; }
+  const tags = v("fTags").split(/[\s,،]+/).filter(Boolean).map((x) => (x.startsWith("#") ? x : "#" + x));
+  const t = { id: "t" + Date.now().toString(36), name: v("fName"), description: v("fDesc"), audience: v("fAud"), tone: v("fTone"), tags };
+  try {
+    say(m, "جارٍ الحفظ…", true);
+    await edit((x) => addBlock(x, t), "topics: add " + t.id);
+    say(m, "تمت الإضافة ✅ ستظهر في القائمة بعد دقيقة تقريباً (تُحدَّث اللوحة تلقائياً).", true);
+    ["fName", "fDesc", "fAud", "fTone", "fTags"].forEach((i) => ($(i).value = ""));
+  } catch (e) { say(m, e.message, false); }
+};
+
+$("topicList").onclick = async (e) => {
+  const id = e.target.dataset && e.target.dataset.del;
+  if (!id || !confirm("حذف هذا الموضوع؟")) return;
+  try {
+    await edit((x) => removeBlock(x, id), "topics: remove " + id);
+    e.target.closest(".tp").remove(); say($("fMsg"), "تم الحذف ✅", true);
+  } catch (err) { say($("fMsg"), err.message, false); }
+};
 </script>
 </body>
 </html>
