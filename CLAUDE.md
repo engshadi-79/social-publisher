@@ -170,7 +170,7 @@ Extra secrets: `CF_ACCOUNT_ID`, `CF_API_TOKEN` (token with Workers AI permission
 ## Secrets (GitHub Actions)
 `FB_PAGE_ID`, `FB_PAGE_TOKEN`, `IG_USER_ID`, `THREADS_USER_ID`, `THREADS_TOKEN`,
 `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHANNEL_ID`, `TELEGRAM_OWNER_CHAT_ID`, `GH_PAT`,
-optional `GEMINI_API_KEY` (paid API tier only), optional `PEXELS_API_KEY` (free, real photos).
+optional `GEMINI_API_KEY` (paid API tier only), optional `PEXELS_API_KEY` / `PIXABAY_API_KEY` (free, real photos).
 
 ## Weekly content workflow (done by Claude Code with the owner)
 When the owner says "جهّز منشورات الأسبوع" (prepare this week's posts):

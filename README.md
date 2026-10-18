@@ -44,6 +44,8 @@ dash.cloudflare.com ← Workers AI ← انسخ Account ID → `CF_ACCOUNT_ID`،
 `gh secret set PEXELS_API_KEY -R engshadi-79/social-publisher`
 ويستعمله النظام تلقائياً للمنشورات التي فيها `image.photo_query`. القالبان الجديدان `photo` و`split` يُظهران الصورة بوضوح.
 
+**بديل إن أوقف Pexels المفاتيح:** Pixabay (مجاني بلا إسناد): سجّل في pixabay.com ثم خذ المفتاح من pixabay.com/api/docs/ و`gh secret set PIXABAY_API_KEY -R engshadi-79/social-publisher`.
+
 ## المواضيع
 حدّد المواضيع المسموحة في `content/topics.yaml`. أي منشور خارجها يُرفض.
 

@@ -52,6 +52,24 @@ def _pexels(query: str, size: tuple[int, int], pick: int) -> bytes:
     return img.content
 
 
+def _pixabay(query: str, size: tuple[int, int], pick: int) -> bytes:
+    """صورة فوتوغرافية حقيقية مجانية من Pixabay (يسمح الترخيص بالنشر دون إسناد)."""
+    key = os.environ.get("PIXABAY_API_KEY")
+    if not key:
+        raise NotConfigured("PIXABAY_API_KEY")
+    orient = "all" if size[0] == size[1] else "vertical"
+    r = requests.get("https://pixabay.com/api/", timeout=30, params={
+        "key": key, "q": query, "image_type": "photo", "orientation": orient,
+        "min_width": 800, "safesearch": "true", "per_page": 20, "order": "popular"})
+    r.raise_for_status()
+    hits = r.json().get("hits", [])
+    if not hits:
+        raise RuntimeError(f"لا نتائج في Pixabay لـ «{query}»")
+    img = requests.get(hits[pick % len(hits)]["largeImageURL"], timeout=60)
+    img.raise_for_status()
+    return img.content
+
+
 def _find_image(node):
     """يبحث في ردّ Gemini عن أول كتلة صورة ويرجع base64 (البنية الدقيقة تختلف بين الإصدارات)."""
     if isinstance(node, dict):
@@ -153,6 +171,8 @@ def ensure_background(post: dict, regen: bool = False, seed: int | None = None):
     query = post["image"].get("photo_query")
     if query:
         chain.append(("Pexels", lambda: _pexels(query, size, seed or 0)))
+    if query:
+        chain.append(("Pixabay", lambda: _pixabay(query, size, seed or 0)))
     chain += [("Gemini", lambda: _gemini(prompt, size)),
               ("Cloudflare", lambda: _cloudflare(prompt, seed)),
               ("Pollinations", lambda: _pollinations(prompt, seed, size))]
