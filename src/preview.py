@@ -24,7 +24,7 @@ def main() -> int:
     if fatal(errs):
         return 1
     state = load_state()
-    posts = [p for p in queue if args.all or args.regen in ("all", p["id"]) or
+    posts = [p for p in queue if args.all or args.regen == p["id"] or
              not all(state.get(p["id"], {}).get(n, {}).get("status") == "published" for n in p["platforms"])]
     if args.regen == "all":
         pass
