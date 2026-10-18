@@ -9,6 +9,7 @@ import sys
 
 import requests
 
+REPO = "engshadi-79/social-publisher"
 V = "https://graph.facebook.com/v21.0"
 
 
@@ -21,7 +22,7 @@ def get(path, **params):
 
 
 def secret(name, value):
-    p = subprocess.run(["gh", "secret", "set", name], input=value, text=True, capture_output=True)
+    p = subprocess.run(["gh", "secret", "set", name, "-R", REPO], input=value, text=True, capture_output=True)
     if p.returncode:
         sys.exit(f"فشل ضبط {name}: {p.stderr[:200]}")
     print(f"✓ {name}")
