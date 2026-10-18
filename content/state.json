@@ -2,13 +2,17 @@
   "2026-10-18-test1": {
     "facebook": {
       "attempts": 1,
-      "error": "فشل الاستضافة: CalledProcessError: Command '['git', 'commit', '-m', 'images [skip ci]']' returned non-zero exit status 128.",
-      "status": "retry"
+      "error": null,
+      "status": "published",
+      "platform_post_id": "197449247358013_1610170447789277",
+      "published_at": "2026-10-18T16:01:25+00:00"
     },
     "instagram": {
       "attempts": 1,
-      "error": "فشل الاستضافة: CalledProcessError: Command '['git', 'commit', '-m', 'images [skip ci]']' returned non-zero exit status 128.",
-      "status": "retry"
+      "error": null,
+      "status": "published",
+      "platform_post_id": "18136005406564141",
+      "published_at": "2026-10-18T16:01:44+00:00"
     }
   }
 }
