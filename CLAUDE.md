@@ -170,14 +170,14 @@ Extra secrets: `CF_ACCOUNT_ID`, `CF_API_TOKEN` (token with Workers AI permission
 ## Secrets (GitHub Actions)
 `FB_PAGE_ID`, `FB_PAGE_TOKEN`, `IG_USER_ID`, `THREADS_USER_ID`, `THREADS_TOKEN`,
 `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHANNEL_ID`, `TELEGRAM_OWNER_CHAT_ID`, `GH_PAT`,
-optional `GEMINI_API_KEY` (paid API tier only), optional `PEXELS_API_KEY` / `PIXABAY_API_KEY` (free, real photos).
+`GEMINI_API_KEY` (text generation for the dashboard Generate button works on the free tier; image generation needs a paid project), optional `PEXELS_API_KEY` / `PIXABAY_API_KEY` (free, real photos).
 
 ## Weekly content workflow (done by Claude Code with the owner)
 When the owner says "جهّز منشورات الأسبوع" (prepare this week's posts):
 1. Read `content/topics.yaml`. Write posts ONLY about the topics listed there, each entry with
    `topic: <id>`. Never invent topics outside the list (the validator rejects them). If the list is
    empty, ask the owner for topics first. Ask for the number of posts if not given.
-2. **Trending hashtags (research every time, never from memory):** use WebSearch to find the
+2. **Trending hashtags (research every time, never from memory).** Note: the dashboard's Generate button (src/generate.py) uses Google Trends RSS as trend context because Gemini search grounding is not free for new projects; when Claude Code writes posts, use WebSearch instead: use WebSearch to find the
    Arabic hashtags that are trending *now* and relevant to each post's topic (Instagram, Threads,
    Facebook, Telegram differ). Mix 2–3 current trending tags + 2–3 niche tags + the topic's
    `hashtags_fixed`. Only use tags that actually relate to the post; never bait with unrelated trends.

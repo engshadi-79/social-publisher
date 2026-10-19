@@ -99,7 +99,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
 <section id="postPanel" hidden>
   <div class="panel">
     <h2>✨ توليد منشورات تلقائياً</h2>
-    <p class="hint">اختر موضوعاً وعدداً، ويكتب الذكاء الاصطناعي (Gemini) المنشورات والهاشتاجات الرائجة وكلمات الصور، فتظهر <b>كمسودات</b> تراجعها وتوافق عليها. لا يُنشر شيء قبل موافقتك.</p>
+    <p class="hint">اختر موضوعاً وعدداً، ويكتب Gemini المنشورات وكلمات الصور، ويقترح هاشتاجات تستفيد من <b>ترند Google الحالي</b> (ما يناسب الموضوع فقط)، فتظهر <b>كمسودات</b> تراجعها وتوافق عليها. لا يُنشر شيء قبل موافقتك.</p>
     {% if gen_log %}<div class="msg {{ 'ok' if gen_log.ok else 'no' }}">آخر توليد: {{ gen_log.message }}{% if gen_log.method %} <span class="hint">({{ gen_log.method }})</span>{% endif %}</div>{% endif %}
     {% if topics %}
     <label>الموضوع *</label>

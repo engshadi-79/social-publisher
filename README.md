@@ -46,6 +46,9 @@ dash.cloudflare.com ← Workers AI ← انسخ Account ID → `CF_ACCOUNT_ID`،
 
 **بديل إن أوقف Pexels المفاتيح:** Pixabay (مجاني بلا إسناد): سجّل في pixabay.com ثم خذ المفتاح من pixabay.com/api/docs/ و`gh secret set PIXABAY_API_KEY -R engshadi-79/social-publisher`.
 
+## توليد المنشورات من اللوحة
+في تبويب «إضافة منشور» زر **✨ ولّد المسودات**: تختار موضوعاً وعدداً وموعداً، فيكتب Gemini (نص مجاني) المسودات ويقترح هاشتاجات من ترند Google الحالي، وتظهر بصورها في «بانتظار موافقتك». سير العمل `generate`. يحتاج سرّ `GEMINI_API_KEY`.
+
 ## المواضيع
 حدّد المواضيع المسموحة في `content/topics.yaml`. أي منشور خارجها يُرفض.
 
