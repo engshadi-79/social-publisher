@@ -50,13 +50,49 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
 @media (max-width:560px){.post{flex-direction:column}.post img{width:100%;min-width:0;max-width:420px;margin:0 auto}}
 #lb{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;z-index:50;padding:16px;cursor:zoom-out}#lb.on{display:flex}#lb img{max-width:100%;max-height:100%;object-fit:contain;border-radius:6px}
 .health{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 16px;margin-bottom:12px}.health summary{cursor:pointer;font-weight:700}.health ul{list-style:none;padding:0;margin:8px 0 0}.health li{padding:3px 0;font-size:.92rem}.h-bad{color:var(--bad)}.h-warn{color:var(--warn)}.h-off{color:var(--mute)}
+.calbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin-bottom:10px}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:8px;margin-bottom:10px}
+.cday{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px;min-height:90px}.cday.today{border-color:var(--teal);box-shadow:0 0 0 1px var(--teal)}
+.cdh{font-weight:700;font-size:.85rem;margin-bottom:6px;color:var(--mute)}.cempty{color:var(--mute);font-size:.8rem;border:1px dashed var(--line);border-radius:8px;padding:6px;text-align:center}
+.cchip{display:block;width:100%;text-align:start;font:inherit;font-size:.78rem;border:0;border-radius:8px;padding:4px 7px;margin-bottom:5px;color:#fff;cursor:pointer;line-height:1.4}
+.cchip.g-draft{background:var(--draft)}.cchip.g-upcoming{background:var(--teal);color:#06201d}.cchip.g-published{background:var(--ok)}.cchip.g-failed{background:var(--bad)}
+#editBox{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:flex-start;justify-content:center;overflow:auto;z-index:60;padding:20px 10px}#editBox.on{display:flex}
+#editBox .box{background:var(--card);border-radius:14px;padding:18px;max-width:640px;width:100%}
 </style>
 </head>
 <body>
+<div id="editBox"><div class="box">
+  <h2 id="eHead">تعديل منشور</h2><div class="hint" id="eNote"></div>
+  <label>الموضوع</label><select id="eTopic"><option value="">— اختر —</option><option value="tmvet3asy">الذكاء الصناعي</option></select>
+  <label>شكل الصورة</label>
+  <select id="eTemplate"><option value="infographic">إنفوجرافك</option><option value="split">صورة + لوحة نص</option><option value="photo">صورة كاملة</option><option value="tip">نصيحة</option><option value="quote">اقتباس</option><option value="announcement">إعلان</option><option value="story">ستوري</option></select>
+  <label>العنوان على الصورة *</label><input id="eTitle">
+  <label>النص الصغير</label><input id="eBody">
+  <label>نقاط الإنفوجرافك (سطر لكل نقطة)</label><textarea id="ePoints" rows="4"></textarea>
+  <label>كلمات إنجليزية للصورة <span class="hint">(تغييرها يعيد توليد الصورة)</span></label><input id="eQuery" dir="ltr">
+  <label>وصف بديل للصورة (إنجليزي)</label><textarea id="eVP" dir="ltr" rows="2"></textarea>
+  <label>الموعد</label><input id="eWhen" type="datetime-local">
+  <label>المنصات ونصوصها</label>
+  
+  <label style="display:flex;gap:6px;align-items:center;margin:8px 0 2px"><input id="ep_facebook" type="checkbox" style="width:auto"> فيسبوك</label>
+  <textarea id="et_facebook" rows="4"></textarea>
+  
+  <label style="display:flex;gap:6px;align-items:center;margin:8px 0 2px"><input id="ep_instagram" type="checkbox" style="width:auto"> إنستغرام</label>
+  <textarea id="et_instagram" rows="4"></textarea>
+  
+  <label style="display:flex;gap:6px;align-items:center;margin:8px 0 2px"><input id="ep_threads" type="checkbox" style="width:auto"> ثريدز</label>
+  <textarea id="et_threads" rows="4"></textarea>
+  
+  <label style="display:flex;gap:6px;align-items:center;margin:8px 0 2px"><input id="ep_telegram" type="checkbox" style="width:auto"> تيليجرام</label>
+  <textarea id="et_telegram" rows="4"></textarea>
+  
+  <button class="act" id="eSave">حفظ التعديل</button> <button class="del" id="eCancel" style="color:var(--ink);border-color:var(--line)">إغلاق</button>
+  <div class="msg" id="eMsg"></div>
+</div></div>
 <div id="lb"><img alt=""></div>
 <div class="wrap">
 <h1>لوحة النشر</h1>
-<div class="upd">آخر تحديث: <bdi dir="ltr">2026-10-19 19:11</bdi></div>
+<div class="upd">آخر تحديث: <bdi dir="ltr">2026-10-19 19:45</bdi></div>
 
 <div class="summary">يوجد 2 منشور مجدول، وأقربها يوم الثلاثاء 20 أكتوبر الساعة 8:32 صباحاً. تم نشر 1 منشور حتى الآن.</div>
 
@@ -89,6 +125,8 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
   
   <button data-f="addpost" aria-pressed="false">إضافة منشور</button>
   
+  <button data-f="calendar" aria-pressed="false">التقويم</button>
+  
 </div>
 
 <section id="topicsPanel" hidden>
@@ -116,6 +154,23 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
     <div class="msg" id="fMsg"></div>
   </div>
 
+</section>
+
+<section id="calPanel" hidden>
+  <div class="panel">
+    <h2>التقويم الأسبوعي</h2>
+    <div class="calbar"><button class="del" id="calPrev" style="color:var(--ink);border-color:var(--line)">→ الأسبوع السابق</button>
+      <b id="calLabel" dir="ltr"></b>
+      <button class="del" id="calNext" style="color:var(--ink);border-color:var(--line)">الأسبوع التالي ←</button>
+      <button class="del" id="calToday" style="color:var(--teal);border-color:var(--teal)">هذا الأسبوع</button></div>
+    <div class="cgrid" id="calGrid"></div>
+    <p class="hint">اضغط على منشور مسودة أو مجدول لتعديله. الأيام الفارغة مكتوب عليها «فراغ».</p>
+    <label>توزيع المسودات تلقائياً: منشور واحد كل يوم فارغ بدءاً من الغد، في الساعة</label>
+    <select id="calHour"><option value="12:30">12:30 ظهراً</option><option value="18:00">6:00 مساءً</option><option value="20:00" selected>8:00 مساءً</option><option value="21:00">9:00 مساءً</option></select>
+    <button class="act" id="calDistribute">🗓️ وزّع المسودات</button>
+    <div class="msg" id="calMsg"></div>
+    <p class="hint">أوقات الذروة تقريبية عامة للجمهور العربي (المساء وبعد الظهر)؛ عدّلها حسب جمهورك.</p>
+  </div>
 </section>
 
 <section id="postPanel" hidden>
@@ -192,8 +247,11 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
     </div>
     
     <div class="acts">
+      <button class="act" data-act="now" data-id="2026-10-20-g1">🚀 انشر الآن</button>
       <button class="del" data-act="unapprove" data-id="2026-10-20-g1">إلغاء الموافقة</button>
+      <button class="del" data-act="edit" data-id="2026-10-20-g1" style="color:var(--teal);border-color:var(--teal)">✏️ تعديل</button>
       <button class="del" data-act="del" data-id="2026-10-20-g1">حذف</button>
+      
       <span class="actmsg msg"></span>
     </div>
     <details><summary>عرض نص المنشور على كل منصة</summary>
@@ -233,8 +291,11 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
     </div>
     
     <div class="acts">
+      <button class="act" data-act="now" data-id="2026-10-21-g1">🚀 انشر الآن</button>
       <button class="del" data-act="unapprove" data-id="2026-10-21-g1">إلغاء الموافقة</button>
+      <button class="del" data-act="edit" data-id="2026-10-21-g1" style="color:var(--teal);border-color:var(--teal)">✏️ تعديل</button>
       <button class="del" data-act="del" data-id="2026-10-21-g1">حذف</button>
+      
       <span class="actmsg msg"></span>
     </div>
     <details><summary>عرض نص المنشور على كل منصة</summary>
@@ -306,7 +367,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
   <ol>
     <li>افتح <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">إنشاء مفتاح جديد</a> (Fine-grained).</li>
     <li>اختر أطول مدة انتهاء، و<b>Only select repositories</b> ثم <b>social-publisher</b>.</li>
-    <li>Permissions ← Repository ← <b>Contents: Read and write</b>، ثم أنشئه وانسخه.</li>
+    <li>Permissions ← Repository ← <b>Contents: Read and write</b> وأيضاً <b>Actions: Read and write</b> (لزر «انشر الآن»)، ثم أنشئه وانسخه.</li>
     <li>الصقه هنا واضغط حفظ.</li>
   </ol>
   <label>المفتاح</label><input id="tok" type="password" autocomplete="off" placeholder="github_pat_...">
@@ -315,9 +376,10 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
 </div>
 
 </div>
+<script type="application/json" id="postdata">{"2026-10-19-g1": {"id": "2026-10-19-g1", "approved": true, "publish_at": "2026-10-19 08:32", "template": "split", "topic": "tmvet3asy", "image": {"title": "الذكاء الاصطناعي لا يستبدلك، بل يدعمك", "body": "أدوات البرمجة الذكية هي مساعدك الشخصي لإنجاز المشاريع بدقة وسرعة أكبر.", "photo_query": "coding laptop screen glowing", "seed": 1}, "platforms": {"facebook": "مرحباً بكم جميعاً! كثير من الأصدقاء يسألونني: \"مهندس شادي، هل سيقضي الذكاء الاصطناعي على وظائف المبرمجين وصناع المواقع؟\"\n\nالإجابة المباشرة: لا، ولكن المبرمج الذي يستعين بأدوات الذكاء الاصطناعي سيتفوق حتماً على من يتجاهلها. اليوم، يمكنك استخدام نماذج ذكية مثل جيميناي لكتابة دوال معقدة، فحص الأخطاء البرمجية وتصحيحها في لحظات، أو حتى اقتراح تصاميم وتوزيع عناصر الصفحات.\n\nالذكاء الاصطناعي ليس بديلاً عن فهمك للمنطق البرمجي، بل هو مسرّع قوي يختصر عليك الساعات الروتينية لتركز أنت على الإبداع وبناء أنظمة حقيقية ذات قيمة. جرب دمج هذه الأدوات في روتينك البرمجي اليوم وستشهد قفزة واضحة في إنتاجيتك.\n\n#جيميناي #الذكاء_الاصطناعي #برمجة #تطوير_الويب #تقنية", "instagram": "مرحباً بكم جميعاً! كثير من الأصدقاء يسألونني: \"مهندس شادي، هل سيقضي الذكاء الاصطناعي على وظائف المبرمجين وصناع المواقع؟\"\n\nالإجابة المباشرة: لا، ولكن المبرمج الذي يستعين بأدوات الذكاء الاصطناعي سيتفوق حتماً على من يتجاهلها. اليوم، يمكنك استخدام نماذج ذكية مثل جيميناي لكتابة دوال معقدة، فحص الأخطاء البرمجية وتصحيحها في لحظات، أو حتى اقتراح تصاميم وتوزيع عناصر الصفحات.\n\nالذكاء الاصطناعي ليس بديلاً عن فهمك للمنطق البرمجي، بل هو مسرّع قوي يختصر عليك الساعات الروتينية لتركز أنت على الإبداع وبناء أنظمة حقيقية ذات قيمة. جرب دمج هذه الأدوات في روتينك البرمجي اليوم وستشهد قفزة واضحة في إنتاجيتك.\n\n#جيميناي #الذكاء_الاصطناعي #برمجة #تطوير_الويب #تقنية", "threads": "هل يلغي الذكاء الاصطناعي دور المبرمج؟ لا، بل يمنحه سرعة فائقة لبناء المواقع والأنظمة! استغل أدوات ذكية مثل جيميناي في تصحيح الأكواد واقتراح الحلول، واجعل تركيزك الأساسي على المنطق وتجربة المستخدم.\n\n#جيميناي #الذكاء_الاصطناعي #برمجة"}, "group": "published"}, "2026-10-20-g1": {"id": "2026-10-20-g1", "approved": true, "publish_at": "2026-10-20 08:32", "template": "split", "topic": "tmvet3asy", "image": {"title": "كيف تحول موقعك إلى نظام تفاعلي ذكي؟", "body": "دمج الذكاء الاصطناعي في المواقع صار خطوة عملية وسهلة التنفيذ.", "photo_query": "modern technology server data", "seed": 8}, "platforms": {"facebook": "صناعة المواقع لم تعد مقتصرة على صفحات ثابتة تعرض نصوصاً وصوراً. اليوم، تستطيع تحويل أي موقع إلى منصة ذكية تتفاعل مع الزائر بشكل مخصص وتفهم متطلباته بدقة.\n\nربط واجهات الذكاء الاصطناعي البرمجية (APIs) بالأنظمة أصبح في غاية البساطة والسرعة. يمكنك إضافة محرك بحث دلالي يفهم قصد المستخدم، أو روبوت دعم فني ذكي يجيب عن الاستفسارات بمستوى احترافي، أو حتى نظام يحلل سلوك التصفح ليعرض المحتوى الأنسب لكل شخص.\n\nالجميل في الأمر أنك لست بحاجة لإنشاء نماذج ذكاء اصطناعي من الصفر؛ الحلول والمكتبات البرمجية متوفرة وجاهزة للتكامل مع موقعك فوراً. خطوة بسيطة كهذه تصنع فارقاً هائلاً في جودة مشروعك ورضا مستخدميه.\n\n#منصة #الذكاء_الاصطناعي #تطوير_المواقع #برمجة_ويب #أنظمة", "instagram": "صناعة المواقع لم تعد مقتصرة على صفحات ثابتة تعرض نصوصاً وصوراً. اليوم، تستطيع تحويل أي موقع إلى منصة ذكية تتفاعل مع الزائر بشكل مخصص وتفهم متطلباته بدقة.\n\nربط واجهات الذكاء الاصطناعي البرمجية (APIs) بالأنظمة أصبح في غاية البساطة والسرعة. يمكنك إضافة محرك بحث دلالي يفهم قصد المستخدم، أو روبوت دعم فني ذكي يجيب عن الاستفسارات بمستوى احترافي، أو حتى نظام يحلل سلوك التصفح ليعرض المحتوى الأنسب لكل شخص.\n\nالجميل في الأمر أنك لست بحاجة لإنشاء نماذج ذكاء اصطناعي من الصفر؛ الحلول والمكتبات البرمجية متوفرة وجاهزة للتكامل مع موقعك فوراً. خطوة بسيطة كهذه تصنع فارقاً هائلاً في جودة مشروعك ورضا مستخدميه.\n\n#منصة #الذكاء_الاصطناعي #تطوير_المواقع #برمجة_ويب #أنظمة", "threads": "المواقع اليوم لم تعد صفحات جامدة! دمج الذكاء الاصطناعي في أي منصة عبر الـ APIs يتيح لك تقديم بحث ذكي، ودعم فوري، وتجربة مخصصة لكل زائر بكل سلاسة وسرعة.\n\n#منصة #الذكاء_الاصطناعي #تطوير_المواقع"}, "group": "upcoming"}, "2026-10-21-g1": {"id": "2026-10-21-g1", "approved": true, "publish_at": "2026-10-21 08:32", "template": "split", "topic": "tmvet3asy", "image": {"title": "تعلم البرمجة في عصر الذكاء الاصطناعي", "body": "الأساسيات الهندسية وحل المشكلات أهم بكثير من مجرد حفظ الأكواد.", "photo_query": "dual computer monitors desk", "seed": 15}, "platforms": {"facebook": "إذا كنت تفكر في دخول عالم البرمجة وصناعة الأنظمة، فقد تسأل نفسك: هل لا يزال التعلم مجدياً بينما الذكاء الاصطناعي يكتب الأكواد الجاهزة؟\n\nنعم وبكل تأكيد! الذكاء الاصطناعي يكتب السطور البرمجية، لكنه يحتاج إلى عقل مهندس يفهم كيف يوجهه، وكيف يدقق النتائج، وكيف يربط مكونات النظام لتكون آمنة وقابلة للتطوير.\n\nالمطلوب منك الآن لم يعد حفظ الأوامر والتراكيب عن ظهر قلب؛ الأولوية الحقيقية أصبحت لفهم هياكل البيانات، وهندسة البرمجيات، وأسلوب التفكير التحليلي. اعتبر أدوات الذكاء الاصطناعي معلماً شخصياً يرافقك: اسألها عما يستعصي عليك، ودعها تشرح لك المفاهيم المعقدة، وسترى كيف تختصر رحلة تعلمك إلى النصف.\n\n#الذكاء_الاصطناعي #تعلم_البرمجة #هندسة_البرمجيات #مطورين", "instagram": "إذا كنت تفكر في دخول عالم البرمجة وصناعة الأنظمة، فقد تسأل نفسك: هل لا يزال التعلم مجدياً بينما الذكاء الاصطناعي يكتب الأكواد الجاهزة؟\n\nنعم وبكل تأكيد! الذكاء الاصطناعي يكتب السطور البرمجية، لكنه يحتاج إلى عقل مهندس يفهم كيف يوجهه، وكيف يدقق النتائج، وكيف يربط مكونات النظام لتكون آمنة وقابلة للتطوير.\n\nالمطلوب منك الآن لم يعد حفظ الأوامر والتراكيب عن ظهر قلب؛ الأولوية الحقيقية أصبحت لفهم هياكل البيانات، وهندسة البرمجيات، وأسلوب التفكير التحليلي. اعتبر أدوات الذكاء الاصطناعي معلماً شخصياً يرافقك: اسألها عما يستعصي عليك، ودعها تشرح لك المفاهيم المعقدة، وسترى كيف تختصر رحلة تعلمك إلى النصف.\n\n#الذكاء_الاصطناعي #تعلم_البرمجة #هندسة_البرمجيات #مطورين", "threads": "في عصر الذكاء الاصطناعي، لا تشغل بالك بحفظ الأكواد؛ ركّز على فهم الأساسيات الهندسية وطريقة بناء الأنظمة وحل المشكلات. الأداة الذكية تكتب الكود، لكن المهندس هو من يدير الفكرة ويوجهها للنجاح.\n\n#تعلم_البرمجة #الذكاء_الاصطناعي #تقنية"}, "group": "upcoming"}}</script>
 <script>
 const tabs=document.querySelectorAll('#tabs button'),posts=document.querySelectorAll('.post'),empty=document.getElementById('empty');
-function show(f){const tp=f==='topics'||f==='addpost';document.getElementById('topicsPanel').hidden=f!=='topics';document.getElementById('postPanel').hidden=f!=='addpost';document.getElementById('grid').hidden=tp;let n=0;posts.forEach(p=>{const ok=!tp&&(f==='all'||p.dataset.s===f);p.hidden=!ok;if(ok)n++});empty.hidden=tp||n>0;tabs.forEach(b=>b.setAttribute('aria-pressed',b.dataset.f===f))}
+function show(f){const PN={topics:'topicsPanel',addpost:'postPanel',calendar:'calPanel'};const tp=f in PN;Object.entries(PN).forEach(([k,id])=>document.getElementById(id).hidden=f!==k);document.getElementById('grid').hidden=tp;let n=0;posts.forEach(p=>{const ok=!tp&&(f==='all'||p.dataset.s===f);p.hidden=!ok;if(ok)n++});empty.hidden=tp||n>0;tabs.forEach(b=>b.setAttribute('aria-pressed',b.dataset.f===f))}
 tabs.forEach(b=>b.onclick=()=>show(b.dataset.f));
 const lb=document.getElementById('lb');document.addEventListener('click',e=>{const i=e.target.closest('.post img');if(i){lb.querySelector('img').src=i.dataset.full;lb.classList.add('on')}else if(lb.contains(e.target)){lb.classList.remove('on')}});document.addEventListener('keydown',e=>{if(e.key==='Escape')lb.classList.remove('on')});
 </script>
@@ -391,6 +453,7 @@ async function gh(path, opt) {
   if ([401, 403, 404].includes(r.status)) throw new Error("المفتاح غير صالح أو صلاحيته ناقصة (يلزم Contents: Read and write على هذا المستودع).");
   if ([409, 422].includes(r.status)) throw new Error("تعارض أثناء الحفظ، أعد المحاولة.");
   if (!r.ok) throw new Error("تعذّر الاتصال بـ GitHub (" + r.status + ").");
+  if (r.status === 204) return {};
   return r.json();
 }
 async function edit(fn, msg, file) {
@@ -461,7 +524,9 @@ $("pAdd").onclick = async () => {
 // ---- منشورات: موافقة / إلغاء / حذف (أزرار البطاقات) ----
 document.addEventListener("click", async (e) => {
   const b = e.target.closest("[data-act]"); if (!b) return;
-  const id = b.dataset.id, act = b.dataset.act, out = b.closest(".post").querySelector(".actmsg");
+  const id = b.dataset.id, act = b.dataset.act;
+  if (!["approve", "unapprove", "del"].includes(act)) return;   // الأزرار الأخرى لها معالجات في dashboard_posts.js
+  const out = b.closest(".post").querySelector(".actmsg");
   if (act === "del" && !confirm("حذف هذا المنشور من الطابور؟")) return;
   try {
     say(out, "جارٍ الحفظ…", true);
@@ -494,6 +559,164 @@ $("gGo").onclick = async () => {
     say(m, "جارٍ إرسال الطلب…", true);
     await putRequest(yml, "generate: request " + id);
     say(m, "طُلب التوليد ✅ خلال دقيقتين إلى ثلاث تظهر المسودات (مع صورها) في «بانتظار موافقتك». حدّث الصفحة بعد ذلك.", true);
+  } catch (e) { say(m, e.message, false); }
+};
+
+// ---- تعديل المنشورات، إعادة المحاولة، التقويم، التوزيع التلقائي (يُدرَج بعد dashboard_topics.js) ----
+const POSTS = JSON.parse(document.getElementById("postdata").textContent);
+const SFILE = "content/state.json";
+
+function serializePost(p) {
+  const im = p.image || {};
+  let b = "- id: " + q(p.id) + "\n  approved: " + (p.approved ? "true" : "false") + "\n  publish_at: " + q(p.publish_at) +
+    "\n  template: " + p.template + "\n";
+  if (p.topic) b += "  topic: " + q(p.topic) + "\n";
+  b += "  image:\n    title: " + q(im.title || "") + "\n    body: " + q(im.body || "") + "\n";
+  if (im.points && im.points.length) b += "    points:\n" + im.points.map((x) => "      - " + q(x)).join("\n") + "\n";
+  if (im.photo_query) b += "    photo_query: " + q(im.photo_query) + "\n";
+  if (im.visual_prompt) b += "    visual_prompt: " + q(im.visual_prompt) + "\n";
+  if (im.seed != null) b += "    seed: " + im.seed + "\n";
+  b += "  platforms:\n";
+  for (const [k, v] of Object.entries(p.platforms || {})) b += "    " + k + ": " + q(v) + "\n";
+  return b;
+}
+function replacePost(text, id, obj) {
+  const lines = text.split("\n"), [s, e] = postRange(lines, id);
+  lines.splice(s, e - s, ...serializePost(obj).replace(/\n$/, "").split("\n"));
+  return lines.join("\n");
+}
+function setWhen(text, id, when) {
+  const lines = text.split("\n"), [s, e] = postRange(lines, id);
+  for (let i = s; i < e; i++) if (/^  publish_at:/.test(lines[i])) { lines[i] = "  publish_at: " + q(when); return lines.join("\n"); }
+  throw new Error("لم أجد موعد المنشور.");
+}
+async function deleteBg(id) {
+  const path = "content/media/" + id + "-bg.png";
+  let sha; try { sha = (await gh("contents/" + path)).sha; } catch (e) { return; }
+  await gh("contents/" + path, { method: "DELETE", body: JSON.stringify({ message: "media: regenerate " + id, sha }) });
+}
+
+// ---------- نافذة التعديل ----------
+const PLATS = ["facebook", "instagram", "threads", "telegram"];
+let editId = null;
+function openEdit(id) {
+  const p = POSTS[id]; if (!p) return;
+  editId = id; const im = p.image || {};
+  $("eTitle").value = im.title || ""; $("eBody").value = im.body || ""; $("ePoints").value = (im.points || []).join("\n");
+  $("eQuery").value = im.photo_query || ""; $("eVP").value = im.visual_prompt || "";
+  $("eTemplate").value = p.template; $("eWhen").value = (p.publish_at || "").replace(" ", "T");
+  if ($("eTopic")) $("eTopic").value = p.topic || "";
+  PLATS.forEach((k) => { $("ep_" + k).checked = !!(p.platforms && p.platforms[k]); $("et_" + k).value = (p.platforms && p.platforms[k]) || ""; });
+  $("eHead").textContent = "تعديل: " + (im.title || id);
+  $("eNote").textContent = p.approved ? "هذا المنشور معتمد: سيُنشر بالنص الجديد في موعده." : "";
+  say($("eMsg"), "", true); $("editBox").classList.add("on");
+}
+$("eCancel").onclick = () => $("editBox").classList.remove("on");
+$("eSave").onclick = async () => {
+  const m = $("eMsg"), v = (i) => $(i).value.trim(), old = POSTS[editId];
+  const platforms = {};
+  PLATS.forEach((k) => { if ($("ep_" + k).checked && v("et_" + k)) platforms[k] = v("et_" + k); });
+  const tpl = $("eTemplate").value, points = v("ePoints").split("\n").map((x) => x.trim()).filter(Boolean);
+  const err = !v("eTitle") ? "العنوان مطلوب." : !Object.keys(platforms).length ? "اختر منصة واحدة على الأقل بنص غير فارغ." :
+    !v("eWhen") ? "اختر الموعد." : (tpl === "infographic" && (points.length < 2 || points.length > 6)) ? "الإنفوجرافك يحتاج من 2 إلى 6 نقاط." :
+    (tpl !== "infographic" && !(v("eQuery") || v("eVP"))) ? "اكتب كلمات إنجليزية للصورة." :
+    (platforms.threads && platforms.threads.length > 500) ? "نص ثريدز أطول من 500 حرف." :
+    (platforms.instagram && platforms.instagram.length > 2200) ? "نص إنستغرام أطول من 2200 حرف." :
+    ($("eTopic") && !v("eTopic")) ? "اختر الموضوع." : "";
+  if (err) { say(m, err, false); return; }
+  const oi = old.image || {};
+  const img = { title: v("eTitle"), body: v("eBody"), seed: oi.seed != null ? oi.seed : 1 };
+  if (tpl === "infographic") img.points = points; else { img.photo_query = v("eQuery"); if (v("eVP")) img.visual_prompt = v("eVP"); }
+  const nu = { id: editId, approved: old.approved, publish_at: v("eWhen").replace("T", " "), template: tpl,
+    topic: $("eTopic") ? v("eTopic") : old.topic, image: img, platforms };
+  const imageChanged = tpl !== old.template || img.photo_query !== oi.photo_query || img.visual_prompt !== oi.visual_prompt;
+  try {
+    say(m, "جارٍ الحفظ…", true);
+    await edit((x) => replacePost(x, editId, nu), "queue: edit " + editId, QFILE);
+    if (imageChanged) await deleteBg(editId);
+    say(m, "تم الحفظ ✅ تتحدّث اللوحة (وصورتها إن تغيّرت) خلال دقيقتين.", true);
+    setTimeout(() => $("editBox").classList.remove("on"), 1200);
+  } catch (e) { say(m, e.message, false); }
+};
+
+// ---------- إعادة المحاولة ----------
+async function retryPost(id) {
+  await edit((text) => {
+    const s = JSON.parse(text || "{}"), e = s[id];
+    if (!e) throw new Error("لا توجد حالة لهذا المنشور.");
+    for (const k of Object.keys(e)) if (e[k].status !== "published") delete e[k];
+    if (!Object.keys(e).length) delete s[id];
+    return JSON.stringify(s, null, 2) + "\n";
+  }, "state: retry " + id, SFILE);
+}
+
+// ---------- أزرار البطاقات الإضافية ----------
+document.addEventListener("click", async (e) => {
+  const b = e.target.closest("[data-act]"); if (!b) return;
+  if (b.dataset.act === "edit") { openEdit(b.dataset.id); return; }
+  if (b.dataset.act === "now") {
+    const out = b.closest(".post").querySelector(".actmsg"), id = b.dataset.id;
+    if (!confirm("سأجعل موعده الآن وأشغّل النشر فوراً. متابعة؟")) return;
+    const d = new Date(), pad = (n) => String(n).padStart(2, "0");
+    const when = ymd(d) + " " + pad(d.getHours()) + ":" + pad(d.getMinutes());
+    try {
+      say(out, "جارٍ الحفظ…", true);
+      await edit((x) => setWhen(x, id, when), "queue: publish now " + id, QFILE);
+      try { await gh("actions/workflows/publish.yml/dispatches", { method: "POST", body: JSON.stringify({ ref: "main" }) });
+        say(out, "بدأ النشر الآن ✅ يستغرق دقائق، وتظهر النتيجة في اللوحة بعد ذلك.", true);
+      } catch (e2) { say(out, "حُدِّث الموعد، لكن تشغيل النشر الفوري يحتاج أن يملك المفتاح صلاحية Actions: Read and write. سيُنشر في التشغيل الدوري القادم.", false); }
+      b.disabled = true;
+    } catch (err) { say(out, err.message, false); }
+    return;
+  }
+  if (b.dataset.act === "retry") {
+    const out = b.closest(".post").querySelector(".actmsg");
+    try { say(out, "جارٍ الحفظ…", true); await retryPost(b.dataset.id);
+      say(out, "ستُعاد المحاولة في التشغيل القادم للنشر (خلال 30 دقيقة تقريباً) ✅", true); b.disabled = true;
+    } catch (err) { say(out, err.message, false); }
+  }
+});
+
+// ---------- التقويم الأسبوعي ----------
+const DAYS_AR = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
+let weekStart = (() => { const d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - d.getDay()); return d; })();
+const ymd = (d) => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+function renderCal() {
+  const end = new Date(weekStart); end.setDate(end.getDate() + 6);
+  $("calLabel").textContent = ymd(weekStart) + " ← " + ymd(end);
+  const todayKey = ymd(new Date()); let html = "";
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(weekStart); d.setDate(d.getDate() + i); const key = ymd(d);
+    const list = Object.values(POSTS).filter((p) => (p.publish_at || "").startsWith(key)).sort((a, b) => a.publish_at.localeCompare(b.publish_at));
+    html += '<div class="cday' + (key === todayKey ? " today" : "") + '"><div class="cdh">' + DAYS_AR[d.getDay()] + " " + d.getDate() + "</div>" +
+      (list.length ? list.map((p) => '<button class="cchip g-' + p.group + '" data-cal="' + p.id + '"><b dir="ltr">' + p.publish_at.slice(11) + "</b> " +
+        (p.image && p.image.title ? p.image.title.replace(/</g, "&lt;") : p.id) + "</button>").join("") : '<div class="cempty">فراغ</div>') + "</div>";
+  }
+  $("calGrid").innerHTML = html;
+}
+$("calPrev").onclick = () => { weekStart.setDate(weekStart.getDate() - 7); renderCal(); };
+$("calNext").onclick = () => { weekStart.setDate(weekStart.getDate() + 7); renderCal(); };
+$("calToday").onclick = () => { const d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - d.getDay()); weekStart = d; renderCal(); };
+$("calGrid").onclick = (e) => { const c = e.target.closest("[data-cal]"); if (!c) return; const p = POSTS[c.dataset.cal];
+  if (p && (p.group === "draft" || p.group === "upcoming")) openEdit(p.id); };
+document.querySelector("button[data-f=calendar]").addEventListener("click", renderCal);
+
+// ---------- توزيع المسودات تلقائياً ----------
+function planSchedule(posts, hour) {
+  const taken = new Set(Object.values(posts).filter((p) => p.group !== "draft").map((p) => (p.publish_at || "").slice(0, 10)));
+  const drafts = Object.values(posts).filter((p) => p.group === "draft").sort((a, b) => a.publish_at.localeCompare(b.publish_at));
+  const day = new Date(); day.setHours(0, 0, 0, 0); day.setDate(day.getDate() + 1);
+  return drafts.map((p) => { while (taken.has(ymd(day))) day.setDate(day.getDate() + 1);
+    const when = ymd(day) + " " + hour; taken.add(ymd(day)); return { id: p.id, from: p.publish_at, when }; });
+}
+$("calDistribute").onclick = async () => {
+  const m = $("calMsg"), plan = planSchedule(POSTS, $("calHour").value);
+  if (!plan.length) { say(m, "لا توجد مسودات لتوزيعها.", false); return; }
+  if (!confirm("سأضع المسودات في أيام فارغة بدءاً من الغد:\n\n" + plan.map((x) => x.when + "  ←  " + (POSTS[x.id].image.title || x.id)).join("\n") + "\n\nمتابعة؟")) return;
+  try {
+    say(m, "جارٍ الحفظ…", true);
+    await edit((text) => plan.reduce((t, x) => setWhen(t, x.id, x.when), text), "queue: schedule drafts", QFILE);
+    say(m, "تم التوزيع ✅ تظهر المواعيد الجديدة خلال دقيقة تقريباً.", true);
   } catch (e) { say(m, e.message, false); }
 };
 </script>
