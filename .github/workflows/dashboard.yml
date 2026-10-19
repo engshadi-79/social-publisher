@@ -8,6 +8,7 @@ on:
     paths:
       - content/queue.yaml
       - content/topics.yaml
+      - content/generate_log.json
       - brand/**
       - templates/**
       - src/dashboard*

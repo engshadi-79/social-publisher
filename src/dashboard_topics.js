@@ -146,3 +146,27 @@ document.addEventListener("click", async (e) => {
     b.parentElement.querySelectorAll("button").forEach((x) => (x.disabled = true));
   } catch (err) { say(out, err.message, false); }
 });
+
+// ---- توليد منشورات تلقائياً: يكتب طلباً في المستودع فيشغّل سير عمل التوليد ----
+async function putRequest(text, msg) {
+  if (!getTok()) throw new Error("ألصق مفتاح GitHub أولاً في قسم «ربط GitHub» أسفل الصفحة.");
+  let sha;
+  try { sha = (await gh("contents/content/generate_request.yaml")).sha; } catch (e) { sha = undefined; }
+  await gh("contents/content/generate_request.yaml", { method: "PUT",
+    body: JSON.stringify({ message: msg, content: b64e(text), sha }) });
+}
+$("gGo").onclick = async () => {
+  const m = $("gMsg");
+  const topicId = $("gTopic") ? $("gTopic").value : "", topicText = $("gTopicText") ? $("gTopicText").value.trim() : "";
+  const when = $("gWhen").value.replace("T", " ");
+  if (!topicId && !topicText) { say(m, "اكتب الموضوع.", false); return; }
+  if (!when) { say(m, "اختر موعد أول منشور.", false); return; }
+  const id = "g" + Date.now().toString(36);
+  const yml = "id: " + q(id) + "\ncount: " + parseInt($("gCount").value, 10) + "\nstart: " + q(when) + "\n" +
+    (topicId ? "topic_id: " + q(topicId) : "topic_text: " + q(topicText)) + "\n";
+  try {
+    say(m, "جارٍ إرسال الطلب…", true);
+    await putRequest(yml, "generate: request " + id);
+    say(m, "طُلب التوليد ✅ خلال دقيقتين إلى ثلاث تظهر المسودات (مع صورها) في «بانتظار موافقتك». حدّث الصفحة بعد ذلك.", true);
+  } catch (e) { say(m, e.message, false); }
+};

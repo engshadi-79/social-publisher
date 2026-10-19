@@ -1,5 +1,6 @@
 """يولّد لوحة تحكم ثابتة (HTML) من الطابور والحالة، لتُنشر على GitHub Pages."""
 import argparse
+import json
 import os
 import sys
 from pathlib import Path
@@ -9,7 +10,7 @@ from jinja2 import Environment, FileSystemLoader
 from PIL import Image
 
 import imagegen
-from config import MEDIA_DIR, OUT_DIR, PLATFORMS, TIMEZONE, TOPICS_PATH
+from config import ROOT, MEDIA_DIR, OUT_DIR, PLATFORMS, TIMEZONE, TOPICS_PATH
 from queue_io import load_queue, load_state, now_local, parse_when
 from render import Renderer
 
@@ -109,6 +110,14 @@ def load_topics() -> list[dict]:
     return [t for t in (data.get("topics") or []) if isinstance(t, dict) and t.get("id")]
 
 
+def load_gen_log():
+    f = ROOT / "content" / "generate_log.json"
+    try:
+        return json.loads(f.read_text(encoding="utf-8")) if f.exists() else None
+    except Exception:  # noqa: BLE001
+        return None
+
+
 def main() -> int:
     sys.stdout.reconfigure(encoding="utf-8")
     ap = argparse.ArgumentParser()
@@ -133,6 +142,7 @@ def main() -> int:
     env = Environment(loader=FileSystemLoader(str(Path(__file__).parent)), autoescape=True)
     html = env.get_template("dashboard_template.html").render(
         topics_js=(Path(__file__).parent / "dashboard_topics.js").read_text(encoding="utf-8").replace("__REPO__", os.environ.get("GITHUB_REPOSITORY", "engshadi-79/social-publisher")),
+        gen_log=load_gen_log(),
         topics=load_topics(), repo=os.environ.get("GITHUB_REPOSITORY", "engshadi-79/social-publisher"),
         posts=items, counts=counts, next_post=nxt, tz=TIMEZONE,
         updated=now.strftime("%Y-%m-%d %H:%M"))
