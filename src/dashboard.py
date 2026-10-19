@@ -110,6 +110,14 @@ def load_topics() -> list[dict]:
     return [t for t in (data.get("topics") or []) if isinstance(t, dict) and t.get("id")]
 
 
+def load_health():
+    f = ROOT / "content" / "health.json"
+    try:
+        return json.loads(f.read_text(encoding="utf-8")) if f.exists() else None
+    except Exception:  # noqa: BLE001
+        return None
+
+
 def load_gen_log():
     f = ROOT / "content" / "generate_log.json"
     try:
@@ -143,7 +151,7 @@ def main() -> int:
     env = Environment(loader=FileSystemLoader(str(Path(__file__).parent)), autoescape=True)
     html = env.get_template("dashboard_template.html").render(
         topics_js=(Path(__file__).parent / "dashboard_topics.js").read_text(encoding="utf-8").replace("__REPO__", os.environ.get("GITHUB_REPOSITORY", "engshadi-79/social-publisher")),
-        gen_log=load_gen_log(),
+        gen_log=load_gen_log(), health=load_health(),
         topics=load_topics(), repo=os.environ.get("GITHUB_REPOSITORY", "engshadi-79/social-publisher"),
         posts=items, counts=counts, next_post=nxt, tz=TIMEZONE,
         updated=now.strftime("%Y-%m-%d %H:%M"))

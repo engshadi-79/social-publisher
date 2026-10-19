@@ -49,6 +49,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
 .acts{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.acts button.act{margin-top:0;padding:5px 14px}
 @media (max-width:560px){.post{flex-direction:column}.post img{width:100%;min-width:0;max-width:420px;margin:0 auto}}
 #lb{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;z-index:50;padding:16px;cursor:zoom-out}#lb.on{display:flex}#lb img{max-width:100%;max-height:100%;object-fit:contain;border-radius:6px}
+.health{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 16px;margin-bottom:12px}.health summary{cursor:pointer;font-weight:700}.health ul{list-style:none;padding:0;margin:8px 0 0}.health li{padding:3px 0;font-size:.92rem}.h-bad{color:var(--bad)}.h-warn{color:var(--warn)}.h-off{color:var(--mute)}
 </style>
 </head>
 <body>
@@ -59,6 +60,13 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
 
 <div class="summary">{{ counts.summary }}</div>
 
+{% if health %}
+<details class="health" {% if health.bad or health.warn %}open{% endif %}>
+  <summary>{% if health.bad %}❌ صحة النظام: {{ health.bad }} مشكلة تحتاج انتباهك{% elif health.warn %}⚠️ صحة النظام: {{ health.warn }} تنبيه{% else %}✅ صحة النظام: كل شيء سليم{% endif %}
+    <span class="hint">— آخر فحص <bdi dir="ltr">{{ health.checked_at[:16]|replace("T"," ") }}</bdi> UTC</span></summary>
+  <ul>{% for i in health['items'] %}<li class="h-{{ i.status }}"><b>{{ {"ok":"✅","warn":"⚠️","bad":"❌","off":"➖"}[i.status] }} {{ i.name }}:</b> {{ i.detail }}</li>{% endfor %}</ul>
+</details>
+{% endif %}
 <div class="how">
   <b>كيف تقرأ هذه الصفحة؟</b> كل بطاقة هي منشور واحد: الصورة التي ستظهر، وتحتها متى سيُنشر وعلى أي منصة.
   علامة ✅ تعني أنه نُشر، و⏳ تعني أنه ينتظر موعده، و❌ تعني أن النشر لم ينجح.

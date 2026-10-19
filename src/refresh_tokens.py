@@ -24,6 +24,9 @@ def main() -> int:
     if p.returncode:
         print("فشل تحديث السرّ:", p.stderr[:200])
         return 1
+    import json, datetime, pathlib
+    pathlib.Path(__file__).resolve().parent.parent.joinpath("content", "token_dates.json").write_text(
+        json.dumps({"threads_token_issued": datetime.date.today().isoformat()}, indent=2) + chr(10), encoding="utf-8")
     print("تم تجديد THREADS_TOKEN (صالح 60 يوماً إضافياً)")
     return 0
 

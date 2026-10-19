@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   refresh:
@@ -23,3 +23,13 @@ jobs:
           GH_PAT: ${{ secrets.GH_PAT }}
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: python refresh_tokens.py
+      - name: Record refresh date
+        run: |
+          git config user.name "publisher-bot"
+          git config user.email "publisher-bot@users.noreply.github.com"
+          git add content/token_dates.json
+          if ! git diff --cached --quiet; then
+            git commit -m "bot: threads token refreshed [skip ci]"
+            git pull --rebase origin "${GITHUB_REF_NAME}"
+            git push
+          fi
