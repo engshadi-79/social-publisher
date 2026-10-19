@@ -136,8 +136,9 @@ def main() -> int:
             bg = imagegen.bg_path(it["id"])
             png = r.render(by_id[it["id"]], OUT_DIR / "_tmp" / f"{it['id']}.png", bg if bg.exists() else None)
             im = Image.open(png).convert("RGB")
-            im.thumbnail((520, 650))
-            im.save(img_dir / f"thumb-{it['id']}.jpg", quality=80)
+            im.save(img_dir / f"full-{it['id']}.jpg", quality=85)
+            im.thumbnail((540, 960))
+            im.save(img_dir / f"thumb-{it['id']}.jpg", quality=82)
 
     env = Environment(loader=FileSystemLoader(str(Path(__file__).parent)), autoescape=True)
     html = env.get_template("dashboard_template.html").render(
