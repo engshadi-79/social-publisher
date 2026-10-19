@@ -50,9 +50,36 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
 @media (max-width:560px){.post{flex-direction:column}.post img{width:100%;min-width:0;max-width:420px;margin:0 auto}}
 #lb{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;z-index:50;padding:16px;cursor:zoom-out}#lb.on{display:flex}#lb img{max-width:100%;max-height:100%;object-fit:contain;border-radius:6px}
 .health{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 16px;margin-bottom:12px}.health summary{cursor:pointer;font-weight:700}.health ul{list-style:none;padding:0;margin:8px 0 0}.health li{padding:3px 0;font-size:.92rem}.h-bad{color:var(--bad)}.h-warn{color:var(--warn)}.h-off{color:var(--mute)}
+.calbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin-bottom:10px}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:8px;margin-bottom:10px}
+.cday{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px;min-height:90px}.cday.today{border-color:var(--teal);box-shadow:0 0 0 1px var(--teal)}
+.cdh{font-weight:700;font-size:.85rem;margin-bottom:6px;color:var(--mute)}.cempty{color:var(--mute);font-size:.8rem;border:1px dashed var(--line);border-radius:8px;padding:6px;text-align:center}
+.cchip{display:block;width:100%;text-align:start;font:inherit;font-size:.78rem;border:0;border-radius:8px;padding:4px 7px;margin-bottom:5px;color:#fff;cursor:pointer;line-height:1.4}
+.cchip.g-draft{background:var(--draft)}.cchip.g-upcoming{background:var(--teal);color:#06201d}.cchip.g-published{background:var(--ok)}.cchip.g-failed{background:var(--bad)}
+#editBox{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:flex-start;justify-content:center;overflow:auto;z-index:60;padding:20px 10px}#editBox.on{display:flex}
+#editBox .box{background:var(--card);border-radius:14px;padding:18px;max-width:640px;width:100%}
 </style>
 </head>
 <body>
+<div id="editBox"><div class="box">
+  <h2 id="eHead">تعديل منشور</h2><div class="hint" id="eNote"></div>
+  {% if topics %}<label>الموضوع</label><select id="eTopic"><option value="">— اختر —</option>{% for t in topics %}<option value="{{ t.id }}">{{ t.name }}</option>{% endfor %}</select>{% endif %}
+  <label>شكل الصورة</label>
+  <select id="eTemplate"><option value="infographic">إنفوجرافك</option><option value="split">صورة + لوحة نص</option><option value="photo">صورة كاملة</option><option value="tip">نصيحة</option><option value="quote">اقتباس</option><option value="announcement">إعلان</option><option value="story">ستوري</option></select>
+  <label>العنوان على الصورة *</label><input id="eTitle">
+  <label>النص الصغير</label><input id="eBody">
+  <label>نقاط الإنفوجرافك (سطر لكل نقطة)</label><textarea id="ePoints" rows="4"></textarea>
+  <label>كلمات إنجليزية للصورة <span class="hint">(تغييرها يعيد توليد الصورة)</span></label><input id="eQuery" dir="ltr">
+  <label>وصف بديل للصورة (إنجليزي)</label><textarea id="eVP" dir="ltr" rows="2"></textarea>
+  <label>الموعد</label><input id="eWhen" type="datetime-local">
+  <label>المنصات ونصوصها</label>
+  {% for k,n in [("facebook","فيسبوك"),("instagram","إنستغرام"),("threads","ثريدز"),("telegram","تيليجرام")] %}
+  <label style="display:flex;gap:6px;align-items:center;margin:8px 0 2px"><input id="ep_{{ k }}" type="checkbox" style="width:auto"> {{ n }}</label>
+  <textarea id="et_{{ k }}" rows="4"></textarea>
+  {% endfor %}
+  <button class="act" id="eSave">حفظ التعديل</button> <button class="del" id="eCancel" style="color:var(--ink);border-color:var(--line)">إغلاق</button>
+  <div class="msg" id="eMsg"></div>
+</div></div>
 <div id="lb"><img alt=""></div>
 <div class="wrap">
 <h1>لوحة النشر</h1>
@@ -74,7 +101,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
 </div>
 
 <div class="tabs" id="tabs">
-  {% for key,label in [("all","الكل"),("upcoming","سيُنشر"),("published","تم نشره"),("draft","بانتظار موافقتك"),("failed","فيه مشكلة"),("topics","المواضيع"),("addpost","إضافة منشور")] %}
+  {% for key,label in [("all","الكل"),("upcoming","سيُنشر"),("published","تم نشره"),("draft","بانتظار موافقتك"),("failed","فيه مشكلة"),("topics","المواضيع"),("addpost","إضافة منشور"),("calendar","التقويم")] %}
   <button data-f="{{ key }}" aria-pressed="{{ 'true' if key=='all' else 'false' }}">{{ label }}</button>
   {% endfor %}
 </div>
@@ -104,6 +131,23 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
     <div class="msg" id="fMsg"></div>
   </div>
 
+</section>
+
+<section id="calPanel" hidden>
+  <div class="panel">
+    <h2>التقويم الأسبوعي</h2>
+    <div class="calbar"><button class="del" id="calPrev" style="color:var(--ink);border-color:var(--line)">→ الأسبوع السابق</button>
+      <b id="calLabel" dir="ltr"></b>
+      <button class="del" id="calNext" style="color:var(--ink);border-color:var(--line)">الأسبوع التالي ←</button>
+      <button class="del" id="calToday" style="color:var(--teal);border-color:var(--teal)">هذا الأسبوع</button></div>
+    <div class="cgrid" id="calGrid"></div>
+    <p class="hint">اضغط على منشور مسودة أو مجدول لتعديله. الأيام الفارغة مكتوب عليها «فراغ».</p>
+    <label>توزيع المسودات تلقائياً: منشور واحد كل يوم فارغ بدءاً من الغد، في الساعة</label>
+    <select id="calHour"><option value="12:30">12:30 ظهراً</option><option value="18:00">6:00 مساءً</option><option value="20:00" selected>8:00 مساءً</option><option value="21:00">9:00 مساءً</option></select>
+    <button class="act" id="calDistribute">🗓️ وزّع المسودات</button>
+    <div class="msg" id="calMsg"></div>
+    <p class="hint">أوقات الذروة تقريبية عامة للجمهور العربي (المساء وبعد الظهر)؛ عدّلها حسب جمهورك.</p>
+  </div>
 </section>
 
 <section id="postPanel" hidden>
@@ -179,8 +223,13 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
     {% for c in p.chips if c.error %}<div class="err">{{ c.label }}: {{ c.error }}</div>{% endfor %}
     <div class="acts">
       {% if p.group == "draft" %}<button class="act" data-act="approve" data-id="{{ p.id }}">✅ موافقة على النشر</button>
+      <button class="del" data-act="edit" data-id="{{ p.id }}" style="color:var(--teal);border-color:var(--teal)">✏️ تعديل</button>
       <button class="del" data-act="del" data-id="{{ p.id }}">حذف</button>
-      {% elif p.group == "upcoming" %}<button class="del" data-act="unapprove" data-id="{{ p.id }}">إلغاء الموافقة</button>
+      {% elif p.group == "upcoming" %}<button class="act" data-act="now" data-id="{{ p.id }}">🚀 انشر الآن</button>
+      <button class="del" data-act="unapprove" data-id="{{ p.id }}">إلغاء الموافقة</button>
+      <button class="del" data-act="edit" data-id="{{ p.id }}" style="color:var(--teal);border-color:var(--teal)">✏️ تعديل</button>
+      <button class="del" data-act="del" data-id="{{ p.id }}">حذف</button>
+      {% elif p.group == "failed" %}<button class="act" data-act="retry" data-id="{{ p.id }}">🔁 إعادة المحاولة</button>
       <button class="del" data-act="del" data-id="{{ p.id }}">حذف</button>{% endif %}
       <span class="actmsg msg"></span>
     </div>
@@ -199,7 +248,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
   <ol>
     <li>افتح <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">إنشاء مفتاح جديد</a> (Fine-grained).</li>
     <li>اختر أطول مدة انتهاء، و<b>Only select repositories</b> ثم <b>social-publisher</b>.</li>
-    <li>Permissions ← Repository ← <b>Contents: Read and write</b>، ثم أنشئه وانسخه.</li>
+    <li>Permissions ← Repository ← <b>Contents: Read and write</b> وأيضاً <b>Actions: Read and write</b> (لزر «انشر الآن»)، ثم أنشئه وانسخه.</li>
     <li>الصقه هنا واضغط حفظ.</li>
   </ol>
   <label>المفتاح</label><input id="tok" type="password" autocomplete="off" placeholder="github_pat_...">
@@ -208,9 +257,10 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
 </div>
 
 </div>
+<script type="application/json" id="postdata">{{ posts_json|safe }}</script>
 <script>
 const tabs=document.querySelectorAll('#tabs button'),posts=document.querySelectorAll('.post'),empty=document.getElementById('empty');
-function show(f){const tp=f==='topics'||f==='addpost';document.getElementById('topicsPanel').hidden=f!=='topics';document.getElementById('postPanel').hidden=f!=='addpost';document.getElementById('grid').hidden=tp;let n=0;posts.forEach(p=>{const ok=!tp&&(f==='all'||p.dataset.s===f);p.hidden=!ok;if(ok)n++});empty.hidden=tp||n>0;tabs.forEach(b=>b.setAttribute('aria-pressed',b.dataset.f===f))}
+function show(f){const PN={topics:'topicsPanel',addpost:'postPanel',calendar:'calPanel'};const tp=f in PN;Object.entries(PN).forEach(([k,id])=>document.getElementById(id).hidden=f!==k);document.getElementById('grid').hidden=tp;let n=0;posts.forEach(p=>{const ok=!tp&&(f==='all'||p.dataset.s===f);p.hidden=!ok;if(ok)n++});empty.hidden=tp||n>0;tabs.forEach(b=>b.setAttribute('aria-pressed',b.dataset.f===f))}
 tabs.forEach(b=>b.onclick=()=>show(b.dataset.f));
 const lb=document.getElementById('lb');document.addEventListener('click',e=>{const i=e.target.closest('.post img');if(i){lb.querySelector('img').src=i.dataset.full;lb.classList.add('on')}else if(lb.contains(e.target)){lb.classList.remove('on')}});document.addEventListener('keydown',e=>{if(e.key==='Escape')lb.classList.remove('on')});
 </script>

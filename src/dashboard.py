@@ -148,10 +148,20 @@ def main() -> int:
             im.thumbnail((540, 960))
             im.save(img_dir / f"thumb-{it['id']}.jpg", quality=82)
 
+    group_of = {it["id"]: it["group"] for it in items}
+    raw = {}
+    for p in posts:
+        e = json.loads(json.dumps(p, default=lambda o: o.strftime("%Y-%m-%d %H:%M") if hasattr(o, "strftime") else str(o)))
+        e["publish_at"] = parse_when(p["publish_at"]).strftime("%Y-%m-%d %H:%M")
+        e["group"] = group_of.get(p["id"], "draft")
+        raw[p["id"]] = e
+    posts_json = json.dumps(raw, ensure_ascii=False).replace("</", "<\\/")
+
     env = Environment(loader=FileSystemLoader(str(Path(__file__).parent)), autoescape=True)
     html = env.get_template("dashboard_template.html").render(
-        topics_js=(Path(__file__).parent / "dashboard_topics.js").read_text(encoding="utf-8").replace("__REPO__", os.environ.get("GITHUB_REPOSITORY", "engshadi-79/social-publisher")),
-        gen_log=load_gen_log(), health=load_health(),
+        topics_js=((Path(__file__).parent / "dashboard_topics.js").read_text(encoding="utf-8") + "\n" +
+                   (Path(__file__).parent / "dashboard_posts.js").read_text(encoding="utf-8")).replace("__REPO__", os.environ.get("GITHUB_REPOSITORY", "engshadi-79/social-publisher")),
+        gen_log=load_gen_log(), health=load_health(), posts_json=posts_json,
         topics=load_topics(), repo=os.environ.get("GITHUB_REPOSITORY", "engshadi-79/social-publisher"),
         posts=items, counts=counts, next_post=nxt, tz=TIMEZONE,
         updated=now.strftime("%Y-%m-%d %H:%M"))

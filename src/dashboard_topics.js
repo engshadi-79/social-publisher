@@ -68,6 +68,7 @@ async function gh(path, opt) {
   if ([401, 403, 404].includes(r.status)) throw new Error("المفتاح غير صالح أو صلاحيته ناقصة (يلزم Contents: Read and write على هذا المستودع).");
   if ([409, 422].includes(r.status)) throw new Error("تعارض أثناء الحفظ، أعد المحاولة.");
   if (!r.ok) throw new Error("تعذّر الاتصال بـ GitHub (" + r.status + ").");
+  if (r.status === 204) return {};
   return r.json();
 }
 async function edit(fn, msg, file) {
@@ -138,7 +139,9 @@ $("pAdd").onclick = async () => {
 // ---- منشورات: موافقة / إلغاء / حذف (أزرار البطاقات) ----
 document.addEventListener("click", async (e) => {
   const b = e.target.closest("[data-act]"); if (!b) return;
-  const id = b.dataset.id, act = b.dataset.act, out = b.closest(".post").querySelector(".actmsg");
+  const id = b.dataset.id, act = b.dataset.act;
+  if (!["approve", "unapprove", "del"].includes(act)) return;   // الأزرار الأخرى لها معالجات في dashboard_posts.js
+  const out = b.closest(".post").querySelector(".actmsg");
   if (act === "del" && !confirm("حذف هذا المنشور من الطابور؟")) return;
   try {
     say(out, "جارٍ الحفظ…", true);
