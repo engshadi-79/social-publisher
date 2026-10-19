@@ -39,6 +39,10 @@
 ## 5) Cloudflare (خلفيات الذكاء الاصطناعي، مجاني بلا بطاقة)
 dash.cloudflare.com ← Workers AI ← انسخ Account ID → `CF_ACCOUNT_ID`، وأنشئ API Token بصلاحية **Workers AI** فقط → `CF_API_TOKEN`. بدونهما يُستعمل Pollinations ثم خلفية متدرجة (لا يتوقف النشر).
 
+## أشكال الصور
+- **إنفوجرافك** (`infographic`): عنوان ونقاط مرقّمة (2 إلى 6) في `image.points`؛ مرتبط بالموضوع دائماً ولا يحتاج صورة خارجية.
+- **صورة حقيقية** (`split`): صورة فوتوغرافية في الأعلى ولوحة نص أسفلها. تُجلب من Openverse (ملكية عامة CC0، بلا مفتاح ولا إسناد)، وإن أضفتَ مفتاح Pixabay أو Pexels صارا أولاً. دقة صور Openverse نحو 1024 بكسل فلذلك قالب `split` أنسب من `photo` الكامل.
+
 ## صور حقيقية مجاناً (Pexels)
 للحصول على صور فوتوغرافية حقيقية بدل صور الذكاء الاصطناعي: سجّل مجاناً في pexels.com/api (فوري وبلا بطاقة)، وانسخ المفتاح، ثم:
 `gh secret set PEXELS_API_KEY -R engshadi-79/social-publisher`
