@@ -18,17 +18,6 @@
       #تنظيم_الوقت #إنتاجية'
     threads: ابدأ يومك بثلاث مهام فقط، اكتبها قبل أن تفتح الهاتف.
     telegram: '💡 نصيحة اليوم: ابدأ يومك بخطة من ثلاث مهام فقط.'
-- id: 2026-10-21-001
-  approved: false
-  publish_at: 2026-10-21 12:00
-  template: quote
-  image:
-    title: الاستمرار أهم من الكمال
-    body: خطوة صغيرة كل يوم
-    visual_prompt: a quiet mountain path at sunrise, calm navy and teal tones, soft light, empty space in the center, no text, no letters, no words, no watermark
-  platforms:
-    telegram: «الاستمرار أهم من الكمال» — خطوة صغيرة كل يوم.
-    threads: الاستمرار أهم من الكمال. خطوة صغيرة كل يوم.
 - id: 2026-10-19-g1
   approved: true
   publish_at: 2026-10-19 08:32
