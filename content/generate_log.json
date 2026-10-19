@@ -1,8 +1,8 @@
 {
-  "id": "livetest3",
+  "id": "gmvetivya",
   "ok": true,
-  "count": 1,
-  "topic": "تنظيم الوقت",
+  "count": 3,
+  "topic": "الذكاء الصناعي",
   "method": "Gemini gemini-3.8-flash | ترند Google: 45 عنصر",
-  "message": "وُلِّدت 1 مسودات عن «تنظيم الوقت»"
+  "message": "وُلِّدت 3 مسودات عن «الذكاء الصناعي»"
 }
