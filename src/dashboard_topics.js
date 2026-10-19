@@ -51,6 +51,7 @@ function addPost(text, p) {
   let b = "- id: " + q(p.id) + "\n  approved: false\n  publish_at: " + q(p.when) + "\n  template: " + p.template + "\n";
   if (p.topic) b += "  topic: " + q(p.topic) + "\n";
   b += "  image:\n    title: " + q(p.title) + "\n    body: " + q(p.body) + "\n";
+  if (p.points && p.points.length) b += "    points:\n" + p.points.map((x) => "      - " + q(x)).join("\n") + "\n";
   if (p.query) b += "    photo_query: " + q(p.query) + "\n";
   if (p.vp) b += "    visual_prompt: " + q(p.vp) + "\n";
   b += "    seed: " + p.seed + "\n  platforms:\n";
@@ -116,19 +117,21 @@ $("pAdd").onclick = async () => {
   const plats = ["facebook", "instagram", "threads", "telegram"].filter((k) => $("pl_" + k).checked);
   const when = v("pWhen").replace("T", " ");
   const err = !v("pTitle") ? "اكتب عنوان الصورة." : !v("pText") ? "اكتب نص المنشور." : !plats.length ? "اختر منصة واحدة على الأقل." :
-    !when ? "اختر موعد النشر." : !(v("pQuery") || v("pVP")) ? "اكتب كلمات إنجليزية للصورة (مثل: engineer construction site)." :
+    !when ? "اختر موعد النشر." :
+    ($("pTemplate").value === "infographic" && (v("pPoints").split("\n").filter((x) => x.trim()).length < 2)) ? "الإنفوجرافك يحتاج نقطتين على الأقل (كل نقطة في سطر)." :
+    ($("pTemplate").value !== "infographic" && !(v("pQuery") || v("pVP"))) ? "اكتب كلمات إنجليزية للصورة (مثل: engineer construction site)." :
     ($("pTopic") && !v("pTopic")) ? "اختر الموضوع." :
     (plats.includes("threads") && v("pText").length > 500) ? "نص ثريدز يجب ألا يتجاوز 500 حرف." :
     (plats.includes("instagram") && v("pText").length > 2200) ? "نص إنستغرام يجب ألا يتجاوز 2200 حرف." : "";
   if (err) { say(m, err, false); return; }
   const d = when.slice(0, 10);
   const p = { id: d + "-w" + Date.now().toString(36).slice(-4), when, template: $("pTemplate").value, topic: $("pTopic") ? v("pTopic") : "",
-    title: v("pTitle"), body: v("pBody"), query: v("pQuery"), vp: v("pVP"), seed: 1 + Math.floor(Math.random() * 90), platforms: plats, text: v("pText") };
+    title: v("pTitle"), body: v("pBody"), query: v("pQuery"), vp: v("pVP"), points: v("pPoints").split("\n").map((x) => x.trim()).filter(Boolean), seed: 1 + Math.floor(Math.random() * 90), platforms: plats, text: v("pText") };
   try {
     say(m, "جارٍ الحفظ…", true);
     await edit((x) => addPost(x, p), "queue: add " + p.id, QFILE);
     say(m, "أُضيف كمسودة ✅ خلال دقيقتين تظهر بصورتها في «بانتظار موافقتك» لتراجعها ثم توافق.", true);
-    ["pTitle", "pBody", "pQuery", "pVP", "pText"].forEach((i) => ($(i).value = "")); updCount();
+    ["pTitle", "pBody", "pQuery", "pVP", "pPoints", "pText"].forEach((i) => ($(i).value = "")); updCount();
   } catch (e2) { say(m, e2.message, false); }
 };
 
@@ -162,7 +165,7 @@ $("gGo").onclick = async () => {
   if (!topicId && !topicText) { say(m, "اكتب الموضوع.", false); return; }
   if (!when) { say(m, "اختر موعد أول منشور.", false); return; }
   const id = "g" + Date.now().toString(36);
-  const yml = "id: " + q(id) + "\ncount: " + parseInt($("gCount").value, 10) + "\nstart: " + q(when) + "\n" +
+  const yml = "id: " + q(id) + "\ncount: " + parseInt($("gCount").value, 10) + "\nstyle: " + q($("gStyle").value) + "\nstart: " + q(when) + "\n" +
     (topicId ? "topic_id: " + q(topicId) : "topic_text: " + q(topicText)) + "\n";
   try {
     say(m, "جارٍ إرسال الطلب…", true);

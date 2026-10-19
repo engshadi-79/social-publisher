@@ -41,6 +41,7 @@ class Renderer:
         html = _env.get_template(f"{post['template']}/template.html").render(
             brand=brand, w=w, h=h, fonts=_fonts(),
             title=post["image"]["title"], body=post["image"].get("body", ""),
+            points=[str(x) for x in (post["image"].get("points") or [])],
             bg=bg.as_uri() if bg and bg.exists() else None,
             logo=logo.as_uri() if brand.get("logo") and logo.is_file() else None,
         )

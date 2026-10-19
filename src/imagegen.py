@@ -52,6 +52,34 @@ def _pexels(query: str, size: tuple[int, int], pick: int) -> bytes:
     return img.content
 
 
+def _openverse(query: str, size: tuple[int, int], pick: int) -> bytes:
+    """صور حقيقية CC0/ملكية عامة من Openverse: بلا مفتاح وبلا حاجة لإسناد."""
+    r = requests.get("https://api.openverse.org/v1/images/", timeout=30,
+                     headers={"User-Agent": "social-publisher/1.0"},
+                     params={"q": query, "license": "cc0,pdm", "category": "photograph",
+                             "page_size": 20, "mature": "false"})
+    r.raise_for_status()
+    cands = [x for x in r.json().get("results", []) if x.get("url") and (x.get("width") or 0) >= 900]
+    if not cands:
+        raise RuntimeError(f"لا نتائج مناسبة في Openverse لـ «{query}»")
+    last = None
+    for i in range(min(5, len(cands))):
+        c = cands[(pick + i) % len(cands)]
+        try:
+            img = requests.get(c["url"], timeout=60, headers={"User-Agent": "social-publisher/1.0"})
+            img.raise_for_status()
+            im = Image.open(io.BytesIO(img.content)).convert("RGB")
+            if im.width < 800 or im.height < 600:
+                continue
+            im.thumbnail((2000, 2000))
+            buf = io.BytesIO()
+            im.save(buf, "JPEG", quality=90)
+            return buf.getvalue()
+        except Exception as e:  # noqa: BLE001
+            last = e
+    raise RuntimeError(f"تعذّر تنزيل صورة صالحة من Openverse ({last})")
+
+
 def _pixabay(query: str, size: tuple[int, int], pick: int) -> bytes:
     """صورة فوتوغرافية حقيقية مجانية من Pixabay (يسمح الترخيص بالنشر دون إسناد)."""
     key = os.environ.get("PIXABAY_API_KEY")
@@ -165,7 +193,10 @@ def ensure_background(post: dict, regen: bool = False, seed: int | None = None):
     if not (post["image"].get("visual_prompt") or post["image"].get("photo_query")):
         return None, ["لا يوجد visual_prompt ولا photo_query — خلفية متدرجة"]
     seed = seed if seed is not None else post["image"].get("seed")
-    prompt = _prompt(post) if post["image"].get("visual_prompt") else "a calm abstract background"
+    if post["image"].get("visual_prompt"):
+        prompt = _prompt(post)
+    else:  # وصف احتياطي مبني على كلمات البحث ليبقى مرتبطاً بالموضوع
+        prompt = f"{post['image']['photo_query']}, {REALISM}, empty space for text, {SUFFIX}"
     size = TEMPLATES[post["template"]]
     chain = []
     query = post["image"].get("photo_query")
@@ -173,6 +204,7 @@ def ensure_background(post: dict, regen: bool = False, seed: int | None = None):
         chain.append(("Pexels", lambda: _pexels(query, size, seed or 0)))
     if query:
         chain.append(("Pixabay", lambda: _pixabay(query, size, seed or 0)))
+        chain.append(("Openverse", lambda: _openverse(query, size, seed or 0)))
     chain += [("Gemini", lambda: _gemini(prompt, size)),
               ("Cloudflare", lambda: _cloudflare(prompt, seed)),
               ("Pollinations", lambda: _pollinations(prompt, seed, size))]

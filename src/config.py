@@ -25,6 +25,7 @@ TEMPLATES = {
     "story": (1080, 1920),
     "split": (1080, 1350),
     "photo": (1080, 1350),
+    "infographic": (1080, 1350),
 }
 
 PLATFORMS = ("facebook", "instagram", "threads", "telegram")

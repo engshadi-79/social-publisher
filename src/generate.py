@@ -60,10 +60,16 @@ def fetch_trends() -> list[str]:
     return out[:60]
 
 
-def build_prompt(topic: dict, count: int, brand: dict, recent: list[str], trends: list[str]) -> str:
+def build_prompt(topic: dict, count: int, brand: dict, recent: list[str], trends: list[str], style: str = "photo") -> str:
     fixed = " ".join(topic.get("hashtags_fixed") or []) or "(لا يوجد)"
     avoid = "، ".join(recent[-15:]) or "(لا يوجد)"
     trend_txt = "، ".join(trends) if trends else "(غير متاح الآن)"
+    if style == "infographic":
+        style_fields = ('  "points": من 3 إلى 5 نقاط قصيرة ومفيدة تلخّص المنشور كإنفوجرافك (كل نقطة حتى 60 حرفاً، بلا ترقيم)،\n'
+                        '  "photo_query": "" (اتركه فارغاً)،\n  "visual_prompt": "" (اتركه فارغاً)،')
+    else:
+        style_fields = ('  "photo_query": 2 إلى 4 كلمات إنجليزية للبحث عن صورة فوتوغرافية حقيقية تمثّل فكرة المنشور مباشرة (شيء ملموس ومرئي، لا مفاهيم مجردة)،\n'
+                        '  "visual_prompt": وصف إنجليزي قصير لمشهد واقعي يمثّل فكرة المنشور حرفياً (للتوليد الاحتياطي)،')
     return f"""أنت كاتب محتوى عربي محترف لحساب «{brand.get('name', '')}» على وسائل التواصل.
 اكتب {count} منشورات مختلفة تماماً عن الموضوع: «{topic['name']}».
 وصف الموضوع: {topic.get('description') or 'غير محدد'}
@@ -79,8 +85,8 @@ def build_prompt(topic: dict, count: int, brand: dict, recent: list[str], trends
   ثم أضف 3 إلى 4 هاشتاجات عربية متخصصة بالموضوع، مع الهاشتاجات الثابتة.
 - لكل منشور هذه الحقول بالضبط:
   "title": عنوان قصير يظهر على الصورة (حتى 60 حرفاً)،
-  "body": سطر صغير تحت العنوان (حتى 110 أحرف، أو فارغ)،
-  "photo_query": 2 إلى 4 كلمات إنجليزية لصورة فوتوغرافية حقيقية مناسبة (بلا وجوه إن أمكن)،
+  "body": سطر صغير تحت العنوان (حتى 80 حرفاً، أو فارغ)،
+{style_fields}
   "text_long": نص كامل لفيسبوك وإنستغرام وتيليجرام مع الهاشتاجات في آخره (حتى 900 حرف)،
   "text_short": نص قصير لثريدز مع 2 إلى 3 هاشتاجات (حتى 380 حرفاً).
 أخرج مصفوفة JSON فقط بلا أي شرح قبلها أو بعدها."""
@@ -101,12 +107,20 @@ def make_entries(items: list[dict], req: dict, topic: dict, existing_ids: set[st
         texts = {"facebook": long_t, "instagram": long_t, "telegram": long_t, "threads": short_t or long_t}
         entry = {
             "id": pid, "approved": False, "publish_at": f"{when:%Y-%m-%d %H:%M}",
-            "template": req.get("template") or "photo",
+            "template": "infographic" if req.get("style") == "infographic" else (req.get("template") or "photo"),
         }
         if topic.get("id"):
             entry["topic"] = topic["id"]
-        entry["image"] = {"title": str(it.get("title", "")).strip(), "body": str(it.get("body", "")).strip(),
-                          "photo_query": str(it.get("photo_query", "")).strip(), "seed": 1 + (i * 7) % 90}
+        img = {"title": str(it.get("title", "")).strip(), "body": str(it.get("body", "")).strip()}
+        if req.get("style") == "infographic":
+            pts = [str(x).strip() for x in (it.get("points") or []) if str(x).strip()][:5]
+            img["points"] = [x[:88] for x in pts]
+        else:
+            img["photo_query"] = str(it.get("photo_query", "")).strip()
+            if str(it.get("visual_prompt", "")).strip():
+                img["visual_prompt"] = str(it["visual_prompt"]).strip()
+        img["seed"] = 1 + (i * 7) % 90
+        entry["image"] = img
         entry["platforms"] = {p: texts[p][:480] if p == "threads" else texts[p] for p in platforms if texts.get(p)}
         out.append(entry)
     return out
@@ -129,13 +143,13 @@ def main() -> int:
         queue = load_queue()
         recent = [p["image"]["title"] for p in queue if isinstance(p.get("image"), dict) and p["image"].get("title")]
         trends = fetch_trends()
-        text, method = generator.generate_text(build_prompt(topic, count, load_brand(), recent, trends))
+        text, method = generator.generate_text(build_prompt(topic, count, load_brand(), recent, trends, req.get("style") or "photo"))
         method += f" | ترند Google: {len(trends)} عنصر" if trends else " | ترند Google غير متاح"
         items = generator.extract_json(text)
         if not isinstance(items, list) or not items:
             raise generator.GeneratorError("قائمة المنشورات فارغة")
         entries = make_entries(items[:count], req, topic, {p["id"] for p in queue})
-        entries = [e for e in entries if e["image"]["title"] and e["platforms"]]
+        entries = [e for e in entries if e["image"]["title"] and e["platforms"] and (e["template"] != "infographic" or len(e["image"].get("points", [])) >= 2)]
         if not entries:
             raise generator.GeneratorError("لم يصلح أي منشور مولَّد")
         errors = fatal(validate(queue + entries))

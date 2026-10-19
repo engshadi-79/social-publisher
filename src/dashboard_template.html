@@ -109,6 +109,8 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
     {% else %}
     <label>الموضوع *</label><input id="gTopicText" placeholder="مثل: تنظيم الوقت">
     {% endif %}
+    <label>شكل الصورة</label>
+    <select id="gStyle"><option value="infographic">إنفوجرافك: نقاط مرقّمة تلخّص الفكرة (مقترح)</option><option value="photo">صورة حقيقية تمثّل الفكرة</option></select>
     <label>عدد المنشورات</label>
     <select id="gCount"><option>1</option><option>2</option><option selected>3</option><option>5</option><option>7</option></select>
     <label>موعد أول منشور (ثم واحد كل يوم في نفس الوقت)</label><input id="gWhen" type="datetime-local">
@@ -125,7 +127,8 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
     {% endif %}
     <label>شكل الصورة</label>
     <select id="pTemplate">
-      <option value="photo">صورة كاملة والنص أسفلها (مقترح)</option>
+      <option value="infographic">إنفوجرافك (نقاط مرقّمة)</option>
+      <option value="photo">صورة كاملة والنص أسفلها</option>
       <option value="split">الصورة أعلى ولوحة نص أسفلها</option>
       <option value="tip">نصيحة (بطاقة)</option>
       <option value="quote">اقتباس</option>
@@ -134,7 +137,8 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
     </select>
     <label>العنوان الذي يظهر على الصورة *</label><input id="pTitle" placeholder="جملة قصيرة وواضحة">
     <label>نص صغير تحت العنوان (اختياري)</label><input id="pBody">
-    <label>كلمات إنجليزية للصورة الحقيقية * <span class="hint">(2 إلى 4 كلمات)</span></label><input id="pQuery" dir="ltr" placeholder="civil engineer construction site">
+    <label>نقاط الإنفوجرافك (كل نقطة في سطر، من 2 إلى 6) <span class="hint">— لقالب الإنفوجرافك فقط</span></label><textarea id="pPoints" rows="4"></textarea>
+    <label>كلمات إنجليزية للصورة الحقيقية <span class="hint">(2 إلى 4 كلمات، لغير الإنفوجرافك)</span></label><input id="pQuery" dir="ltr" placeholder="civil engineer construction site">
     <label>وصف بديل للصورة بالإنجليزية (اختياري)</label><textarea id="pVP" dir="ltr" rows="2"></textarea>
     <label>موعد النشر *</label><input id="pWhen" type="datetime-local">
     <label>المنصات</label>

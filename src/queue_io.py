@@ -84,6 +84,12 @@ def validate(queue: list[dict]) -> list[str]:
         img = p.get("image")
         if not isinstance(img, dict) or not img.get("title"):
             errors.append(f"{tag} image.title مطلوب")
+        elif p.get("template") == "infographic":
+            pts = img.get("points")
+            if not (isinstance(pts, list) and 2 <= len(pts) <= 6 and all(isinstance(x, str) and x.strip() for x in pts)):
+                errors.append(f"{tag} قالب infographic يحتاج image.points من 2 إلى 6 نقاط نصية")
+            elif any(len(x) > 90 for x in pts):
+                errors.append(f"{tag} نقطة في image.points أطول من 90 حرفاً")
         elif not (img.get("visual_prompt") or img.get("photo_query")):
             errors.append(f"{tag} image.visual_prompt مفقود (سيُستعمل خلفية متدرجة فقط)")
         if topic_ids and p.get("topic") not in topic_ids:
