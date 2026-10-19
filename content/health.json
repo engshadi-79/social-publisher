@@ -1,0 +1,47 @@
+{
+  "checked_at": "2026-10-19T16:10+00:00",
+  "bad": 0,
+  "warn": 1,
+  "items": [
+    {
+      "name": "فيسبوك",
+      "status": "ok",
+      "detail": "متصل: الوان"
+    },
+    {
+      "name": "إنستغرام",
+      "status": "ok",
+      "detail": "متصل: ostoraplus"
+    },
+    {
+      "name": "ثريدز",
+      "status": "ok",
+      "detail": "متصل: engshadi2011"
+    },
+    {
+      "name": "صلاحية توكن ثريدز",
+      "status": "warn",
+      "detail": "ينتهي بعد 59 يوماً. فعّل التجديد التلقائي بإضافة سرّ GH_PAT"
+    },
+    {
+      "name": "تيليجرام",
+      "status": "off",
+      "detail": "غير مُعدّ بعد (اختياري)"
+    },
+    {
+      "name": "توليد النصوص (Gemini)",
+      "status": "ok",
+      "detail": "مفتاح موجود"
+    },
+    {
+      "name": "صور حقيقية",
+      "status": "ok",
+      "detail": "Openverse (مجاني بلا مفتاح)"
+    },
+    {
+      "name": "تشغيل النشر الدوري",
+      "status": "ok",
+      "detail": "آخر تشغيل قبل 148 دقيقة"
+    }
+  ]
+}
