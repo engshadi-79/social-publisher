@@ -184,7 +184,7 @@ When the owner says "جهّز منشورات الأسبوع" (prepare this week'
    Caveat to tell the owner: there is no official free trends API, so this is web research at
    preparation time and trends may shift before the post goes out.
 3. Images (the owner wants REAL-looking photos, not AI-looking art):
-   - Prefer the `photo` or `split` template (photo is shown clearly, not hidden under a dark overlay).
+   - Prefer the `infographic` template (numbered key points in `image.points`, always on-topic) or `split` for real photos (stock photos are ~1000px wide, so full-bleed `photo` looks soft).
    - Set `image.photo_query`: 2–4 English keywords for a real stock photo (Pexels), e.g.
      "woman planning day notebook window". Also keep `image.visual_prompt` as the AI fallback.
    - Choose a different `seed` per post (it picks a different Pexels result).

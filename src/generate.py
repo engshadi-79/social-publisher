@@ -107,7 +107,7 @@ def make_entries(items: list[dict], req: dict, topic: dict, existing_ids: set[st
         texts = {"facebook": long_t, "instagram": long_t, "telegram": long_t, "threads": short_t or long_t}
         entry = {
             "id": pid, "approved": False, "publish_at": f"{when:%Y-%m-%d %H:%M}",
-            "template": "infographic" if req.get("style") == "infographic" else (req.get("template") or "photo"),
+            "template": "infographic" if req.get("style") == "infographic" else (req.get("template") or "split"),
         }
         if topic.get("id"):
             entry["topic"] = topic["id"]

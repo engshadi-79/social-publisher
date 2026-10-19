@@ -32,7 +32,7 @@
 - id: 2026-10-19-g1
   approved: false
   publish_at: 2026-10-19 08:32
-  template: photo
+  template: split
   topic: tmvet3asy
   image:
     title: الذكاء الاصطناعي لا يستبدلك، بل يدعمك
@@ -67,7 +67,7 @@
 - id: 2026-10-20-g1
   approved: false
   publish_at: 2026-10-20 08:32
-  template: photo
+  template: split
   topic: tmvet3asy
   image:
     title: كيف تحول موقعك إلى نظام تفاعلي ذكي؟
@@ -102,7 +102,7 @@
 - id: 2026-10-21-g1
   approved: false
   publish_at: 2026-10-21 08:32
-  template: photo
+  template: split
   topic: tmvet3asy
   image:
     title: تعلم البرمجة في عصر الذكاء الاصطناعي

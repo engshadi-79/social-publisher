@@ -54,12 +54,22 @@ def _pexels(query: str, size: tuple[int, int], pick: int) -> bytes:
 
 def _openverse(query: str, size: tuple[int, int], pick: int) -> bytes:
     """صور حقيقية CC0/ملكية عامة من Openverse: بلا مفتاح وبلا حاجة لإسناد."""
-    r = requests.get("https://api.openverse.org/v1/images/", timeout=30,
-                     headers={"User-Agent": "social-publisher/1.0"},
-                     params={"q": query, "license": "cc0,pdm", "category": "photograph",
-                             "page_size": 20, "mature": "false"})
-    r.raise_for_status()
-    cands = [x for x in r.json().get("results", []) if x.get("url") and (x.get("width") or 0) >= 900]
+    words = query.split()
+    variants = [" ".join(words[:n]) for n in (len(words), 3, 2, 1) if n and n <= len(words)]
+    cands = []
+    for v in dict.fromkeys(variants):
+        r = requests.get("https://api.openverse.org/v1/images/", timeout=30,
+                         headers={"User-Agent": "social-publisher/1.0"},
+                         params={"q": v, "license": "cc0,pdm", "category": "photograph",
+                                 "page_size": 20, "mature": "false"})
+        r.raise_for_status()
+        found = [x for x in r.json().get("results", []) if x.get("url")]
+        for min_w in (2000, 1600, 1300, 1000):      # نفضّل الأعلى دقة، ثم نتساهل
+            cands = [x for x in found if (x.get("width") or 0) >= min_w]
+            if cands:
+                break
+        if cands:
+            break
     if not cands:
         raise RuntimeError(f"لا نتائج مناسبة في Openverse لـ «{query}»")
     last = None
@@ -69,7 +79,7 @@ def _openverse(query: str, size: tuple[int, int], pick: int) -> bytes:
             img = requests.get(c["url"], timeout=60, headers={"User-Agent": "social-publisher/1.0"})
             img.raise_for_status()
             im = Image.open(io.BytesIO(img.content)).convert("RGB")
-            if im.width < 800 or im.height < 600:
+            if im.width < 900 or im.height < 600:
                 continue
             im.thumbnail((2000, 2000))
             buf = io.BytesIO()
