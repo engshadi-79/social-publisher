@@ -1,6 +1,7 @@
 """استدعاء Gemini لتوليد نصوص المنشورات (الطبقة المجانية للنص كافية).
 
-بحث Google (لهاشتاجات الترند) مجاني فقط مع gemini-2.5-flash، لذلك هو الافتراضي.
+ملاحظة: gemini-2.5-flash لم يعد متاحاً للحسابات الجديدة وبحث Google مدفوع في النماذج الأحدث،
+لذلك يُجلب الترند من Google Trends RSS خارج النموذج (انظر generate.fetch_trends).
 """
 import json
 import os
@@ -78,9 +79,9 @@ def generate_text(prompt: str):
     if not enabled():
         raise GeneratorError("GEMINI_API_KEY غير مضبوط")
     attempts = [
-        ("2.5-flash + بحث Google (هاشتاجات الترند الحالية)", lambda: _generate_content(prompt, MODEL, True)),
-        ("2.5-flash بلا بحث (لم يتوفر بحث Google)", lambda: _generate_content(prompt, MODEL, False)),
-        ("نموذج بديل بلا بحث", lambda: _interactions(prompt, FALLBACK_MODEL)),
+        ("Gemini " + FALLBACK_MODEL, lambda: _interactions(prompt, FALLBACK_MODEL)),
+        ("Gemini " + FALLBACK_MODEL + " (generateContent)", lambda: _generate_content(prompt, FALLBACK_MODEL, False)),
+        ("Gemini 3.6", lambda: _interactions(prompt, "gemini-3.6-flash")),
     ]
     errors = []
     for label, fn in attempts:

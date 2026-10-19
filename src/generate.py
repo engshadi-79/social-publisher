@@ -9,6 +9,9 @@ import re
 import sys
 from datetime import timedelta
 
+import urllib.request
+import xml.etree.ElementTree as ET
+
 import yaml
 
 import generator
@@ -35,9 +38,32 @@ def load_topic(req: dict) -> dict:
     return {"id": "", "name": text, "description": "", "audience": "", "tone": "", "hashtags_fixed": []}
 
 
-def build_prompt(topic: dict, count: int, brand: dict, recent: list[str]) -> str:
+TREND_GEOS = ["PS", "SA", "JO", "EG", "AE"]
+
+
+def fetch_trends() -> list[str]:
+    """ترند Google الحالي (RSS عام بلا مفتاح). عند أي فشل يرجع قائمة فارغة."""
+    seen, out = set(), []
+    for geo in TREND_GEOS:
+        try:
+            req = urllib.request.Request(f"https://trends.google.com/trending/rss?geo={geo}",
+                                         headers={"User-Agent": "Mozilla/5.0"})
+            with urllib.request.urlopen(req, timeout=15) as r:
+                root = ET.fromstring(r.read())
+            for item in root.iter("item"):
+                title = (item.findtext("title") or "").strip()
+                if title and title not in seen:
+                    seen.add(title)
+                    out.append(title)
+        except Exception:  # noqa: BLE001
+            continue
+    return out[:60]
+
+
+def build_prompt(topic: dict, count: int, brand: dict, recent: list[str], trends: list[str]) -> str:
     fixed = " ".join(topic.get("hashtags_fixed") or []) or "(لا يوجد)"
     avoid = "، ".join(recent[-15:]) or "(لا يوجد)"
+    trend_txt = "، ".join(trends) if trends else "(غير متاح الآن)"
     return f"""أنت كاتب محتوى عربي محترف لحساب «{brand.get('name', '')}» على وسائل التواصل.
 اكتب {count} منشورات مختلفة تماماً عن الموضوع: «{topic['name']}».
 وصف الموضوع: {topic.get('description') or 'غير محدد'}
@@ -48,8 +74,9 @@ def build_prompt(topic: dict, count: int, brand: dict, recent: list[str]) -> str
 
 قواعد صارمة:
 - العربية الفصحى المبسّطة. معلومات صحيحة ومفيدة، بلا ادعاءات طبية أو مالية أو سياسية ولا أرقام مختلقة.
-- ابحث في الويب الآن عن الهاشتاجات العربية الرائجة حالياً والمرتبطة فعلاً بالموضوع، واستعمل 2 إلى 3 منها،
-  مع 2 إلى 3 هاشتاجات متخصصة، مع الثابتة. لا تستعمل ترنداً لا علاقة له بالمنشور.
+- ترند Google الحالي (مواضيع يبحث عنها الناس الآن): {trend_txt}
+  استعمل منها كهاشتاج فقط ما يرتبط فعلاً بموضوع المنشور (قد لا يوجد شيء مناسب، وهذا مقبول ولا تُقحم ترنداً لا علاقة له).
+  ثم أضف 3 إلى 4 هاشتاجات عربية متخصصة بالموضوع، مع الهاشتاجات الثابتة.
 - لكل منشور هذه الحقول بالضبط:
   "title": عنوان قصير يظهر على الصورة (حتى 60 حرفاً)،
   "body": سطر صغير تحت العنوان (حتى 110 أحرف، أو فارغ)،
@@ -101,7 +128,9 @@ def main() -> int:
         topic = load_topic(req)
         queue = load_queue()
         recent = [p["image"]["title"] for p in queue if isinstance(p.get("image"), dict) and p["image"].get("title")]
-        text, method = generator.generate_text(build_prompt(topic, count, load_brand(), recent))
+        trends = fetch_trends()
+        text, method = generator.generate_text(build_prompt(topic, count, load_brand(), recent, trends))
+        method += f" | ترند Google: {len(trends)} عنصر" if trends else " | ترند Google غير متاح"
         items = generator.extract_json(text)
         if not isinstance(items, list) or not items:
             raise generator.GeneratorError("قائمة المنشورات فارغة")
