@@ -53,7 +53,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
 <body>
 <div class="wrap">
 <h1>لوحة النشر</h1>
-<div class="upd">آخر تحديث: <bdi dir="ltr">2026-10-19 08:21</bdi></div>
+<div class="upd">آخر تحديث: <bdi dir="ltr">2026-10-19 08:25</bdi></div>
 
 <div class="summary">لا يوجد أي منشور مجدول حالياً. 2 منشور ينتظر موافقتك ولن يُنشر قبلها.</div>
 
@@ -109,6 +109,21 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
 </section>
 
 <section id="postPanel" hidden>
+  <div class="panel">
+    <h2>✨ توليد منشورات تلقائياً</h2>
+    <p class="hint">اختر موضوعاً وعدداً، ويكتب الذكاء الاصطناعي (Gemini) المنشورات والهاشتاجات الرائجة وكلمات الصور، فتظهر <b>كمسودات</b> تراجعها وتوافق عليها. لا يُنشر شيء قبل موافقتك.</p>
+    
+    
+    <label>الموضوع *</label>
+    <select id="gTopic"><option value="tmvet3asy">الذكاء الصناعي</option></select>
+    
+    <label>عدد المنشورات</label>
+    <select id="gCount"><option>1</option><option>2</option><option selected>3</option><option>5</option><option>7</option></select>
+    <label>موعد أول منشور (ثم واحد كل يوم في نفس الوقت)</label><input id="gWhen" type="datetime-local">
+    <button class="act" id="gGo">✨ ولّد المسودات</button>
+    <div class="msg" id="gMsg"></div>
+  </div>
+
   <div class="panel">
     <h2>إضافة منشور جديد</h2>
     <p class="hint">يُحفظ كمسودة، وخلال دقيقتين تراه بصورته في «بانتظار موافقتك»، ثم توافق عليه من بطاقته.</p>
@@ -376,6 +391,30 @@ document.addEventListener("click", async (e) => {
     b.parentElement.querySelectorAll("button").forEach((x) => (x.disabled = true));
   } catch (err) { say(out, err.message, false); }
 });
+
+// ---- توليد منشورات تلقائياً: يكتب طلباً في المستودع فيشغّل سير عمل التوليد ----
+async function putRequest(text, msg) {
+  if (!getTok()) throw new Error("ألصق مفتاح GitHub أولاً في قسم «ربط GitHub» أسفل الصفحة.");
+  let sha;
+  try { sha = (await gh("contents/content/generate_request.yaml")).sha; } catch (e) { sha = undefined; }
+  await gh("contents/content/generate_request.yaml", { method: "PUT",
+    body: JSON.stringify({ message: msg, content: b64e(text), sha }) });
+}
+$("gGo").onclick = async () => {
+  const m = $("gMsg");
+  const topicId = $("gTopic") ? $("gTopic").value : "", topicText = $("gTopicText") ? $("gTopicText").value.trim() : "";
+  const when = $("gWhen").value.replace("T", " ");
+  if (!topicId && !topicText) { say(m, "اكتب الموضوع.", false); return; }
+  if (!when) { say(m, "اختر موعد أول منشور.", false); return; }
+  const id = "g" + Date.now().toString(36);
+  const yml = "id: " + q(id) + "\ncount: " + parseInt($("gCount").value, 10) + "\nstart: " + q(when) + "\n" +
+    (topicId ? "topic_id: " + q(topicId) : "topic_text: " + q(topicText)) + "\n";
+  try {
+    say(m, "جارٍ إرسال الطلب…", true);
+    await putRequest(yml, "generate: request " + id);
+    say(m, "طُلب التوليد ✅ خلال دقيقتين إلى ثلاث تظهر المسودات (مع صورها) في «بانتظار موافقتك». حدّث الصفحة بعد ذلك.", true);
+  } catch (e) { say(m, e.message, false); }
+};
 </script>
 </body>
 </html>
