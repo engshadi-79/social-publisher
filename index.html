@@ -53,7 +53,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
 <body>
 <div class="wrap">
 <h1>لوحة النشر</h1>
-<div class="upd">آخر تحديث: <bdi dir="ltr">2026-10-19 04:27</bdi></div>
+<div class="upd">آخر تحديث: <bdi dir="ltr">2026-10-19 08:21</bdi></div>
 
 <div class="summary">لا يوجد أي منشور مجدول حالياً. 2 منشور ينتظر موافقتك ولن يُنشر قبلها.</div>
 
@@ -84,8 +84,13 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
 <section id="topicsPanel" hidden>
   <div class="panel">
     <h2>المواضيع المسموح بنشرها</h2>
-    <p class="hint">لا يُنشر منشور معتمد خارج هذه القائمة. القائمة فارغة حالياً، فلا قيد على المواضيع إلى أن تضيف أول موضوع.</p>
+    <p class="hint">لا يُنشر منشور معتمد خارج هذه القائمة. </p>
     <div id="topicList">
+    
+    <div class="tp"><div><b>الذكاء الصناعي</b><small>البرمجة وصناعة المواقع الانظمة</small>
+      <small>الجمهور: الكل · النبرة: —</small>
+      <small></small></div>
+      <button class="del" data-del="tmvet3asy">حذف</button></div>
     
     </div>
   </div>
@@ -107,6 +112,9 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
   <div class="panel">
     <h2>إضافة منشور جديد</h2>
     <p class="hint">يُحفظ كمسودة، وخلال دقيقتين تراه بصورته في «بانتظار موافقتك»، ثم توافق عليه من بطاقته.</p>
+    
+    <label>الموضوع *</label>
+    <select id="pTopic"><option value="">— اختر —</option><option value="tmvet3asy">الذكاء الصناعي</option></select>
     
     <label>شكل الصورة</label>
     <select id="pTemplate">
