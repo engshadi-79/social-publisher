@@ -11,4 +11,10 @@
 #     audience: موظفون وطلاب
 #     tone: ودّي ومباشر
 #     hashtags_fixed: ["#تنظيم_الوقت", "#إنتاجية"]
-topics: []
+topics:
+  - id: "tmvet3asy"
+    name: "الذكاء الصناعي"
+    description: "البرمجة وصناعة المواقع الانظمة"
+    audience: "الكل"
+    tone: ""
+    hashtags_fixed: []
