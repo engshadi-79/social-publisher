@@ -71,15 +71,22 @@ def main() -> int:
             pid = post["id"]
             todo = pending_platforms(post, state)
             warns: list[str] = []
-            if args.dry_run:
+            if post["template"] in ("carousel", "infographic"):
+                bg = None                      # قوالب نصّية بلا خلفية خارجية
+            elif args.dry_run:
                 bg = imagegen.bg_path(pid)
                 bg = bg if bg.exists() else None
             else:
                 bg, warns = imagegen.ensure_background(post)
-            png = r.render(post, OUT_DIR / f"{pid}.png", bg)
-            jpg = png.with_suffix(".jpg")
-            Image.open(png).convert("RGB").save(jpg, quality=92)
-            print(f"[{pid}] صورة: {png}  منصات: {', '.join(todo)}")
+            pngs = r.render_post(post, OUT_DIR, bg)
+            jpgs = []
+            for f in pngs:
+                j = f.with_suffix(".jpg")
+                Image.open(f).convert("RGB").save(j, quality=92)
+                jpgs.append(j)
+            png, jpg = pngs[0], jpgs[0]
+            post["_files"] = pngs              # للمنصات التي ترفع الملفات (تيليجرام)
+            print(f"[{pid}] صور: {len(pngs)}  منصات: {', '.join(todo)}")
             if args.dry_run:
                 continue
 
@@ -87,7 +94,8 @@ def main() -> int:
             if any(PUBLISHERS[n].needs_url for n in todo):
                 try:
                     import hosting
-                    urls = hosting.upload([jpg])
+                    urls = hosting.upload(jpgs)
+                    post["_urls"] = [urls[j.name] for j in jpgs]
                 except Exception as e:  # noqa: BLE001
                     msg = redact(f"{type(e).__name__}: {e}")
                     for n in todo:

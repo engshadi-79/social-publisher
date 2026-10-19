@@ -84,6 +84,18 @@ def validate(queue: list[dict]) -> list[str]:
         img = p.get("image")
         if not isinstance(img, dict) or not img.get("title"):
             errors.append(f"{tag} image.title مطلوب")
+        elif p.get("template") == "carousel":
+            sl = img.get("slides")
+            if not (isinstance(sl, list) and 3 <= len(sl) <= 10):
+                errors.append(f"{tag} الكاروسيل يحتاج image.slides من 3 إلى 10 شرائح")
+            else:
+                for n, s_ in enumerate(sl, 1):
+                    if not (isinstance(s_, dict) and str(s_.get("title", "")).strip()):
+                        errors.append(f"{tag} الشريحة {n} بلا عنوان")
+                    elif len(str(s_["title"])) > 120 or len(str(s_.get("body", ""))) > 260:
+                        errors.append(f"{tag} الشريحة {n}: العنوان أو النص أطول من المسموح")
+                    elif len(s_.get("points") or []) > 5:
+                        errors.append(f"{tag} الشريحة {n}: أكثر من 5 نقاط")
         elif p.get("template") == "infographic":
             pts = img.get("points")
             if not (isinstance(pts, list) and 2 <= len(pts) <= 6 and all(isinstance(x, str) and x.strip() for x in pts)):

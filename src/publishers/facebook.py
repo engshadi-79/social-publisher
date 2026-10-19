@@ -1,3 +1,4 @@
+import json
 import os
 
 import requests
@@ -14,7 +15,19 @@ class Facebook(Publisher):
         page, tok = os.environ.get("FB_PAGE_ID"), os.environ.get("FB_PAGE_TOKEN")
         if not (page and tok):
             raise PublishError("FB_PAGE_ID/FB_PAGE_TOKEN غير مضبوطين")
-        r = requests.post(f"https://graph.facebook.com/{GRAPH_VERSION}/{page}/photos", timeout=60,
+        base = f"https://graph.facebook.com/{GRAPH_VERSION}/{page}"
+        urls = post.get("_urls") or []
+        if post["template"] == "carousel" and len(urls) >= 2:
+            # ألبوم: ارفع كل صورة غير منشورة ثم أنشئ منشوراً واحداً يرفقها كلها
+            data = {"message": text, "access_token": tok}
+            for i, u in enumerate(urls):
+                pid = check(requests.post(f"{base}/photos", timeout=60,
+                                          data={"url": u, "published": "false", "access_token": tok}),
+                            f"facebook photo {i + 1}")["id"]
+                data[f"attached_media[{i}]"] = json.dumps({"media_fbid": pid})
+            d = check(requests.post(f"{base}/feed", timeout=60, data=data), "facebook feed")
+            return str(d["id"])
+        r = requests.post(f"{base}/photos", timeout=60,
                           data={"url": image_url, "message": text, "access_token": tok})
         d = check(r, "facebook photos")
         return str(d.get("post_id") or d["id"])

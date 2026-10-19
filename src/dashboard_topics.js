@@ -6,6 +6,30 @@ const b64d = (b) => new TextDecoder().decode(Uint8Array.from(atob(b.replace(/\n/
 const b64e = (s) => { let bin = ""; new TextEncoder().encode(s).forEach((x) => (bin += String.fromCharCode(x))); return btoa(bin); };
 const q = (s) => JSON.stringify(s);
 
+
+// ---------- شرائح الكاروسيل: تحويل النص <-> بنية ----------
+function parseSlides(text) {
+  return text.split(/^\s*---\s*$/m).map((blk) => {
+    const sl = { kicker: "", title: "", body: "", points: [] }, body = [];
+    blk.split("\n").map((l) => l.trim()).filter(Boolean).forEach((l) => {
+      if (l.startsWith("# ")) sl.title = l.slice(2).trim();
+      else if (l.startsWith("@ ")) sl.kicker = l.slice(2).trim();
+      else if (l.startsWith("- ")) sl.points.push(l.slice(2).trim());
+      else body.push(l);
+    });
+    sl.body = body.join(" "); return sl;
+  }).filter((s) => s.title || s.body || s.points.length);
+}
+function slidesToText(slides) {
+  return (slides || []).map((s) => [s.title ? "# " + s.title : "", s.kicker ? "@ " + s.kicker : "", s.body || "",
+    ...(s.points || []).map((p) => "- " + p)].filter(Boolean).join("\n")).join("\n---\n");
+}
+function slidesYaml(slides) {
+  return "    slides:\n" + slides.map((s) => "      - kicker: " + q(s.kicker || "") + "\n        title: " + q(s.title) + "\n        body: " + q(s.body || "") +
+    (s.points && s.points.length ? "\n        points:\n" + s.points.map((x) => "          - " + q(x)).join("\n") : "")).join("\n") + "\n";
+}
+const slidesError = (sl) => (sl.length < 3 || sl.length > 10) ? "الكاروسيل يحتاج من 3 إلى 10 شرائح." : (sl.some((s) => !s.title) ? "لكل شريحة عنوان («# العنوان»)." : "");
+
 // ---------- المواضيع ----------
 function addBlock(text, t) {
   const tags = (t.tags || []).map(q).join(", ");
@@ -52,6 +76,7 @@ function addPost(text, p) {
   if (p.topic) b += "  topic: " + q(p.topic) + "\n";
   b += "  image:\n    title: " + q(p.title) + "\n    body: " + q(p.body) + "\n";
   if (p.points && p.points.length) b += "    points:\n" + p.points.map((x) => "      - " + q(x)).join("\n") + "\n";
+  if (p.slides && p.slides.length) b += slidesYaml(p.slides);
   if (p.query) b += "    photo_query: " + q(p.query) + "\n";
   if (p.vp) b += "    visual_prompt: " + q(p.vp) + "\n";
   b += "    seed: " + p.seed + "\n  platforms:\n";
@@ -117,22 +142,23 @@ $("pAdd").onclick = async () => {
   const m = $("pMsg"), v = (i) => $(i).value.trim();
   const plats = ["facebook", "instagram", "threads", "telegram"].filter((k) => $("pl_" + k).checked);
   const when = v("pWhen").replace("T", " ");
-  const err = !v("pTitle") ? "اكتب عنوان الصورة." : !v("pText") ? "اكتب نص المنشور." : !plats.length ? "اختر منصة واحدة على الأقل." :
+  const isCar = $("pTemplate").value === "carousel", slides = isCar ? parseSlides($("pSlides").value) : [];
+  const err = isCar && slidesError(slides) ? slidesError(slides) : (!isCar && !v("pTitle")) ? "اكتب عنوان الصورة." : !v("pText") ? "اكتب نص المنشور." : !plats.length ? "اختر منصة واحدة على الأقل." :
     !when ? "اختر موعد النشر." :
-    ($("pTemplate").value === "infographic" && (v("pPoints").split("\n").filter((x) => x.trim()).length < 2)) ? "الإنفوجرافك يحتاج نقطتين على الأقل (كل نقطة في سطر)." :
-    ($("pTemplate").value !== "infographic" && !(v("pQuery") || v("pVP"))) ? "اكتب كلمات إنجليزية للصورة (مثل: engineer construction site)." :
+    (isCar ? false : $("pTemplate").value === "infographic" && (v("pPoints").split("\n").filter((x) => x.trim()).length < 2)) ? "الإنفوجرافك يحتاج نقطتين على الأقل (كل نقطة في سطر)." :
+    (!isCar && $("pTemplate").value !== "infographic" && !(v("pQuery") || v("pVP"))) ? "اكتب كلمات إنجليزية للصورة (مثل: engineer construction site)." :
     ($("pTopic") && !v("pTopic")) ? "اختر الموضوع." :
     (plats.includes("threads") && v("pText").length > 500) ? "نص ثريدز يجب ألا يتجاوز 500 حرف." :
     (plats.includes("instagram") && v("pText").length > 2200) ? "نص إنستغرام يجب ألا يتجاوز 2200 حرف." : "";
   if (err) { say(m, err, false); return; }
   const d = when.slice(0, 10);
   const p = { id: d + "-w" + Date.now().toString(36).slice(-4), when, template: $("pTemplate").value, topic: $("pTopic") ? v("pTopic") : "",
-    title: v("pTitle"), body: v("pBody"), query: v("pQuery"), vp: v("pVP"), points: v("pPoints").split("\n").map((x) => x.trim()).filter(Boolean), seed: 1 + Math.floor(Math.random() * 90), platforms: plats, text: v("pText") };
+    title: isCar ? slides[0].title : v("pTitle"), body: isCar ? "" : v("pBody"), slides, query: v("pQuery"), vp: v("pVP"), points: v("pPoints").split("\n").map((x) => x.trim()).filter(Boolean), seed: 1 + Math.floor(Math.random() * 90), platforms: plats, text: v("pText") };
   try {
     say(m, "جارٍ الحفظ…", true);
     await edit((x) => addPost(x, p), "queue: add " + p.id, QFILE);
     say(m, "أُضيف كمسودة ✅ خلال دقيقتين تظهر بصورتها في «بانتظار موافقتك» لتراجعها ثم توافق.", true);
-    ["pTitle", "pBody", "pQuery", "pVP", "pPoints", "pText"].forEach((i) => ($(i).value = "")); updCount();
+    ["pTitle", "pBody", "pQuery", "pVP", "pPoints", "pSlides", "pText"].forEach((i) => ($(i).value = "")); updCount();
   } catch (e2) { say(m, e2.message, false); }
 };
 
@@ -168,7 +194,7 @@ $("gGo").onclick = async () => {
   if (!topicId && !topicText) { say(m, "اكتب الموضوع.", false); return; }
   if (!when) { say(m, "اختر موعد أول منشور.", false); return; }
   const id = "g" + Date.now().toString(36);
-  const yml = "id: " + q(id) + "\ncount: " + parseInt($("gCount").value, 10) + "\nstyle: " + q($("gStyle").value) + "\nstart: " + q(when) + "\n" +
+  const yml = "id: " + q(id) + "\ncount: " + parseInt($("gCount").value, 10) + "\nstyle: " + q($("gStyle").value) + "\nslides: " + parseInt($("gSlides").value, 10) + "\nstart: " + q(when) + "\n" +
     (topicId ? "topic_id: " + q(topicId) : "topic_text: " + q(topicText)) + "\n";
   try {
     say(m, "جارٍ إرسال الطلب…", true);

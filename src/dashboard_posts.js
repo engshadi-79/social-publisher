@@ -9,6 +9,7 @@ function serializePost(p) {
   if (p.topic) b += "  topic: " + q(p.topic) + "\n";
   b += "  image:\n    title: " + q(im.title || "") + "\n    body: " + q(im.body || "") + "\n";
   if (im.points && im.points.length) b += "    points:\n" + im.points.map((x) => "      - " + q(x)).join("\n") + "\n";
+  if (im.slides && im.slides.length) b += slidesYaml(im.slides);
   if (im.photo_query) b += "    photo_query: " + q(im.photo_query) + "\n";
   if (im.visual_prompt) b += "    visual_prompt: " + q(im.visual_prompt) + "\n";
   if (im.seed != null) b += "    seed: " + im.seed + "\n";
@@ -38,7 +39,7 @@ let editId = null;
 function openEdit(id) {
   const p = POSTS[id]; if (!p) return;
   editId = id; const im = p.image || {};
-  $("eTitle").value = im.title || ""; $("eBody").value = im.body || ""; $("ePoints").value = (im.points || []).join("\n");
+  $("eTitle").value = im.title || ""; $("eBody").value = im.body || ""; $("ePoints").value = (im.points || []).join("\n"); $("eSlides").value = slidesToText(im.slides);
   $("eQuery").value = im.photo_query || ""; $("eVP").value = im.visual_prompt || "";
   $("eTemplate").value = p.template; $("eWhen").value = (p.publish_at || "").replace(" ", "T");
   if ($("eTopic")) $("eTopic").value = p.topic || "";
@@ -52,17 +53,17 @@ $("eSave").onclick = async () => {
   const m = $("eMsg"), v = (i) => $(i).value.trim(), old = POSTS[editId];
   const platforms = {};
   PLATS.forEach((k) => { if ($("ep_" + k).checked && v("et_" + k)) platforms[k] = v("et_" + k); });
-  const tpl = $("eTemplate").value, points = v("ePoints").split("\n").map((x) => x.trim()).filter(Boolean);
-  const err = !v("eTitle") ? "العنوان مطلوب." : !Object.keys(platforms).length ? "اختر منصة واحدة على الأقل بنص غير فارغ." :
+  const tpl = $("eTemplate").value, eSlides = tpl === "carousel" ? parseSlides($("eSlides").value) : [], points = v("ePoints").split("\n").map((x) => x.trim()).filter(Boolean);
+  const err = (tpl === "carousel" && slidesError(eSlides)) ? slidesError(eSlides) : (tpl !== "carousel" && !v("eTitle")) ? "العنوان مطلوب." : !Object.keys(platforms).length ? "اختر منصة واحدة على الأقل بنص غير فارغ." :
     !v("eWhen") ? "اختر الموعد." : (tpl === "infographic" && (points.length < 2 || points.length > 6)) ? "الإنفوجرافك يحتاج من 2 إلى 6 نقاط." :
-    (tpl !== "infographic" && !(v("eQuery") || v("eVP"))) ? "اكتب كلمات إنجليزية للصورة." :
+    (tpl !== "infographic" && tpl !== "carousel" && !(v("eQuery") || v("eVP"))) ? "اكتب كلمات إنجليزية للصورة." :
     (platforms.threads && platforms.threads.length > 500) ? "نص ثريدز أطول من 500 حرف." :
     (platforms.instagram && platforms.instagram.length > 2200) ? "نص إنستغرام أطول من 2200 حرف." :
     ($("eTopic") && !v("eTopic")) ? "اختر الموضوع." : "";
   if (err) { say(m, err, false); return; }
   const oi = old.image || {};
-  const img = { title: v("eTitle"), body: v("eBody"), seed: oi.seed != null ? oi.seed : 1 };
-  if (tpl === "infographic") img.points = points; else { img.photo_query = v("eQuery"); if (v("eVP")) img.visual_prompt = v("eVP"); }
+  const img = { title: tpl === "carousel" ? eSlides[0].title : v("eTitle"), body: tpl === "carousel" ? "" : v("eBody"), seed: oi.seed != null ? oi.seed : 1 };
+  if (tpl === "carousel") img.slides = eSlides; else if (tpl === "infographic") img.points = points; else { img.photo_query = v("eQuery"); if (v("eVP")) img.visual_prompt = v("eVP"); }
   const nu = { id: editId, approved: old.approved, publish_at: v("eWhen").replace("T", " "), template: tpl,
     topic: $("eTopic") ? v("eTopic") : old.topic, image: img, platforms };
   const imageChanged = tpl !== old.template || img.photo_query !== oi.photo_query || img.visual_prompt !== oi.visual_prompt;

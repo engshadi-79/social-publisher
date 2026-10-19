@@ -34,20 +34,10 @@ class Renderer:
         self._browser.close()
         self._pw.stop()
 
-    def render(self, post: dict, out_png: Path, bg: Path | None = None) -> Path:
-        brand = load_brand()
-        w, h = TEMPLATES[post["template"]]
-        logo = ROOT / brand.get("logo", "")
-        html = _env.get_template(f"{post['template']}/template.html").render(
-            brand=brand, w=w, h=h, fonts=_fonts(),
-            title=post["image"]["title"], body=post["image"].get("body", ""),
-            points=[str(x) for x in (post["image"].get("points") or [])],
-            bg=bg.as_uri() if bg and bg.exists() else None,
-            logo=logo.as_uri() if brand.get("logo") and logo.is_file() else None,
-        )
+    def _shoot(self, html: str, key: str, w: int, h: int, out_png: Path) -> Path:
         tmp = OUT_DIR / "_tmp"
         tmp.mkdir(parents=True, exist_ok=True)
-        page_file = tmp / f"{post['id']}.html"
+        page_file = tmp / f"{key}.html"
         page_file.write_text(html, encoding="utf-8")
         page = self._browser.new_page(viewport={"width": w, "height": h}, device_scale_factor=1)
         try:
@@ -58,3 +48,48 @@ class Renderer:
         finally:
             page.close()
         return out_png
+
+    def render(self, post: dict, out_png: Path, bg: Path | None = None) -> Path:
+        """يرسم صورة المنشور (للكاروسيل: الغلاف فقط، استعمل render_post لكل الشرائح)."""
+        if post["template"] == "carousel":
+            return self.render_slides(post, out_png.parent)[0]
+        brand = load_brand()
+        w, h = TEMPLATES[post["template"]]
+        logo = ROOT / brand.get("logo", "")
+        html = _env.get_template(f"{post['template']}/template.html").render(
+            brand=brand, w=w, h=h, fonts=_fonts(),
+            title=post["image"]["title"], body=post["image"].get("body", ""),
+            points=[str(x) for x in (post["image"].get("points") or [])],
+            bg=bg.as_uri() if bg and bg.exists() else None,
+            logo=logo.as_uri() if brand.get("logo") and logo.is_file() else None,
+        )
+        return self._shoot(html, post["id"], w, h, out_png)
+
+    def render_slides(self, post: dict, out_dir: Path) -> list[Path]:
+        brand = load_brand()
+        w, h = TEMPLATES["carousel"]
+        tpl = _env.get_template("carousel/slide.html")
+        outs = []
+        for spec in slide_specs(post):
+            html = tpl.render(brand=brand, w=w, h=h, fonts=_fonts(), **spec)
+            outs.append(self._shoot(html, f"{post['id']}-s{spec['index']}", w, h, out_dir / f"{post['id']}-s{spec['index']}.png"))
+        return outs
+
+    def render_post(self, post: dict, out_dir: Path, bg: Path | None = None) -> list[Path]:
+        """كل صور المنشور: صورة واحدة أو كل شرائح الكاروسيل."""
+        if post["template"] == "carousel":
+            return self.render_slides(post, out_dir)
+        return [self.render(post, out_dir / f"{post['id']}.png", bg)]
+
+
+def slide_specs(post: dict) -> list[dict]:
+    """يحوّل image.slides إلى مواصفات رسم: الغلاف فاتح، الأخيرة (دعوة للتفاعل) بلون العلامة، والبقية متناوبة."""
+    slides = post["image"].get("slides") or []
+    n, out = len(slides), []
+    for i, s in enumerate(slides, 1):
+        kind = "cover" if i == 1 else ("cta" if i == n and n > 2 else "content")
+        theme = "light" if i == 1 else ("cta" if kind == "cta" else ("dark" if i % 2 == 0 else "light"))
+        out.append({"index": i, "total": n, "kind": kind, "theme": theme, "kicker": str(s.get("kicker", "") or ""),
+                    "title": str(s.get("title", "")), "body": str(s.get("body", "") or ""),
+                    "points": [str(x) for x in (s.get("points") or [])]})
+    return out

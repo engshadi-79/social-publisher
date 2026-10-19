@@ -1,0 +1,92 @@
+<!doctype html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="utf-8">
+<style>
+{% for f in fonts %}
+@font-face { font-family: "BrandFont"; src: url("{{ f.uri }}"); font-weight: {{ f.weight }}; font-style: normal; }
+{% endfor %}
+{% set cream = brand.colors.cream or "#F5F1E8" %}
+{% set ink = brand.colors.ink or "#0E1A2B" %}
+{% set kick = brand.colors.kicker or "#C8452B" %}
+:root { --cream: {{ cream }}; --ink: {{ ink }}; --kick: {{ kick }}; --accent: {{ brand.colors.accent }}; --teal: {{ brand.colors.teal }}; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: {{ w }}px; height: {{ h }}px; overflow: hidden; }
+body { font-family: "BrandFont", "Cairo", "Segoe UI", Tahoma, sans-serif; }
+.slide { position: relative; width: {{ w }}px; height: {{ h }}px; overflow: hidden; padding: 70px 78px 62px; display: flex; flex-direction: column; }
+.slide.light { background: var(--cream); color: var(--ink); --mute: rgba(14,26,43,.62); --line: rgba(14,26,43,.13); }
+.slide.dark  { background: var(--ink); color: #F5F1E8; --mute: rgba(245,241,232,.66); --line: rgba(245,241,232,.14); }
+.slide.cta   { background: var(--teal); color: #06201d; --mute: rgba(6,32,29,.7); --line: rgba(6,32,29,.2); }
+/* خطوط إرشادية منقّطة كما في المرجع */
+.guides { position: absolute; inset: 0; pointer-events: none; }
+.guides i { position: absolute; left: 0; right: 0; border-top: 2px dashed var(--line); }
+.top { position: relative; display: flex; justify-content: space-between; align-items: center; font-size: 27px; color: var(--mute); direction: ltr; }
+.top .ctr { font-family: ui-monospace, Consolas, "Courier New", monospace; letter-spacing: 2px; }
+.top .lbl { display: flex; align-items: center; gap: 12px; direction: rtl; font-weight: 700; color: inherit; }
+.top .lbl span.dot { width: 36px; height: 36px; border: 2.5px solid currentColor; border-radius: 50%; display: grid; place-items: center; font-size: 19px; }
+.body-area { position: relative; flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column; font-size: calc(var(--base, 44px) * var(--k, 1)); }
+.inner { margin: var(--m, auto 0); }
+.kicker { display: flex; align-items: center; gap: 16px; color: var(--kick); font-size: .62em; font-weight: 700; margin-bottom: .9em; }
+.kicker::before { content: ""; width: 64px; height: 3px; background: currentColor; }
+.cta .kicker, .dark .kicker { color: var(--accent); }
+.cta .kicker { color: #06201d; }
+.title { font-weight: 800; line-height: 1.32; font-size: 1.75em; }
+.cover .title { font-size: 1.95em; }
+.sub { margin-top: .75em; color: var(--mute); line-height: 1.75; font-size: .66em; font-weight: 500; }
+.dark .sub, .cta .sub { color: var(--mute); }
+.pts { list-style: none; margin-top: 1em; display: flex; flex-direction: column; gap: .55em; }
+.pts li { display: flex; gap: .6em; align-items: flex-start; font-size: .7em; line-height: 1.6; font-weight: 600; }
+.pts li::before { content: "✦"; color: var(--kick); flex: 0 0 auto; }
+.dark .pts li::before { color: var(--accent); }
+.cta .pts li::before { color: #06201d; }
+/* بطاقة مائلة تشبه «التذكرة» في شريحة الغلاف */
+.card { transform: rotate(-3.2deg); background: #FBF8F1; border: 2px solid rgba(14,26,43,.18); border-radius: 22px; padding: 26px 34px;
+        box-shadow: 0 18px 40px rgba(14,26,43,.14); margin: 18px 22px 1.3em 14px; position: relative; color: var(--ink); }
+.card .ct { font-size: .5em; color: rgba(14,26,43,.55); margin-bottom: .3em; }
+.card ul { list-style: none; font-size: .58em; line-height: 1.7; font-weight: 600; }
+.card ul li::before { content: "● "; color: var(--teal); font-size: .7em; }
+.stamp { position: absolute; left: 22px; top: 18px; width: 92px; height: 92px; border: 3px solid var(--kick); border-radius: 50%; color: var(--kick);
+         display: grid; place-items: center; text-align: center; font-size: 22px; line-height: 1.1; font-weight: 800; transform: rotate(-10deg); }
+.foot { position: relative; display: flex; justify-content: space-between; align-items: center; font-size: 26px; color: var(--mute); direction: ltr; }
+.foot .swipe { font-weight: 600; }
+.foot .who { display: flex; align-items: center; gap: 16px; direction: ltr; font-weight: 700; color: inherit; }
+.foot .seal { width: 76px; height: 76px; border: 2.5px solid var(--kick); border-radius: 50%; display: grid; place-items: center; text-align: center;
+              font-size: 14px; line-height: 1.15; color: var(--kick); font-weight: 800; }
+.dark .foot .seal { border-color: var(--accent); color: var(--accent); }
+.cta .foot .seal { border-color: #06201d; color: #06201d; }
+</style>
+</head>
+<body>
+<div class="slide {{ theme }} {{ kind }}">
+  <div class="guides"><i style="top:150px"></i><i style="top:{{ h - 150 }}px"></i><i style="top:{{ (h * 0.52)|int }}px"></i></div>
+  <div class="top">
+    <span class="ctr">{{ '%02d' % index }} / {{ '%02d' % total }}</span>
+    <span class="lbl"><span>{{ brand.name }}</span><span class="dot">◎</span></span>
+  </div>
+  <div class="body-area" id="area"><div class="inner" id="inner">
+    {% if kind == "cover" and points %}
+    <div class="card"><div class="stamp">{{ '%02d' % total }}<br>شرائح</div>
+      <div class="ct">{{ kicker or "ملخص" }}</div>
+      <ul>{% for p in points[:3] %}<li>{{ p }}</li>{% endfor %}</ul></div>
+    {% endif %}
+    {% if kicker %}<div class="kicker">{{ kicker }}</div>{% endif %}
+    <div class="title">{{ title }}</div>
+    {% if body %}<div class="sub">{{ body }}</div>{% endif %}
+    {% if points and kind != "cover" %}<ul class="pts">{% for p in points %}<li><span>{{ p }}</span></li>{% endfor %}</ul>{% endif %}
+  </div></div>
+  <div class="foot">
+    <span class="swipe">{% if index < total %}← اسحب{% else %}احفظ المنشور ✓{% endif %}</span>
+    <span class="who"><span>{{ brand.handle }}</span><span class="seal">{{ brand.name }}</span></span>
+  </div>
+</div>
+<script>
+(async () => {
+  await document.fonts.ready;
+  const area = document.getElementById('area'), inner = document.getElementById('inner');
+  let k = 1;
+  while (inner.offsetHeight > area.clientHeight && k > 0.4) { k -= 0.03; area.style.setProperty('--k', k.toFixed(2)); }
+  window.__ready = true;
+})();
+</script>
+</body>
+</html>

@@ -141,12 +141,21 @@ def main() -> int:
     by_id = {p["id"]: p for p in posts}
     with Renderer() as r:
         for it in items:
+            post = by_id[it["id"]]
             bg = imagegen.bg_path(it["id"])
-            png = r.render(by_id[it["id"]], OUT_DIR / "_tmp" / f"{it['id']}.png", bg if bg.exists() else None)
-            im = Image.open(png).convert("RGB")
-            im.save(img_dir / f"full-{it['id']}.jpg", quality=85)
-            im.thumbnail((540, 960))
-            im.save(img_dir / f"thumb-{it['id']}.jpg", quality=82)
+            pngs = r.render_post(post, OUT_DIR / "_tmp", bg if bg.exists() else None)
+            fulls = []
+            for n, png in enumerate(pngs, 1):
+                im = Image.open(png).convert("RGB")
+                name = f"full-{it['id']}.jpg" if len(pngs) == 1 else f"full-{it['id']}-s{n}.jpg"
+                im.save(img_dir / name, quality=85)
+                fulls.append("images/" + name)
+                if n == 1:
+                    th = im.copy()
+                    th.thumbnail((540, 960))
+                    th.save(img_dir / f"thumb-{it['id']}.jpg", quality=82)
+            it["slides_json"] = json.dumps(fulls) if len(fulls) > 1 else ""
+            it["slide_count"] = len(fulls)
 
     group_of = {it["id"]: it["group"] for it in items}
     raw = {}

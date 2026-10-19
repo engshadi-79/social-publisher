@@ -60,16 +60,29 @@ def fetch_trends() -> list[str]:
     return out[:60]
 
 
-def build_prompt(topic: dict, count: int, brand: dict, recent: list[str], trends: list[str], style: str = "photo") -> str:
+def build_prompt(topic: dict, count: int, brand: dict, recent: list[str], trends: list[str], style: str = "photo", slides_n: int = 7) -> str:
     fixed = " ".join(topic.get("hashtags_fixed") or []) or "(لا يوجد)"
     avoid = "، ".join(recent[-15:]) or "(لا يوجد)"
     trend_txt = "، ".join(trends) if trends else "(غير متاح الآن)"
-    if style == "infographic":
+    if style == "carousel":
+        n = max(5, min(int(slides_n or 7), 10))
+        style_fields = (f'  "slides": مصفوفة من {n} شرائح لكاروسيل إنستغرام بأسلوب «دراسة حالة/دليل عملي»، كل شريحة كائن فيه: '
+                        '"kicker" (سطر صغير فوق العنوان مثل: المشكلة، الفكرة، الخطوة الأولى، الخلاصة)، "title" (عنوان قوي حتى 70 حرفاً)، '
+                        '"body" (جملة أو جملتان حتى 180 حرفاً، أو فارغ)، "points" (قائمة حتى 3 نقاط قصيرة حتى 60 حرفاً لكل نقطة، أو فارغة).\n'
+                        '    الشريحة الأولى غلاف: عنوان جاذب وجملة تحته و3 نقاط في "points" تلخّص الوعد. الشرائح الوسطى: فكرة واحدة لكل شريحة بتسلسل منطقي. '
+                        'الأخيرة: سؤال تفاعلي للمتابع في "title" ودعوة لحفظ المنشور والتعليق في "body".\n'
+                        '  "photo_query": "" (اتركه فارغاً)،\n  "visual_prompt": "" (اتركه فارغاً)،\n'
+                        '  ملاحظة: "title" و"body" الخارجيان للمنشور ككل: "title" هو عنوان الغلاف و"body" فارغ.')
+    elif style == "infographic":
         style_fields = ('  "points": من 3 إلى 5 نقاط قصيرة ومفيدة تلخّص المنشور كإنفوجرافك (كل نقطة حتى 60 حرفاً، بلا ترقيم)،\n'
                         '  "photo_query": "" (اتركه فارغاً)،\n  "visual_prompt": "" (اتركه فارغاً)،')
     else:
         style_fields = ('  "photo_query": 2 إلى 4 كلمات إنجليزية للبحث عن صورة فوتوغرافية حقيقية تمثّل فكرة المنشور مباشرة (شيء ملموس ومرئي، لا مفاهيم مجردة)،\n'
                         '  "visual_prompt": وصف إنجليزي قصير لمشهد واقعي يمثّل فكرة المنشور حرفياً (للتوليد الاحتياطي)،')
+    caption_style = ""
+    if style == "carousel":
+        caption_style = (" بأسلوب حكاية شخصية بصيغة المتكلم: جملة افتتاحية تحكي موقفاً حقيقياً أو سؤالاً يعيشه الجمهور، ثم 3 إلى 4 نقاط "
+                         "تبدأ كل واحدة بالرمز ✦ تلخّص ما في الشرائح، ثم سؤال تفاعلي في آخر النص قبل الهاشتاجات، وفي أول سطر اطلب «اسحب للآخر»")
     return f"""أنت كاتب محتوى عربي محترف لحساب «{brand.get('name', '')}» على وسائل التواصل.
 اكتب {count} منشورات مختلفة تماماً عن الموضوع: «{topic['name']}».
 وصف الموضوع: {topic.get('description') or 'غير محدد'}
@@ -87,7 +100,7 @@ def build_prompt(topic: dict, count: int, brand: dict, recent: list[str], trends
   "title": عنوان قصير يظهر على الصورة (حتى 60 حرفاً)،
   "body": سطر صغير تحت العنوان (حتى 80 حرفاً، أو فارغ)،
 {style_fields}
-  "text_long": نص كامل لفيسبوك وإنستغرام وتيليجرام مع الهاشتاجات في آخره (حتى 900 حرف)،
+  "text_long": نص كامل لفيسبوك وإنستغرام وتيليجرام مع الهاشتاجات في آخره (حتى 900 حرف){caption_style}،
   "text_short": نص قصير لثريدز مع 2 إلى 3 هاشتاجات (حتى 380 حرفاً).
 أخرج مصفوفة JSON فقط بلا أي شرح قبلها أو بعدها."""
 
@@ -107,12 +120,23 @@ def make_entries(items: list[dict], req: dict, topic: dict, existing_ids: set[st
         texts = {"facebook": long_t, "instagram": long_t, "telegram": long_t, "threads": short_t or long_t}
         entry = {
             "id": pid, "approved": False, "publish_at": f"{when:%Y-%m-%d %H:%M}",
-            "template": "infographic" if req.get("style") == "infographic" else (req.get("template") or "split"),
+            "template": ("carousel" if req.get("style") == "carousel" else "infographic" if req.get("style") == "infographic" else (req.get("template") or "split")),
         }
         if topic.get("id"):
             entry["topic"] = topic["id"]
         img = {"title": str(it.get("title", "")).strip(), "body": str(it.get("body", "")).strip()}
-        if req.get("style") == "infographic":
+        if req.get("style") == "carousel":
+            slides = []
+            for sl in (it.get("slides") or [])[:10]:
+                if not isinstance(sl, dict) or not str(sl.get("title", "")).strip():
+                    continue
+                slides.append({"kicker": str(sl.get("kicker", "") or "").strip()[:40], "title": str(sl["title"]).strip()[:110],
+                               "body": str(sl.get("body", "") or "").strip()[:240],
+                               "points": [str(x).strip()[:88] for x in (sl.get("points") or []) if str(x).strip()][:3]})
+            img["slides"] = slides
+            img["title"] = slides[0]["title"] if slides else img["title"]
+            img["body"] = ""
+        elif req.get("style") == "infographic":
             pts = [str(x).strip() for x in (it.get("points") or []) if str(x).strip()][:5]
             img["points"] = [x[:88] for x in pts]
         else:
@@ -143,13 +167,13 @@ def main() -> int:
         queue = load_queue()
         recent = [p["image"]["title"] for p in queue if isinstance(p.get("image"), dict) and p["image"].get("title")]
         trends = fetch_trends()
-        text, method = generator.generate_text(build_prompt(topic, count, load_brand(), recent, trends, req.get("style") or "photo"))
+        text, method = generator.generate_text(build_prompt(topic, count, load_brand(), recent, trends, req.get("style") or "photo", int(req.get("slides") or 7)))
         method += f" | ترند Google: {len(trends)} عنصر" if trends else " | ترند Google غير متاح"
         items = generator.extract_json(text)
         if not isinstance(items, list) or not items:
             raise generator.GeneratorError("قائمة المنشورات فارغة")
         entries = make_entries(items[:count], req, topic, {p["id"] for p in queue})
-        entries = [e for e in entries if e["image"]["title"] and e["platforms"] and (e["template"] != "infographic" or len(e["image"].get("points", [])) >= 2)]
+        entries = [e for e in entries if e["image"]["title"] and e["platforms"] and (e["template"] != "infographic" or len(e["image"].get("points", [])) >= 2) and (e["template"] != "carousel" or len(e["image"].get("slides", [])) >= 3)]
         if not entries:
             raise generator.GeneratorError("لم يصلح أي منشور مولَّد")
         errors = fatal(validate(queue + entries))
