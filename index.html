@@ -58,6 +58,11 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
 .cchip.g-draft{background:var(--draft)}.cchip.g-upcoming{background:var(--teal);color:#06201d}.cchip.g-published{background:var(--ok)}.cchip.g-failed{background:var(--bad)}
 #editBox{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:flex-start;justify-content:center;overflow:auto;z-index:60;padding:20px 10px}#editBox.on{display:flex}
 #editBox .box{background:var(--card);border-radius:14px;padding:18px;max-width:640px;width:100%}
+.imgwrap{position:relative;align-self:flex-start;flex:0 0 auto}.imgwrap img{display:block}
+.scount{position:absolute;top:8px;left:8px;background:rgba(0,0,0,.72);color:#fff;font-size:.78rem;padding:2px 10px;border-radius:999px}
+#lb button{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.16);color:#fff;border:0;border-radius:50%;width:48px;height:48px;font-size:30px;cursor:pointer;display:none}
+#lb.multi button{display:block}#lb #lbPrev{right:14px}#lb #lbNext{left:14px}
+#lbCtr{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);color:#fff;font-size:.95rem;background:rgba(0,0,0,.55);padding:2px 12px;border-radius:999px}
 </style>
 </head>
 <body>
@@ -65,9 +70,10 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
   <h2 id="eHead">تعديل منشور</h2><div class="hint" id="eNote"></div>
   <label>الموضوع</label><select id="eTopic"><option value="">— اختر —</option><option value="tmvet3asy">الذكاء الصناعي</option></select>
   <label>شكل الصورة</label>
-  <select id="eTemplate"><option value="infographic">إنفوجرافك</option><option value="split">صورة + لوحة نص</option><option value="photo">صورة كاملة</option><option value="tip">نصيحة</option><option value="quote">اقتباس</option><option value="announcement">إعلان</option><option value="story">ستوري</option></select>
+  <select id="eTemplate"><option value="carousel">كاروسيل</option><option value="infographic">إنفوجرافك</option><option value="split">صورة + لوحة نص</option><option value="photo">صورة كاملة</option><option value="tip">نصيحة</option><option value="quote">اقتباس</option><option value="announcement">إعلان</option><option value="story">ستوري</option></select>
   <label>العنوان على الصورة *</label><input id="eTitle">
   <label>النص الصغير</label><input id="eBody">
+  <label>شرائح الكاروسيل (انظر التنسيق في نموذج الإضافة)</label><textarea id="eSlides" rows="10"></textarea>
   <label>نقاط الإنفوجرافك (سطر لكل نقطة)</label><textarea id="ePoints" rows="4"></textarea>
   <label>كلمات إنجليزية للصورة <span class="hint">(تغييرها يعيد توليد الصورة)</span></label><input id="eQuery" dir="ltr">
   <label>وصف بديل للصورة (إنجليزي)</label><textarea id="eVP" dir="ltr" rows="2"></textarea>
@@ -89,12 +95,12 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
   <button class="act" id="eSave">حفظ التعديل</button> <button class="del" id="eCancel" style="color:var(--ink);border-color:var(--line)">إغلاق</button>
   <div class="msg" id="eMsg"></div>
 </div></div>
-<div id="lb"><img alt=""></div>
+<div id="lb"><button id="lbPrev" aria-label="السابق">›</button><img alt=""><button id="lbNext" aria-label="التالي">‹</button><span id="lbCtr"></span></div>
 <div class="wrap">
 <h1>لوحة النشر</h1>
-<div class="upd">آخر تحديث: <bdi dir="ltr">2026-10-19 19:46</bdi></div>
+<div class="upd">آخر تحديث: <bdi dir="ltr">2026-10-19 20:49</bdi></div>
 
-<div class="summary">يوجد 2 منشور مجدول، وأقربها يوم الثلاثاء 20 أكتوبر الساعة 8:32 صباحاً. تم نشر 1 منشور حتى الآن.</div>
+<div class="summary">يوجد 2 منشور مجدول، وأقربها يوم الثلاثاء 20 أكتوبر الساعة 8:32 صباحاً. 1 منشور ينتظر موافقتك ولن يُنشر قبلها. تم نشر 1 منشور حتى الآن.</div>
 
 
 <details class="health" open>
@@ -183,7 +189,9 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
     <select id="gTopic"><option value="tmvet3asy">الذكاء الصناعي</option></select>
     
     <label>شكل الصورة</label>
-    <select id="gStyle"><option value="infographic">إنفوجرافك: نقاط مرقّمة تلخّص الفكرة (مقترح)</option><option value="photo">صورة حقيقية تمثّل الفكرة</option></select>
+    <select id="gStyle"><option value="carousel">كاروسيل: عدة شرائح بأسلوب دراسة حالة (مقترح)</option><option value="infographic">إنفوجرافك: نقاط مرقّمة تلخّص الفكرة (مقترح)</option><option value="photo">صورة حقيقية تمثّل الفكرة</option></select>
+    <label>عدد الشرائح (للكاروسيل)</label>
+    <select id="gSlides"><option>5</option><option selected>7</option><option>8</option><option>10</option></select>
     <label>عدد المنشورات</label>
     <select id="gCount"><option>1</option><option>2</option><option selected>3</option><option>5</option><option>7</option></select>
     <label>موعد أول منشور (ثم واحد كل يوم في نفس الوقت)</label><input id="gWhen" type="datetime-local">
@@ -200,6 +208,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
     
     <label>شكل الصورة</label>
     <select id="pTemplate">
+      <option value="carousel">كاروسيل (عدة شرائح، أسلوب دراسة حالة)</option>
       <option value="infographic">إنفوجرافك (نقاط مرقّمة)</option>
       <option value="split">صورة في الأعلى ولوحة نص أسفلها (الأنسب للصور الحقيقية)</option>
       <option value="photo">صورة كاملة والنص أسفلها (تحتاج صورة عالية الدقة)</option>
@@ -210,6 +219,9 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
     </select>
     <label>العنوان الذي يظهر على الصورة *</label><input id="pTitle" placeholder="جملة قصيرة وواضحة">
     <label>نص صغير تحت العنوان (اختياري)</label><input id="pBody">
+    <label>شرائح الكاروسيل <span class="hint">— لقالب الكاروسيل فقط</span></label>
+    <textarea id="pSlides" rows="9" placeholder="# عنوان الغلاف&#10;@ دراسة حالة&#10;جملة تحت العنوان&#10;- نقطة&#10;---&#10;# عنوان الشريحة الثانية&#10;شرح قصير"></textarea>
+    <div class="hint">كل شريحة تبدأ بسطر «# العنوان»؛ «@ ...» للسطر الصغير فوق العنوان؛ «- ...» للنقاط؛ وبقية الأسطر شرحٌ. وتفصل بين الشرائح بسطر «---». من 3 إلى 10 شرائح.</div>
     <label>نقاط الإنفوجرافك (كل نقطة في سطر، من 2 إلى 6) <span class="hint">— لقالب الإنفوجرافك فقط</span></label><textarea id="pPoints" rows="4"></textarea>
     <label>كلمات إنجليزية للصورة الحقيقية <span class="hint">(2 إلى 4 كلمات، لغير الإنفوجرافك)</span></label><input id="pQuery" dir="ltr" placeholder="civil engineer construction site">
     <label>وصف بديل للصورة بالإنجليزية (اختياري)</label><textarea id="pVP" dir="ltr" rows="2"></textarea>
@@ -231,7 +243,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
 <div class="list" id="grid">
 
 <article class="post" data-s="upcoming">
-  <img loading="lazy" src="images/thumb-2026-10-20-g1.jpg" data-full="images/full-2026-10-20-g1.jpg" alt="كيف تحول موقعك إلى نظام تفاعلي ذكي؟" title="اضغط لعرض الصورة كاملة">
+  <div class="imgwrap"><img loading="lazy" src="images/thumb-2026-10-20-g1.jpg" data-full="images/full-2026-10-20-g1.jpg" alt="كيف تحول موقعك إلى نظام تفاعلي ذكي؟" title="اضغط لعرض الصورة كاملة"></div>
   <div class="body">
     <span class="badge b-scheduled">سيُنشر في موعده</span>
     <div class="title">كيف تحول موقعك إلى نظام تفاعلي ذكي؟</div>
@@ -275,7 +287,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
 </article>
 
 <article class="post" data-s="upcoming">
-  <img loading="lazy" src="images/thumb-2026-10-21-g1.jpg" data-full="images/full-2026-10-21-g1.jpg" alt="تعلم البرمجة في عصر الذكاء الاصطناعي" title="اضغط لعرض الصورة كاملة">
+  <div class="imgwrap"><img loading="lazy" src="images/thumb-2026-10-21-g1.jpg" data-full="images/full-2026-10-21-g1.jpg" alt="تعلم البرمجة في عصر الذكاء الاصطناعي" title="اضغط لعرض الصورة كاملة"></div>
   <div class="body">
     <span class="badge b-scheduled">سيُنشر في موعده</span>
     <div class="title">تعلم البرمجة في عصر الذكاء الاصطناعي</div>
@@ -318,8 +330,59 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
   </div>
 </article>
 
+<article class="post" data-s="draft">
+  <div class="imgwrap"><img loading="lazy" src="images/thumb-2026-10-22-car1.jpg" data-full="images/full-2026-10-22-car1-s1.jpg" data-slides='[&#34;images/full-2026-10-22-car1-s1.jpg&#34;, &#34;images/full-2026-10-22-car1-s2.jpg&#34;, &#34;images/full-2026-10-22-car1-s3.jpg&#34;, &#34;images/full-2026-10-22-car1-s4.jpg&#34;, &#34;images/full-2026-10-22-car1-s5.jpg&#34;, &#34;images/full-2026-10-22-car1-s6.jpg&#34;, &#34;images/full-2026-10-22-car1-s7.jpg&#34;, &#34;images/full-2026-10-22-car1-s8.jpg&#34;]' alt="كيف أجعل الذكاء الاصطناعي مساعد برمجة لا بديلاً عني" title="اضغط لعرض الصورة كاملة"><span class="scount">8 شرائح ▤</span></div>
+  <div class="body">
+    <span class="badge b-draft">بانتظار موافقتك</span>
+    <div class="title">كيف أجعل الذكاء الاصطناعي مساعد برمجة لا بديلاً عني</div>
+    <div class="line">لن يُنشر حتى توافق عليه. الموعد المقترح: يوم الخميس 22 أكتوبر الساعة 8:00 مساءً. المنصات: فيسبوك وإنستغرام وثريدز.</div>
+    <div class="plats">
+      
+      <span class="chip ">فيسبوك: ⏳ ينتظر موعده</span>
+      
+      <span class="chip ">إنستغرام: ⏳ ينتظر موعده</span>
+      
+      <span class="chip ">ثريدز: ⏳ ينتظر موعده</span>
+      
+    </div>
+    
+    <div class="acts">
+      <button class="act" data-act="approve" data-id="2026-10-22-car1">✅ موافقة على النشر</button>
+      <button class="del" data-act="edit" data-id="2026-10-22-car1" style="color:var(--teal);border-color:var(--teal)">✏️ تعديل</button>
+      <button class="del" data-act="del" data-id="2026-10-22-car1">حذف</button>
+      
+      <span class="actmsg msg"></span>
+    </div>
+    <details><summary>عرض نص المنشور على كل منصة</summary>
+      <p><b>فيسبوك</b><br>كل مرة أبدأ مشروعاً أجد نفسي أضيّع أول ساعاته في أمور أكررها: هيكلة الملفات، وأكواد أعرفها عن ظهر قلب 😅
+فسألت نفسي: ماذا لو سلّمت هذا الروتين لمساعد ذكي، وركّزت أنا على القرار؟
+
+✦ أشرح له ما أريد بجملة واضحة ليبدأ بالمسودة الأولى
+✦ أراجع كل سطر وأفهم لماذا كُتب هكذا قبل أن أعتمده
+✦ أجعله يشرح لي ما لا أفهمه، فهو معلّم صبور لا يملّ
+✦ والقرار النهائي يبقى لي أنا، فالمهندس يقود والأداة تسرّع
+
+اسحب للآخر ← وقل لي: ما أول مهمة ستسلّمها لمساعدك الذكي؟
+
+#الذكاء_الاصطناعي #برمجة #تطوير_الويب #تقنية #مهندس</p><p><b>إنستغرام</b><br>كل مرة أبدأ مشروعاً أجد نفسي أضيّع أول ساعاته في أمور أكررها: هيكلة الملفات، وأكواد أعرفها عن ظهر قلب 😅
+فسألت نفسي: ماذا لو سلّمت هذا الروتين لمساعد ذكي، وركّزت أنا على القرار؟
+
+✦ أشرح له ما أريد بجملة واضحة ليبدأ بالمسودة الأولى
+✦ أراجع كل سطر وأفهم لماذا كُتب هكذا قبل أن أعتمده
+✦ أجعله يشرح لي ما لا أفهمه، فهو معلّم صبور لا يملّ
+✦ والقرار النهائي يبقى لي أنا، فالمهندس يقود والأداة تسرّع
+
+اسحب للآخر ← وقل لي: ما أول مهمة ستسلّمها لمساعدك الذكي؟
+
+#الذكاء_الاصطناعي #برمجة #تطوير_الويب #تقنية #مهندس</p><p><b>ثريدز</b><br>المهندس يقود والأداة تسرّع: لا تنسخ كود الذكاء الاصطناعي قبل أن تفهمه، واجعله يشرح لك ما لا تعرفه. ما أول مهمة ستسلّمها لمساعدك؟
+
+#الذكاء_الاصطناعي #برمجة #تقنية</p>
+    </details>
+  </div>
+</article>
+
 <article class="post" data-s="published">
-  <img loading="lazy" src="images/thumb-2026-10-19-g1.jpg" data-full="images/full-2026-10-19-g1.jpg" alt="الذكاء الاصطناعي لا يستبدلك، بل يدعمك" title="اضغط لعرض الصورة كاملة">
+  <div class="imgwrap"><img loading="lazy" src="images/thumb-2026-10-19-g1.jpg" data-full="images/full-2026-10-19-g1.jpg" alt="الذكاء الاصطناعي لا يستبدلك، بل يدعمك" title="اضغط لعرض الصورة كاملة"></div>
   <div class="body">
     <span class="badge b-published">تم النشر</span>
     <div class="title">الذكاء الاصطناعي لا يستبدلك، بل يدعمك</div>
@@ -376,12 +439,19 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
 </div>
 
 </div>
-<script type="application/json" id="postdata">{"2026-10-19-g1": {"id": "2026-10-19-g1", "approved": true, "publish_at": "2026-10-19 08:32", "template": "split", "topic": "tmvet3asy", "image": {"title": "الذكاء الاصطناعي لا يستبدلك، بل يدعمك", "body": "أدوات البرمجة الذكية هي مساعدك الشخصي لإنجاز المشاريع بدقة وسرعة أكبر.", "photo_query": "coding laptop screen glowing", "seed": 1}, "platforms": {"facebook": "مرحباً بكم جميعاً! كثير من الأصدقاء يسألونني: \"مهندس شادي، هل سيقضي الذكاء الاصطناعي على وظائف المبرمجين وصناع المواقع؟\"\n\nالإجابة المباشرة: لا، ولكن المبرمج الذي يستعين بأدوات الذكاء الاصطناعي سيتفوق حتماً على من يتجاهلها. اليوم، يمكنك استخدام نماذج ذكية مثل جيميناي لكتابة دوال معقدة، فحص الأخطاء البرمجية وتصحيحها في لحظات، أو حتى اقتراح تصاميم وتوزيع عناصر الصفحات.\n\nالذكاء الاصطناعي ليس بديلاً عن فهمك للمنطق البرمجي، بل هو مسرّع قوي يختصر عليك الساعات الروتينية لتركز أنت على الإبداع وبناء أنظمة حقيقية ذات قيمة. جرب دمج هذه الأدوات في روتينك البرمجي اليوم وستشهد قفزة واضحة في إنتاجيتك.\n\n#جيميناي #الذكاء_الاصطناعي #برمجة #تطوير_الويب #تقنية", "instagram": "مرحباً بكم جميعاً! كثير من الأصدقاء يسألونني: \"مهندس شادي، هل سيقضي الذكاء الاصطناعي على وظائف المبرمجين وصناع المواقع؟\"\n\nالإجابة المباشرة: لا، ولكن المبرمج الذي يستعين بأدوات الذكاء الاصطناعي سيتفوق حتماً على من يتجاهلها. اليوم، يمكنك استخدام نماذج ذكية مثل جيميناي لكتابة دوال معقدة، فحص الأخطاء البرمجية وتصحيحها في لحظات، أو حتى اقتراح تصاميم وتوزيع عناصر الصفحات.\n\nالذكاء الاصطناعي ليس بديلاً عن فهمك للمنطق البرمجي، بل هو مسرّع قوي يختصر عليك الساعات الروتينية لتركز أنت على الإبداع وبناء أنظمة حقيقية ذات قيمة. جرب دمج هذه الأدوات في روتينك البرمجي اليوم وستشهد قفزة واضحة في إنتاجيتك.\n\n#جيميناي #الذكاء_الاصطناعي #برمجة #تطوير_الويب #تقنية", "threads": "هل يلغي الذكاء الاصطناعي دور المبرمج؟ لا، بل يمنحه سرعة فائقة لبناء المواقع والأنظمة! استغل أدوات ذكية مثل جيميناي في تصحيح الأكواد واقتراح الحلول، واجعل تركيزك الأساسي على المنطق وتجربة المستخدم.\n\n#جيميناي #الذكاء_الاصطناعي #برمجة"}, "group": "published"}, "2026-10-20-g1": {"id": "2026-10-20-g1", "approved": true, "publish_at": "2026-10-20 08:32", "template": "split", "topic": "tmvet3asy", "image": {"title": "كيف تحول موقعك إلى نظام تفاعلي ذكي؟", "body": "دمج الذكاء الاصطناعي في المواقع صار خطوة عملية وسهلة التنفيذ.", "photo_query": "modern technology server data", "seed": 8}, "platforms": {"facebook": "صناعة المواقع لم تعد مقتصرة على صفحات ثابتة تعرض نصوصاً وصوراً. اليوم، تستطيع تحويل أي موقع إلى منصة ذكية تتفاعل مع الزائر بشكل مخصص وتفهم متطلباته بدقة.\n\nربط واجهات الذكاء الاصطناعي البرمجية (APIs) بالأنظمة أصبح في غاية البساطة والسرعة. يمكنك إضافة محرك بحث دلالي يفهم قصد المستخدم، أو روبوت دعم فني ذكي يجيب عن الاستفسارات بمستوى احترافي، أو حتى نظام يحلل سلوك التصفح ليعرض المحتوى الأنسب لكل شخص.\n\nالجميل في الأمر أنك لست بحاجة لإنشاء نماذج ذكاء اصطناعي من الصفر؛ الحلول والمكتبات البرمجية متوفرة وجاهزة للتكامل مع موقعك فوراً. خطوة بسيطة كهذه تصنع فارقاً هائلاً في جودة مشروعك ورضا مستخدميه.\n\n#منصة #الذكاء_الاصطناعي #تطوير_المواقع #برمجة_ويب #أنظمة", "instagram": "صناعة المواقع لم تعد مقتصرة على صفحات ثابتة تعرض نصوصاً وصوراً. اليوم، تستطيع تحويل أي موقع إلى منصة ذكية تتفاعل مع الزائر بشكل مخصص وتفهم متطلباته بدقة.\n\nربط واجهات الذكاء الاصطناعي البرمجية (APIs) بالأنظمة أصبح في غاية البساطة والسرعة. يمكنك إضافة محرك بحث دلالي يفهم قصد المستخدم، أو روبوت دعم فني ذكي يجيب عن الاستفسارات بمستوى احترافي، أو حتى نظام يحلل سلوك التصفح ليعرض المحتوى الأنسب لكل شخص.\n\nالجميل في الأمر أنك لست بحاجة لإنشاء نماذج ذكاء اصطناعي من الصفر؛ الحلول والمكتبات البرمجية متوفرة وجاهزة للتكامل مع موقعك فوراً. خطوة بسيطة كهذه تصنع فارقاً هائلاً في جودة مشروعك ورضا مستخدميه.\n\n#منصة #الذكاء_الاصطناعي #تطوير_المواقع #برمجة_ويب #أنظمة", "threads": "المواقع اليوم لم تعد صفحات جامدة! دمج الذكاء الاصطناعي في أي منصة عبر الـ APIs يتيح لك تقديم بحث ذكي، ودعم فوري، وتجربة مخصصة لكل زائر بكل سلاسة وسرعة.\n\n#منصة #الذكاء_الاصطناعي #تطوير_المواقع"}, "group": "upcoming"}, "2026-10-21-g1": {"id": "2026-10-21-g1", "approved": true, "publish_at": "2026-10-21 08:32", "template": "split", "topic": "tmvet3asy", "image": {"title": "تعلم البرمجة في عصر الذكاء الاصطناعي", "body": "الأساسيات الهندسية وحل المشكلات أهم بكثير من مجرد حفظ الأكواد.", "photo_query": "dual computer monitors desk", "seed": 15}, "platforms": {"facebook": "إذا كنت تفكر في دخول عالم البرمجة وصناعة الأنظمة، فقد تسأل نفسك: هل لا يزال التعلم مجدياً بينما الذكاء الاصطناعي يكتب الأكواد الجاهزة؟\n\nنعم وبكل تأكيد! الذكاء الاصطناعي يكتب السطور البرمجية، لكنه يحتاج إلى عقل مهندس يفهم كيف يوجهه، وكيف يدقق النتائج، وكيف يربط مكونات النظام لتكون آمنة وقابلة للتطوير.\n\nالمطلوب منك الآن لم يعد حفظ الأوامر والتراكيب عن ظهر قلب؛ الأولوية الحقيقية أصبحت لفهم هياكل البيانات، وهندسة البرمجيات، وأسلوب التفكير التحليلي. اعتبر أدوات الذكاء الاصطناعي معلماً شخصياً يرافقك: اسألها عما يستعصي عليك، ودعها تشرح لك المفاهيم المعقدة، وسترى كيف تختصر رحلة تعلمك إلى النصف.\n\n#الذكاء_الاصطناعي #تعلم_البرمجة #هندسة_البرمجيات #مطورين", "instagram": "إذا كنت تفكر في دخول عالم البرمجة وصناعة الأنظمة، فقد تسأل نفسك: هل لا يزال التعلم مجدياً بينما الذكاء الاصطناعي يكتب الأكواد الجاهزة؟\n\nنعم وبكل تأكيد! الذكاء الاصطناعي يكتب السطور البرمجية، لكنه يحتاج إلى عقل مهندس يفهم كيف يوجهه، وكيف يدقق النتائج، وكيف يربط مكونات النظام لتكون آمنة وقابلة للتطوير.\n\nالمطلوب منك الآن لم يعد حفظ الأوامر والتراكيب عن ظهر قلب؛ الأولوية الحقيقية أصبحت لفهم هياكل البيانات، وهندسة البرمجيات، وأسلوب التفكير التحليلي. اعتبر أدوات الذكاء الاصطناعي معلماً شخصياً يرافقك: اسألها عما يستعصي عليك، ودعها تشرح لك المفاهيم المعقدة، وسترى كيف تختصر رحلة تعلمك إلى النصف.\n\n#الذكاء_الاصطناعي #تعلم_البرمجة #هندسة_البرمجيات #مطورين", "threads": "في عصر الذكاء الاصطناعي، لا تشغل بالك بحفظ الأكواد؛ ركّز على فهم الأساسيات الهندسية وطريقة بناء الأنظمة وحل المشكلات. الأداة الذكية تكتب الكود، لكن المهندس هو من يدير الفكرة ويوجهها للنجاح.\n\n#تعلم_البرمجة #الذكاء_الاصطناعي #تقنية"}, "group": "upcoming"}}</script>
+<script type="application/json" id="postdata">{"2026-10-19-g1": {"id": "2026-10-19-g1", "approved": true, "publish_at": "2026-10-19 08:32", "template": "split", "topic": "tmvet3asy", "image": {"title": "الذكاء الاصطناعي لا يستبدلك، بل يدعمك", "body": "أدوات البرمجة الذكية هي مساعدك الشخصي لإنجاز المشاريع بدقة وسرعة أكبر.", "photo_query": "coding laptop screen glowing", "seed": 1}, "platforms": {"facebook": "مرحباً بكم جميعاً! كثير من الأصدقاء يسألونني: \"مهندس شادي، هل سيقضي الذكاء الاصطناعي على وظائف المبرمجين وصناع المواقع؟\"\n\nالإجابة المباشرة: لا، ولكن المبرمج الذي يستعين بأدوات الذكاء الاصطناعي سيتفوق حتماً على من يتجاهلها. اليوم، يمكنك استخدام نماذج ذكية مثل جيميناي لكتابة دوال معقدة، فحص الأخطاء البرمجية وتصحيحها في لحظات، أو حتى اقتراح تصاميم وتوزيع عناصر الصفحات.\n\nالذكاء الاصطناعي ليس بديلاً عن فهمك للمنطق البرمجي، بل هو مسرّع قوي يختصر عليك الساعات الروتينية لتركز أنت على الإبداع وبناء أنظمة حقيقية ذات قيمة. جرب دمج هذه الأدوات في روتينك البرمجي اليوم وستشهد قفزة واضحة في إنتاجيتك.\n\n#جيميناي #الذكاء_الاصطناعي #برمجة #تطوير_الويب #تقنية", "instagram": "مرحباً بكم جميعاً! كثير من الأصدقاء يسألونني: \"مهندس شادي، هل سيقضي الذكاء الاصطناعي على وظائف المبرمجين وصناع المواقع؟\"\n\nالإجابة المباشرة: لا، ولكن المبرمج الذي يستعين بأدوات الذكاء الاصطناعي سيتفوق حتماً على من يتجاهلها. اليوم، يمكنك استخدام نماذج ذكية مثل جيميناي لكتابة دوال معقدة، فحص الأخطاء البرمجية وتصحيحها في لحظات، أو حتى اقتراح تصاميم وتوزيع عناصر الصفحات.\n\nالذكاء الاصطناعي ليس بديلاً عن فهمك للمنطق البرمجي، بل هو مسرّع قوي يختصر عليك الساعات الروتينية لتركز أنت على الإبداع وبناء أنظمة حقيقية ذات قيمة. جرب دمج هذه الأدوات في روتينك البرمجي اليوم وستشهد قفزة واضحة في إنتاجيتك.\n\n#جيميناي #الذكاء_الاصطناعي #برمجة #تطوير_الويب #تقنية", "threads": "هل يلغي الذكاء الاصطناعي دور المبرمج؟ لا، بل يمنحه سرعة فائقة لبناء المواقع والأنظمة! استغل أدوات ذكية مثل جيميناي في تصحيح الأكواد واقتراح الحلول، واجعل تركيزك الأساسي على المنطق وتجربة المستخدم.\n\n#جيميناي #الذكاء_الاصطناعي #برمجة"}, "group": "published"}, "2026-10-20-g1": {"id": "2026-10-20-g1", "approved": true, "publish_at": "2026-10-20 08:32", "template": "split", "topic": "tmvet3asy", "image": {"title": "كيف تحول موقعك إلى نظام تفاعلي ذكي؟", "body": "دمج الذكاء الاصطناعي في المواقع صار خطوة عملية وسهلة التنفيذ.", "photo_query": "modern technology server data", "seed": 8}, "platforms": {"facebook": "صناعة المواقع لم تعد مقتصرة على صفحات ثابتة تعرض نصوصاً وصوراً. اليوم، تستطيع تحويل أي موقع إلى منصة ذكية تتفاعل مع الزائر بشكل مخصص وتفهم متطلباته بدقة.\n\nربط واجهات الذكاء الاصطناعي البرمجية (APIs) بالأنظمة أصبح في غاية البساطة والسرعة. يمكنك إضافة محرك بحث دلالي يفهم قصد المستخدم، أو روبوت دعم فني ذكي يجيب عن الاستفسارات بمستوى احترافي، أو حتى نظام يحلل سلوك التصفح ليعرض المحتوى الأنسب لكل شخص.\n\nالجميل في الأمر أنك لست بحاجة لإنشاء نماذج ذكاء اصطناعي من الصفر؛ الحلول والمكتبات البرمجية متوفرة وجاهزة للتكامل مع موقعك فوراً. خطوة بسيطة كهذه تصنع فارقاً هائلاً في جودة مشروعك ورضا مستخدميه.\n\n#منصة #الذكاء_الاصطناعي #تطوير_المواقع #برمجة_ويب #أنظمة", "instagram": "صناعة المواقع لم تعد مقتصرة على صفحات ثابتة تعرض نصوصاً وصوراً. اليوم، تستطيع تحويل أي موقع إلى منصة ذكية تتفاعل مع الزائر بشكل مخصص وتفهم متطلباته بدقة.\n\nربط واجهات الذكاء الاصطناعي البرمجية (APIs) بالأنظمة أصبح في غاية البساطة والسرعة. يمكنك إضافة محرك بحث دلالي يفهم قصد المستخدم، أو روبوت دعم فني ذكي يجيب عن الاستفسارات بمستوى احترافي، أو حتى نظام يحلل سلوك التصفح ليعرض المحتوى الأنسب لكل شخص.\n\nالجميل في الأمر أنك لست بحاجة لإنشاء نماذج ذكاء اصطناعي من الصفر؛ الحلول والمكتبات البرمجية متوفرة وجاهزة للتكامل مع موقعك فوراً. خطوة بسيطة كهذه تصنع فارقاً هائلاً في جودة مشروعك ورضا مستخدميه.\n\n#منصة #الذكاء_الاصطناعي #تطوير_المواقع #برمجة_ويب #أنظمة", "threads": "المواقع اليوم لم تعد صفحات جامدة! دمج الذكاء الاصطناعي في أي منصة عبر الـ APIs يتيح لك تقديم بحث ذكي، ودعم فوري، وتجربة مخصصة لكل زائر بكل سلاسة وسرعة.\n\n#منصة #الذكاء_الاصطناعي #تطوير_المواقع"}, "group": "upcoming"}, "2026-10-21-g1": {"id": "2026-10-21-g1", "approved": true, "publish_at": "2026-10-21 08:32", "template": "split", "topic": "tmvet3asy", "image": {"title": "تعلم البرمجة في عصر الذكاء الاصطناعي", "body": "الأساسيات الهندسية وحل المشكلات أهم بكثير من مجرد حفظ الأكواد.", "photo_query": "dual computer monitors desk", "seed": 15}, "platforms": {"facebook": "إذا كنت تفكر في دخول عالم البرمجة وصناعة الأنظمة، فقد تسأل نفسك: هل لا يزال التعلم مجدياً بينما الذكاء الاصطناعي يكتب الأكواد الجاهزة؟\n\nنعم وبكل تأكيد! الذكاء الاصطناعي يكتب السطور البرمجية، لكنه يحتاج إلى عقل مهندس يفهم كيف يوجهه، وكيف يدقق النتائج، وكيف يربط مكونات النظام لتكون آمنة وقابلة للتطوير.\n\nالمطلوب منك الآن لم يعد حفظ الأوامر والتراكيب عن ظهر قلب؛ الأولوية الحقيقية أصبحت لفهم هياكل البيانات، وهندسة البرمجيات، وأسلوب التفكير التحليلي. اعتبر أدوات الذكاء الاصطناعي معلماً شخصياً يرافقك: اسألها عما يستعصي عليك، ودعها تشرح لك المفاهيم المعقدة، وسترى كيف تختصر رحلة تعلمك إلى النصف.\n\n#الذكاء_الاصطناعي #تعلم_البرمجة #هندسة_البرمجيات #مطورين", "instagram": "إذا كنت تفكر في دخول عالم البرمجة وصناعة الأنظمة، فقد تسأل نفسك: هل لا يزال التعلم مجدياً بينما الذكاء الاصطناعي يكتب الأكواد الجاهزة؟\n\nنعم وبكل تأكيد! الذكاء الاصطناعي يكتب السطور البرمجية، لكنه يحتاج إلى عقل مهندس يفهم كيف يوجهه، وكيف يدقق النتائج، وكيف يربط مكونات النظام لتكون آمنة وقابلة للتطوير.\n\nالمطلوب منك الآن لم يعد حفظ الأوامر والتراكيب عن ظهر قلب؛ الأولوية الحقيقية أصبحت لفهم هياكل البيانات، وهندسة البرمجيات، وأسلوب التفكير التحليلي. اعتبر أدوات الذكاء الاصطناعي معلماً شخصياً يرافقك: اسألها عما يستعصي عليك، ودعها تشرح لك المفاهيم المعقدة، وسترى كيف تختصر رحلة تعلمك إلى النصف.\n\n#الذكاء_الاصطناعي #تعلم_البرمجة #هندسة_البرمجيات #مطورين", "threads": "في عصر الذكاء الاصطناعي، لا تشغل بالك بحفظ الأكواد؛ ركّز على فهم الأساسيات الهندسية وطريقة بناء الأنظمة وحل المشكلات. الأداة الذكية تكتب الكود، لكن المهندس هو من يدير الفكرة ويوجهها للنجاح.\n\n#تعلم_البرمجة #الذكاء_الاصطناعي #تقنية"}, "group": "upcoming"}, "2026-10-22-car1": {"id": "2026-10-22-car1", "approved": false, "publish_at": "2026-10-22 20:00", "template": "carousel", "topic": "tmvet3asy", "image": {"title": "كيف أجعل الذكاء الاصطناعي مساعد برمجة لا بديلاً عني", "body": "", "slides": [{"kicker": "دراسة حالة · ذكاء اصطناعي", "title": "كيف أجعل الذكاء الاصطناعي مساعد برمجة لا بديلاً عني", "body": "ثماني شرائح: الطريقة التي وفّرت عليّ ساعات أسبوعياً دون أن أفقد فهمي.", "points": ["يكتب المسودة الأولى", "يراجع الأخطاء", "وأنا صاحب القرار"]}, {"kicker": "المشكلة", "title": "كل مرة أبدأ مشروعاً أضيّع أول ساعاته في أمور متكررة", "body": "هيكلة الملفات، كتابة الأكواد المعتادة، والبحث عن الصيغة نفسها للمرة العاشرة."}, {"kicker": "الفكرة", "title": "ماذا لو سلّمت الروتين لمساعد ذكي وركّزت أنا على القرار؟", "points": ["هو يقترح", "أنا أراجع", "ثم أُقرّر"]}, {"kicker": "الخطوة الأولى", "title": "اشرح له ما تريد بجملة واضحة", "body": "كلما كان طلبك أدق كانت النتيجة أقرب لما في ذهنك وأقل حاجة للتعديل."}, {"kicker": "الخطوة الثانية", "title": "راجع كل سطر قبل أن تعتمده", "points": ["افهم لماذا كُتب هكذا", "جرّبه في بيئة آمنة", "لا تنسخ ما لا تفهمه"]}, {"kicker": "الخطوة الثالثة", "title": "اجعله يشرح لك ما لا تفهمه", "body": "المساعد الذكي معلّم صبور: يجيب بلا ملل ويعيد الشرح بطرق مختلفة."}, {"kicker": "الخلاصة", "title": "المهندس يقود، والأداة تسرّع", "body": "من يفهم الأساسيات يستفيد من الذكاء الاصطناعي أكثر بكثير ممن يكتفي بنسخ الأكواد."}, {"kicker": "", "title": "وأنت، ما أول مهمة ستسلّمها لمساعدك الذكي؟", "body": "اكتب لي في التعليقات، واحفظ المنشور للرجوع إليه."}], "seed": 1}, "platforms": {"facebook": "كل مرة أبدأ مشروعاً أجد نفسي أضيّع أول ساعاته في أمور أكررها: هيكلة الملفات، وأكواد أعرفها عن ظهر قلب 😅\nفسألت نفسي: ماذا لو سلّمت هذا الروتين لمساعد ذكي، وركّزت أنا على القرار؟\n\n✦ أشرح له ما أريد بجملة واضحة ليبدأ بالمسودة الأولى\n✦ أراجع كل سطر وأفهم لماذا كُتب هكذا قبل أن أعتمده\n✦ أجعله يشرح لي ما لا أفهمه، فهو معلّم صبور لا يملّ\n✦ والقرار النهائي يبقى لي أنا، فالمهندس يقود والأداة تسرّع\n\nاسحب للآخر ← وقل لي: ما أول مهمة ستسلّمها لمساعدك الذكي؟\n\n#الذكاء_الاصطناعي #برمجة #تطوير_الويب #تقنية #مهندس", "instagram": "كل مرة أبدأ مشروعاً أجد نفسي أضيّع أول ساعاته في أمور أكررها: هيكلة الملفات، وأكواد أعرفها عن ظهر قلب 😅\nفسألت نفسي: ماذا لو سلّمت هذا الروتين لمساعد ذكي، وركّزت أنا على القرار؟\n\n✦ أشرح له ما أريد بجملة واضحة ليبدأ بالمسودة الأولى\n✦ أراجع كل سطر وأفهم لماذا كُتب هكذا قبل أن أعتمده\n✦ أجعله يشرح لي ما لا أفهمه، فهو معلّم صبور لا يملّ\n✦ والقرار النهائي يبقى لي أنا، فالمهندس يقود والأداة تسرّع\n\nاسحب للآخر ← وقل لي: ما أول مهمة ستسلّمها لمساعدك الذكي؟\n\n#الذكاء_الاصطناعي #برمجة #تطوير_الويب #تقنية #مهندس", "threads": "المهندس يقود والأداة تسرّع: لا تنسخ كود الذكاء الاصطناعي قبل أن تفهمه، واجعله يشرح لك ما لا تعرفه. ما أول مهمة ستسلّمها لمساعدك؟\n\n#الذكاء_الاصطناعي #برمجة #تقنية"}, "group": "draft"}}</script>
 <script>
 const tabs=document.querySelectorAll('#tabs button'),posts=document.querySelectorAll('.post'),empty=document.getElementById('empty');
 function show(f){const PN={topics:'topicsPanel',addpost:'postPanel',calendar:'calPanel'};const tp=f in PN;Object.entries(PN).forEach(([k,id])=>document.getElementById(id).hidden=f!==k);document.getElementById('grid').hidden=tp;let n=0;posts.forEach(p=>{const ok=!tp&&(f==='all'||p.dataset.s===f);p.hidden=!ok;if(ok)n++});empty.hidden=tp||n>0;tabs.forEach(b=>b.setAttribute('aria-pressed',b.dataset.f===f))}
 tabs.forEach(b=>b.onclick=()=>show(b.dataset.f));
-const lb=document.getElementById('lb');document.addEventListener('click',e=>{const i=e.target.closest('.post img');if(i){lb.querySelector('img').src=i.dataset.full;lb.classList.add('on')}else if(lb.contains(e.target)){lb.classList.remove('on')}});document.addEventListener('keydown',e=>{if(e.key==='Escape')lb.classList.remove('on')});
+const lb=document.getElementById('lb'),lbImg=lb.querySelector('img');let lbList=[],lbI=0;
+function lbShow(){lbImg.src=lbList[lbI];document.getElementById('lbCtr').textContent=lbList.length>1?(lbI+1)+' / '+lbList.length:'';lb.classList.toggle('multi',lbList.length>1)}
+function lbMove(d){lbI=(lbI+d+lbList.length)%lbList.length;lbShow()}
+document.addEventListener('click',e=>{const i=e.target.closest('.post img');
+  if(i){lbList=i.dataset.slides?JSON.parse(i.dataset.slides):[i.dataset.full];lbI=0;lbShow();lb.classList.add('on');return}
+  if(e.target.id==='lbPrev'){lbMove(-1);return}if(e.target.id==='lbNext'){lbMove(1);return}
+  if(lb.classList.contains('on')&&lb.contains(e.target)&&e.target.tagName!=='BUTTON')lb.classList.remove('on')});
+document.addEventListener('keydown',e=>{if(!lb.classList.contains('on'))return;if(e.key==='Escape')lb.classList.remove('on');if(e.key==='ArrowLeft')lbMove(1);if(e.key==='ArrowRight')lbMove(-1)});
 </script>
 <script>// ---- إدارة المواضيع والمنشورات عبر GitHub API (يُدرَج داخل اللوحة) ----
 const REPO = "engshadi-79/social-publisher", TFILE = "content/topics.yaml", QFILE = "content/queue.yaml";
@@ -390,6 +460,30 @@ const setTok = (v, keep) => { try { sessionStorage.setItem("gh_tok", v); keep ? 
 const b64d = (b) => new TextDecoder().decode(Uint8Array.from(atob(b.replace(/\n/g, "")), (c) => c.charCodeAt(0)));
 const b64e = (s) => { let bin = ""; new TextEncoder().encode(s).forEach((x) => (bin += String.fromCharCode(x))); return btoa(bin); };
 const q = (s) => JSON.stringify(s);
+
+
+// ---------- شرائح الكاروسيل: تحويل النص <-> بنية ----------
+function parseSlides(text) {
+  return text.split(/^\s*---\s*$/m).map((blk) => {
+    const sl = { kicker: "", title: "", body: "", points: [] }, body = [];
+    blk.split("\n").map((l) => l.trim()).filter(Boolean).forEach((l) => {
+      if (l.startsWith("# ")) sl.title = l.slice(2).trim();
+      else if (l.startsWith("@ ")) sl.kicker = l.slice(2).trim();
+      else if (l.startsWith("- ")) sl.points.push(l.slice(2).trim());
+      else body.push(l);
+    });
+    sl.body = body.join(" "); return sl;
+  }).filter((s) => s.title || s.body || s.points.length);
+}
+function slidesToText(slides) {
+  return (slides || []).map((s) => [s.title ? "# " + s.title : "", s.kicker ? "@ " + s.kicker : "", s.body || "",
+    ...(s.points || []).map((p) => "- " + p)].filter(Boolean).join("\n")).join("\n---\n");
+}
+function slidesYaml(slides) {
+  return "    slides:\n" + slides.map((s) => "      - kicker: " + q(s.kicker || "") + "\n        title: " + q(s.title) + "\n        body: " + q(s.body || "") +
+    (s.points && s.points.length ? "\n        points:\n" + s.points.map((x) => "          - " + q(x)).join("\n") : "")).join("\n") + "\n";
+}
+const slidesError = (sl) => (sl.length < 3 || sl.length > 10) ? "الكاروسيل يحتاج من 3 إلى 10 شرائح." : (sl.some((s) => !s.title) ? "لكل شريحة عنوان («# العنوان»)." : "");
 
 // ---------- المواضيع ----------
 function addBlock(text, t) {
@@ -437,6 +531,7 @@ function addPost(text, p) {
   if (p.topic) b += "  topic: " + q(p.topic) + "\n";
   b += "  image:\n    title: " + q(p.title) + "\n    body: " + q(p.body) + "\n";
   if (p.points && p.points.length) b += "    points:\n" + p.points.map((x) => "      - " + q(x)).join("\n") + "\n";
+  if (p.slides && p.slides.length) b += slidesYaml(p.slides);
   if (p.query) b += "    photo_query: " + q(p.query) + "\n";
   if (p.vp) b += "    visual_prompt: " + q(p.vp) + "\n";
   b += "    seed: " + p.seed + "\n  platforms:\n";
@@ -502,22 +597,23 @@ $("pAdd").onclick = async () => {
   const m = $("pMsg"), v = (i) => $(i).value.trim();
   const plats = ["facebook", "instagram", "threads", "telegram"].filter((k) => $("pl_" + k).checked);
   const when = v("pWhen").replace("T", " ");
-  const err = !v("pTitle") ? "اكتب عنوان الصورة." : !v("pText") ? "اكتب نص المنشور." : !plats.length ? "اختر منصة واحدة على الأقل." :
+  const isCar = $("pTemplate").value === "carousel", slides = isCar ? parseSlides($("pSlides").value) : [];
+  const err = isCar && slidesError(slides) ? slidesError(slides) : (!isCar && !v("pTitle")) ? "اكتب عنوان الصورة." : !v("pText") ? "اكتب نص المنشور." : !plats.length ? "اختر منصة واحدة على الأقل." :
     !when ? "اختر موعد النشر." :
-    ($("pTemplate").value === "infographic" && (v("pPoints").split("\n").filter((x) => x.trim()).length < 2)) ? "الإنفوجرافك يحتاج نقطتين على الأقل (كل نقطة في سطر)." :
-    ($("pTemplate").value !== "infographic" && !(v("pQuery") || v("pVP"))) ? "اكتب كلمات إنجليزية للصورة (مثل: engineer construction site)." :
+    (isCar ? false : $("pTemplate").value === "infographic" && (v("pPoints").split("\n").filter((x) => x.trim()).length < 2)) ? "الإنفوجرافك يحتاج نقطتين على الأقل (كل نقطة في سطر)." :
+    (!isCar && $("pTemplate").value !== "infographic" && !(v("pQuery") || v("pVP"))) ? "اكتب كلمات إنجليزية للصورة (مثل: engineer construction site)." :
     ($("pTopic") && !v("pTopic")) ? "اختر الموضوع." :
     (plats.includes("threads") && v("pText").length > 500) ? "نص ثريدز يجب ألا يتجاوز 500 حرف." :
     (plats.includes("instagram") && v("pText").length > 2200) ? "نص إنستغرام يجب ألا يتجاوز 2200 حرف." : "";
   if (err) { say(m, err, false); return; }
   const d = when.slice(0, 10);
   const p = { id: d + "-w" + Date.now().toString(36).slice(-4), when, template: $("pTemplate").value, topic: $("pTopic") ? v("pTopic") : "",
-    title: v("pTitle"), body: v("pBody"), query: v("pQuery"), vp: v("pVP"), points: v("pPoints").split("\n").map((x) => x.trim()).filter(Boolean), seed: 1 + Math.floor(Math.random() * 90), platforms: plats, text: v("pText") };
+    title: isCar ? slides[0].title : v("pTitle"), body: isCar ? "" : v("pBody"), slides, query: v("pQuery"), vp: v("pVP"), points: v("pPoints").split("\n").map((x) => x.trim()).filter(Boolean), seed: 1 + Math.floor(Math.random() * 90), platforms: plats, text: v("pText") };
   try {
     say(m, "جارٍ الحفظ…", true);
     await edit((x) => addPost(x, p), "queue: add " + p.id, QFILE);
     say(m, "أُضيف كمسودة ✅ خلال دقيقتين تظهر بصورتها في «بانتظار موافقتك» لتراجعها ثم توافق.", true);
-    ["pTitle", "pBody", "pQuery", "pVP", "pPoints", "pText"].forEach((i) => ($(i).value = "")); updCount();
+    ["pTitle", "pBody", "pQuery", "pVP", "pPoints", "pSlides", "pText"].forEach((i) => ($(i).value = "")); updCount();
   } catch (e2) { say(m, e2.message, false); }
 };
 
@@ -553,7 +649,7 @@ $("gGo").onclick = async () => {
   if (!topicId && !topicText) { say(m, "اكتب الموضوع.", false); return; }
   if (!when) { say(m, "اختر موعد أول منشور.", false); return; }
   const id = "g" + Date.now().toString(36);
-  const yml = "id: " + q(id) + "\ncount: " + parseInt($("gCount").value, 10) + "\nstyle: " + q($("gStyle").value) + "\nstart: " + q(when) + "\n" +
+  const yml = "id: " + q(id) + "\ncount: " + parseInt($("gCount").value, 10) + "\nstyle: " + q($("gStyle").value) + "\nslides: " + parseInt($("gSlides").value, 10) + "\nstart: " + q(when) + "\n" +
     (topicId ? "topic_id: " + q(topicId) : "topic_text: " + q(topicText)) + "\n";
   try {
     say(m, "جارٍ إرسال الطلب…", true);
@@ -573,6 +669,7 @@ function serializePost(p) {
   if (p.topic) b += "  topic: " + q(p.topic) + "\n";
   b += "  image:\n    title: " + q(im.title || "") + "\n    body: " + q(im.body || "") + "\n";
   if (im.points && im.points.length) b += "    points:\n" + im.points.map((x) => "      - " + q(x)).join("\n") + "\n";
+  if (im.slides && im.slides.length) b += slidesYaml(im.slides);
   if (im.photo_query) b += "    photo_query: " + q(im.photo_query) + "\n";
   if (im.visual_prompt) b += "    visual_prompt: " + q(im.visual_prompt) + "\n";
   if (im.seed != null) b += "    seed: " + im.seed + "\n";
@@ -602,7 +699,7 @@ let editId = null;
 function openEdit(id) {
   const p = POSTS[id]; if (!p) return;
   editId = id; const im = p.image || {};
-  $("eTitle").value = im.title || ""; $("eBody").value = im.body || ""; $("ePoints").value = (im.points || []).join("\n");
+  $("eTitle").value = im.title || ""; $("eBody").value = im.body || ""; $("ePoints").value = (im.points || []).join("\n"); $("eSlides").value = slidesToText(im.slides);
   $("eQuery").value = im.photo_query || ""; $("eVP").value = im.visual_prompt || "";
   $("eTemplate").value = p.template; $("eWhen").value = (p.publish_at || "").replace(" ", "T");
   if ($("eTopic")) $("eTopic").value = p.topic || "";
@@ -616,17 +713,17 @@ $("eSave").onclick = async () => {
   const m = $("eMsg"), v = (i) => $(i).value.trim(), old = POSTS[editId];
   const platforms = {};
   PLATS.forEach((k) => { if ($("ep_" + k).checked && v("et_" + k)) platforms[k] = v("et_" + k); });
-  const tpl = $("eTemplate").value, points = v("ePoints").split("\n").map((x) => x.trim()).filter(Boolean);
-  const err = !v("eTitle") ? "العنوان مطلوب." : !Object.keys(platforms).length ? "اختر منصة واحدة على الأقل بنص غير فارغ." :
+  const tpl = $("eTemplate").value, eSlides = tpl === "carousel" ? parseSlides($("eSlides").value) : [], points = v("ePoints").split("\n").map((x) => x.trim()).filter(Boolean);
+  const err = (tpl === "carousel" && slidesError(eSlides)) ? slidesError(eSlides) : (tpl !== "carousel" && !v("eTitle")) ? "العنوان مطلوب." : !Object.keys(platforms).length ? "اختر منصة واحدة على الأقل بنص غير فارغ." :
     !v("eWhen") ? "اختر الموعد." : (tpl === "infographic" && (points.length < 2 || points.length > 6)) ? "الإنفوجرافك يحتاج من 2 إلى 6 نقاط." :
-    (tpl !== "infographic" && !(v("eQuery") || v("eVP"))) ? "اكتب كلمات إنجليزية للصورة." :
+    (tpl !== "infographic" && tpl !== "carousel" && !(v("eQuery") || v("eVP"))) ? "اكتب كلمات إنجليزية للصورة." :
     (platforms.threads && platforms.threads.length > 500) ? "نص ثريدز أطول من 500 حرف." :
     (platforms.instagram && platforms.instagram.length > 2200) ? "نص إنستغرام أطول من 2200 حرف." :
     ($("eTopic") && !v("eTopic")) ? "اختر الموضوع." : "";
   if (err) { say(m, err, false); return; }
   const oi = old.image || {};
-  const img = { title: v("eTitle"), body: v("eBody"), seed: oi.seed != null ? oi.seed : 1 };
-  if (tpl === "infographic") img.points = points; else { img.photo_query = v("eQuery"); if (v("eVP")) img.visual_prompt = v("eVP"); }
+  const img = { title: tpl === "carousel" ? eSlides[0].title : v("eTitle"), body: tpl === "carousel" ? "" : v("eBody"), seed: oi.seed != null ? oi.seed : 1 };
+  if (tpl === "carousel") img.slides = eSlides; else if (tpl === "infographic") img.points = points; else { img.photo_query = v("eQuery"); if (v("eVP")) img.visual_prompt = v("eVP"); }
   const nu = { id: editId, approved: old.approved, publish_at: v("eWhen").replace("T", " "), template: tpl,
     topic: $("eTopic") ? v("eTopic") : old.topic, image: img, platforms };
   const imageChanged = tpl !== old.template || img.photo_query !== oi.photo_query || img.visual_prompt !== oi.visual_prompt;
