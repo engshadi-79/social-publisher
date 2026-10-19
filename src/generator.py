@@ -85,7 +85,8 @@ def generate_text(prompt: str):
     errors = []
     for label, fn in attempts:
         try:
-            return fn(), label
+            note = f" — تعذّر سابقاً: {errors[0][:170]}" if errors else ""
+            return fn(), label + note
         except (GeneratorError, requests.RequestException) as e:
             errors.append(f"{label}: {e}")
     raise GeneratorError(" | ".join(errors)[:600])
