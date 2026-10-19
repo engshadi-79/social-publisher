@@ -23,5 +23,28 @@
       "error": null,
       "published_at": "2026-10-18T16:50:36+00:00"
     }
+  },
+  "2026-10-19-g1": {
+    "facebook": {
+      "attempts": 0,
+      "status": "published",
+      "platform_post_id": "197449247358013_1610724257733896",
+      "error": null,
+      "published_at": "2026-10-19T06:25:05+00:00"
+    },
+    "instagram": {
+      "attempts": 0,
+      "status": "published",
+      "platform_post_id": "18080767265707376",
+      "error": null,
+      "published_at": "2026-10-19T06:25:24+00:00"
+    },
+    "threads": {
+      "attempts": 0,
+      "status": "published",
+      "platform_post_id": "18126681575304902",
+      "error": null,
+      "published_at": "2026-10-19T06:25:40+00:00"
+    }
   }
 }
