@@ -211,6 +211,9 @@ When the owner says "جهّز منشورات الأسبوع" (prepare this week'
      `terminal` (code, tools, developer content) · `poster` (announcement, short strong message) ·
      `sticky` (tips, friendly checklists) · `duo` (comparisons, ordered steps).
      Omitting `style` is allowed: the renderer derives one from the post id (stable, and spread across styles).
+     The six photo styles need photos: give each slide its own `photo_query` (2–4 English words for
+     what that slide is about) plus a post-level `image.photo_query` as the fallback. Without any
+     query the renderer falls back to a flat style, so a carousel never ships with empty image boxes.
    - Otherwise prefer the `infographic` template (numbered key points in `image.points`, always on-topic) or `split` for real photos (stock photos are ~1000px wide, so full-bleed `photo` looks soft).
    - Set `image.photo_query`: 2–4 English keywords for a real stock photo (Pexels), e.g.
      "woman planning day notebook window". Also keep `image.visual_prompt` as the AI fallback.

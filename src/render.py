@@ -5,8 +5,8 @@ from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 
 import imagegen
-from config import (CAROUSEL_STYLES, CAROUSEL_STYLES_PHOTO, OUT_DIR, ROOT,
-                    TEMPLATES, TEMPLATES_DIR)
+from config import (CAROUSEL_STYLES, CAROUSEL_STYLES_FLAT, CAROUSEL_STYLES_PHOTO, OUT_DIR,
+                    ROOT, TEMPLATES, TEMPLATES_DIR)
 from queue_io import load_brand
 
 _env = Environment(loader=FileSystemLoader(str(TEMPLATES_DIR)), autoescape=True)
@@ -71,10 +71,13 @@ class Renderer:
         brand = load_brand()
         w, h = TEMPLATES["carousel"]
         style = carousel_style(post)
-        tpl = _env.get_template(f"carousel/styles/{style}.html")
         photos: dict[int, Path] = {}
         if style in CAROUSEL_STYLES_PHOTO:
             photos, _warns = imagegen.ensure_slide_photos(post)
+            if not photos:
+                # نمط مصوَّر بلا صورة واحدة يخرج بمربّع فارغ، فننزل إلى نمط لوني
+                style = flat_style(post)
+        tpl = _env.get_template(f"carousel/styles/{style}.html")
         outs = []
         for spec in slide_specs(post):
             photo = photos.get(spec["index"])
@@ -88,6 +91,12 @@ class Renderer:
         if post["template"] == "carousel":
             return self.render_slides(post, out_dir)
         return [self.render(post, out_dir / f"{post['id']}.png", bg)]
+
+
+def flat_style(post: dict) -> str:
+    """نمط لوني (بلا صور) يُشتق من معرّف المنشور: بديلٌ حين تتعذّر الصور."""
+    digest = hashlib.sha1(("flat:" + str(post.get("id", ""))).encode("utf-8")).digest()
+    return CAROUSEL_STYLES_FLAT[digest[0] % len(CAROUSEL_STYLES_FLAT)]
 
 
 def carousel_style(post: dict) -> str:

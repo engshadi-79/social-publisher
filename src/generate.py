@@ -68,10 +68,10 @@ def build_prompt(topic: dict, count: int, brand: dict, recent: list[str], trends
         n = max(5, min(int(slides_n or 7), 10))
         style_fields = (f'  "slides": مصفوفة من {n} شرائح لكاروسيل إنستغرام بأسلوب «دراسة حالة/دليل عملي»، كل شريحة كائن فيه: '
                         '"kicker" (سطر صغير فوق العنوان مثل: المشكلة، الفكرة، الخطوة الأولى، الخلاصة)، "title" (عنوان قوي حتى 70 حرفاً)، '
-                        '"body" (جملة أو جملتان حتى 180 حرفاً، أو فارغ)، "points" (قائمة حتى 3 نقاط قصيرة حتى 60 حرفاً لكل نقطة، أو فارغة).\n'
+                        '"body" (جملة أو جملتان حتى 180 حرفاً، أو فارغ)، "points" (قائمة حتى 3 نقاط قصيرة حتى 60 حرفاً لكل نقطة، أو فارغة)، "photo_query" (2 إلى 4 كلمات إنجليزية للبحث عن صورة فوتوغرافية حقيقية تمثّل فكرة هذه الشريحة تحديداً: شيء ملموس مرئي لا مفهوم مجرد).\n'
                         '    الشريحة الأولى غلاف: عنوان جاذب وجملة تحته و3 نقاط في "points" تلخّص الوعد. الشرائح الوسطى: فكرة واحدة لكل شريحة بتسلسل منطقي. '
                         'الأخيرة: سؤال تفاعلي للمتابع في "title" ودعوة لحفظ المنشور والتعليق في "body".\n'
-                        '  "photo_query": "" (اتركه فارغاً)،\n  "visual_prompt": "" (اتركه فارغاً)،\n'
+                        '  "photo_query": 2 إلى 4 كلمات إنجليزية تمثّل موضوع المنشور كله (تُستعمل للشريحة التي بلا كلمات خاصة)،\n  "visual_prompt": "" (اتركه فارغاً)،\n'
                         '  ملاحظة: "title" و"body" الخارجيان للمنشور ككل: "title" هو عنوان الغلاف و"body" فارغ.')
     elif style == "infographic":
         style_fields = ('  "points": من 3 إلى 5 نقاط قصيرة ومفيدة تلخّص المنشور كإنفوجرافك (كل نقطة حتى 60 حرفاً، بلا ترقيم)،\n'
@@ -141,12 +141,17 @@ def make_entries(items: list[dict], req: dict, topic: dict, existing_ids: set[st
             for sl in (it.get("slides") or [])[:10]:
                 if not isinstance(sl, dict) or not str(sl.get("title", "")).strip():
                     continue
-                slides.append({"kicker": str(sl.get("kicker", "") or "").strip()[:40], "title": str(sl["title"]).strip()[:110],
-                               "body": str(sl.get("body", "") or "").strip()[:240],
-                               "points": [str(x).strip()[:88] for x in (sl.get("points") or []) if str(x).strip()][:3]})
+                one = {"kicker": str(sl.get("kicker", "") or "").strip()[:40], "title": str(sl["title"]).strip()[:110],
+                       "body": str(sl.get("body", "") or "").strip()[:240],
+                       "points": [str(x).strip()[:88] for x in (sl.get("points") or []) if str(x).strip()][:3]}
+                if str(sl.get("photo_query", "") or "").strip():
+                    one["photo_query"] = str(sl["photo_query"]).strip()[:60]
+                slides.append(one)
             img["slides"] = slides
             img["title"] = slides[0]["title"] if slides else img["title"]
             img["body"] = ""
+            if str(it.get("photo_query", "") or "").strip():      # احتياط الشرائح بلا كلمات خاصة
+                img["photo_query"] = str(it["photo_query"]).strip()[:60]
         elif req.get("style") == "infographic":
             pts = [str(x).strip() for x in (it.get("points") or []) if str(x).strip()][:5]
             img["points"] = [x[:88] for x in pts]
