@@ -2,24 +2,38 @@
 في أسرار GitHub، ويسجّل تاريخ الإصدار ليُنبّهك فحص الصحة قبل انتهائه.
 لا يطبع أي توكن ولا يحفظه في ملف.
 
-الاستعمال:  python scripts/setup_linkedin.py
+الاستعمال:  python scripts/setup_linkedin.py --client-id <المعرّف>
 يُعاد تشغيله كل 60 يوماً: التجديد البرمجي مقصور على شركاء MDP المعتمدين.
+
+افتراضياً يلتقط رمز التفويض بنفسه عبر خادم محلي على المنفذ 8765، فلا تنسخ رابطاً.
+يتطلّب ذلك تسجيل http://localhost:8765/callback في Authorized redirect URLs.
+وإن تعذّر، استعمل --manual لتلصق الرابط يدوياً مع رابط صفحات GitHub.
 """
+import argparse
 import getpass
 import json
 import subprocess
 import sys
+import threading
 import urllib.parse
 import webbrowser
 from datetime import date
+from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 
 import requests
 
 REPO = "engshadi-79/social-publisher"
-REDIRECT = "https://engshadi-79.github.io/social-publisher/"
+LOCAL_PORT = 8765
+LOCAL_REDIRECT = f"http://localhost:{LOCAL_PORT}/callback"
+PAGES_REDIRECT = "https://engshadi-79.github.io/social-publisher/"
 SCOPES = "openid profile w_member_social"
 DATES = Path(__file__).resolve().parent.parent / "content" / "token_dates.json"
+
+DONE_PAGE = """<!doctype html><meta charset="utf-8">
+<title>تم</title><style>body{font-family:system-ui,sans-serif;direction:rtl;text-align:center;
+padding:80px 24px;background:#0B1F3A;color:#F5F1E8}h1{font-size:28px}p{opacity:.75}</style>
+<h1>تمّ التفويض ✓</h1><p>أغلق هذه الصفحة وعُد إلى الطرفية.</p>"""
 
 
 def secret(name, value):
@@ -40,33 +54,81 @@ def check(r, what):
     return r.json()
 
 
+class _Catcher(BaseHTTPRequestHandler):
+    """يلتقط ?code= من إعادة التوجيه ثم يُنهي الخادم."""
+
+    result: dict = {}
+
+    def do_GET(self):  # noqa: N802
+        q = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+        _Catcher.result = {k: v[0] for k, v in q.items()}
+        self.send_response(200)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.end_headers()
+        self.wfile.write(DONE_PAGE.encode("utf-8"))
+
+    def log_message(self, *a):  # صمتاً: لا نريد سجلّ HTTP في الطرفية
+        pass
+
+
+def wait_for_code(timeout=300) -> str:
+    srv = HTTPServer(("localhost", LOCAL_PORT), _Catcher)
+    srv.timeout = timeout
+    t = threading.Thread(target=srv.handle_request, daemon=True)
+    t.start()
+    t.join(timeout)
+    srv.server_close()
+    res = _Catcher.result
+    if res.get("error"):
+        sys.exit(f"رفض التفويض: {res.get('error_description') or res['error']}")
+    if not res.get("code"):
+        sys.exit("لم يصل رمز التفويض خلال المهلة. أعد التشغيل، أو استعمل --manual.")
+    return res["code"]
+
+
 def main():
     sys.stdout.reconfigure(encoding="utf-8")
-    print("قبل أن تبدأ، في linkedin.com/developers:")
-    print("  1. Create app (تُربط بصفحة شركة، والنشر يبقى على حسابك الشخصي).")
-    print("  2. تبويب Products: أضف «Share on LinkedIn» و«Sign In with LinkedIn using OpenID Connect».")
-    print("  3. تبويب Auth ثم Authorized redirect URLs، أضف هذا الرابط بالضبط:")
-    print(f"     {REDIRECT}")
-    print("  4. من تبويب Auth انسخ Client ID و Client Secret.")
-    print("")
-    client_id = input("LinkedIn Client ID: ").strip()
-    client_secret = getpass.getpass("LinkedIn Client Secret (مخفي): ").strip()
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--client-id", help="معرّف التطبيق العلني (من تبويب Auth)")
+    ap.add_argument("--manual", action="store_true",
+                    help="ألصق رابط إعادة التوجيه يدوياً بدل الالتقاط التلقائي")
+    args = ap.parse_args()
+
+    redirect = PAGES_REDIRECT if args.manual else LOCAL_REDIRECT
+    client_id = args.client_id or input("LinkedIn Client ID: ").strip()
+    print(f"\nرابط إعادة التوجيه المستعمل: {redirect}")
+    print("(لا بدّ أن يكون مسجّلاً في Authorized redirect URLs داخل تبويب Auth.)\n")
+    client_secret = getpass.getpass("ألصق Client Secret هنا ثم Enter (لن يظهر شيء وأنت تلصق): ").strip()
+    if not client_secret:
+        sys.exit("لم يصل أي سرّ.")
 
     url = "https://www.linkedin.com/oauth/v2/authorization?" + urllib.parse.urlencode({
-        "response_type": "code", "client_id": client_id, "redirect_uri": REDIRECT,
+        "response_type": "code", "client_id": client_id, "redirect_uri": redirect,
         "scope": SCOPES, "state": "shadi"})
-    print("\nافتح هذا الرابط ووافق، ثم انسخ رابط الصفحة التي حُوّلت إليها كاملاً:")
-    print(url + "\n")
-    try:
-        webbrowser.open(url)        # توفيراً لخطوة نسخ الرابط ولصقه
-    except Exception:  # noqa: BLE001
-        pass
-    code = input("الرابط أو قيمة code: ").strip()
-    if "code=" in code:
-        code = urllib.parse.parse_qs(urllib.parse.urlparse(code).query).get("code", [code])[0]
+
+    if args.manual:
+        print("\nافتح هذا الرابط ووافق، ثم انسخ رابط الصفحة التي حُوّلت إليها كاملاً:")
+        print(url + "\n")
+        try:
+            webbrowser.open(url)
+        except Exception:  # noqa: BLE001
+            pass
+        code = input("الرابط أو قيمة code: ").strip()
+        if "code=" in code:
+            code = urllib.parse.parse_qs(urllib.parse.urlparse(code).query).get("code", [code])[0]
+    else:
+        print("افتح صفحة الموافقة واضغط «السماح». سألتقط الرمز بنفسي:")
+        print(url + "\n")
+        try:
+            webbrowser.open(url)
+        except Exception:  # noqa: BLE001
+            pass
+        print("بانتظار الموافقة…")
+        code = wait_for_code()
+        print("وصل رمز التفويض ✓")
 
     tok = check(requests.post("https://www.linkedin.com/oauth/v2/accessToken", timeout=30, data={
-        "grant_type": "authorization_code", "code": code, "redirect_uri": REDIRECT,
+        "grant_type": "authorization_code", "code": code, "redirect_uri": redirect,
         "client_id": client_id, "client_secret": client_secret}), "تبادل الكود")
     access = tok["access_token"]
 
