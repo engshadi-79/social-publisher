@@ -1,8 +1,7 @@
 {
-  "id": "gmvgd2ubl",
-  "ok": true,
-  "count": 1,
-  "topic": "اقتباسات سريعة وتفاعل خفيف (Quotes & Engagement)",
-  "method": "Gemini gemini-3.8-flash | ترند Google: 45 عنصر",
-  "message": "وُلِّدت 1 مسودات عن «اقتباسات سريعة وتفاعل خفيف (Quotes & Engagement)»"
+  "id": "gmvgvcvg1",
+  "ok": false,
+  "count": 0,
+  "topic": "tmvgcw0d5",
+  "message": "فشل التوليد: Gemini gemini-3.8-flash: gemini-3.8-flash (interactions) HTTP 503: gemini-3.8-flash is currently experiencing high demand, spikes in demand are usually temporary. Please try again later. | Gemini gemini-3.8-flash (generateContent): gemini-3.8-flash HTTP 503: This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later. | Gemini 3.6: gemini-3.6-fl"
 }
