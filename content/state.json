@@ -69,5 +69,31 @@
       "error": null,
       "published_at": "2026-10-20T05:15:35+00:00"
     }
+  },
+  "2026-10-20-g1": {
+    "facebook": {
+      "attempts": 0,
+      "status": "published",
+      "platform_post_id": "197449247358013_1611714490968206",
+      "error": null,
+      "account": "فيسبوك — الوان",
+      "published_at": "2026-10-20T06:04:39+00:00"
+    },
+    "instagram": {
+      "attempts": 0,
+      "status": "published",
+      "platform_post_id": "17880516306630537",
+      "error": null,
+      "account": "إنستغرام — engshadi2011",
+      "published_at": "2026-10-20T06:04:53+00:00"
+    },
+    "threads": {
+      "attempts": 0,
+      "status": "published",
+      "platform_post_id": "17959974960246539",
+      "error": null,
+      "account": "ثريدز — engshadi2011",
+      "published_at": "2026-10-20T06:05:09+00:00"
+    }
   }
 }
