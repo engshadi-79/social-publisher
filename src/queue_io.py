@@ -7,8 +7,8 @@ from zoneinfo import ZoneInfo
 import yaml
 
 import accounts as _acc
-from config import (BRAND_PATH, TOPICS_PATH, LIMITS, PLATFORMS, QUEUE_PATH, STATE_PATH,
-                    TEMPLATES, TIMEZONE)
+from config import (BRAND_PATH, CAROUSEL_STYLES, TOPICS_PATH, LIMITS, PLATFORMS, QUEUE_PATH,
+                    STATE_PATH, TEMPLATES, TIMEZONE)
 
 TZ = ZoneInfo(TIMEZONE)
 
@@ -87,6 +87,9 @@ def validate(queue: list[dict]) -> list[str]:
             errors.append(f"{tag} image.title مطلوب")
         elif p.get("template") == "carousel":
             sl = img.get("slides")
+            style = str(img.get("style", "") or "").strip()
+            if style and style.lower() not in CAROUSEL_STYLES:
+                errors.append(f"{tag} نمط كاروسيل غير معروف: {style} (المتاح: {', '.join(CAROUSEL_STYLES)})")
             if not (isinstance(sl, list) and 3 <= len(sl) <= 10):
                 errors.append(f"{tag} الكاروسيل يحتاج image.slides من 3 إلى 10 شرائح")
             else:

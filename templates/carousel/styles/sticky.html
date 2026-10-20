@@ -1,0 +1,70 @@
+{% extends "carousel/base.html" %}
+{# نمط «الورقة الملصقة»: بطاقة ورقية مائلة بشريط لاصق، تظليل قلم خلف العنوان، نقاط بمربعات تحقّق.
+   يناسب: النصائح، القوائم، المحتوى الودّي القريب. #}
+
+{% block style %}
+.slide{ padding:62px 58px; background:#EFE7D8;
+        background-image:radial-gradient(circle at 20% 15%, rgba(255,255,255,.7), transparent 45%),
+                         radial-gradient(circle at 85% 80%, rgba(20,184,166,.10), transparent 40%);
+        color:var(--ink) }
+.slide.dark{ background:#E3DAC7 }
+.slide.cta { background:#DCEFEA }
+
+/* شبكة دفتر خفيفة */
+.grid{ position:absolute; inset:0; pointer-events:none; opacity:.5;
+       background-image:linear-gradient(rgba(14,26,43,.06) 1px, transparent 1px);
+       background-size:100% 58px }
+
+.paper{ position:relative; flex:1; min-height:0; display:flex; flex-direction:column;
+        background:#FDFBF5; border-radius:16px; padding:68px 62px 56px;
+        box-shadow:0 26px 60px rgba(14,26,43,.18), 0 2px 0 rgba(14,26,43,.06);
+        transform:rotate(-1.1deg) }
+.slide.dark .paper{ transform:rotate(1.3deg); background:#FFFDF8 }
+.tape{ position:absolute; top:-26px; left:50%; transform:translateX(-50%) rotate(-2deg);
+       width:230px; height:54px; background:rgba(244,185,66,.55); border-radius:3px;
+       box-shadow:0 4px 12px rgba(14,26,43,.12) }
+.tape::before,.tape::after{ content:""; position:absolute; top:0; bottom:0; width:10px;
+       background:repeating-linear-gradient(135deg, transparent 0 5px, rgba(255,255,255,.5) 5px 10px) }
+.tape::before{ left:0 } .tape::after{ right:0 }
+
+.meta{ display:flex; justify-content:space-between; align-items:center; font-size:25px;
+       color:rgba(14,26,43,.5); direction:ltr; margin-bottom:34px }
+.meta .name{ direction:rtl; font-weight:700 }
+
+.kicker{ font-size:.52em; font-weight:800; color:var(--kick); margin-bottom:.7em }
+.title{ font-weight:800; line-height:1.4; font-size:1.62em; display:inline }
+/* تظليل قلم خلف العنوان */
+.title mark, .title{ background:linear-gradient(transparent 58%, rgba(244,185,66,.55) 58%); padding:0 .06em }
+.cover .title{ font-size:1.85em }
+.sub{ margin-top:1em; color:rgba(14,26,43,.66); line-height:1.8; font-size:.62em; font-weight:500 }
+.pts{ margin-top:1.2em; display:flex; flex-direction:column; gap:.65em }
+.pts li{ display:flex; gap:.6em; align-items:flex-start; font-size:.64em; line-height:1.6; font-weight:600 }
+.pts li::before{ content:"☑"; color:var(--teal); flex:0 0 auto }
+
+.foot{ position:relative; display:flex; justify-content:space-between; align-items:center;
+       font-size:26px; color:rgba(14,26,43,.55); direction:ltr; margin-top:28px; padding-top:0 }
+.foot .who{ direction:rtl; font-weight:700 }
+{% endblock %}
+
+{% block slide %}
+<div class="slide {{ theme }} {{ kind }}">
+  <div class="grid"></div>
+  <div class="paper">
+    <div class="tape"></div>
+    <div class="meta">
+      <span>{{ '%02d' % index }} / {{ '%02d' % total }}</span>
+      <span class="name">{{ brand.name }}</span>
+    </div>
+    <div class="body-area" id="area"><div class="inner" id="inner">
+      {% if kicker %}<div class="kicker">{{ kicker }}</div>{% endif %}
+      <div><span class="title">{{ title }}</span></div>
+      {% if body %}<div class="sub">{{ body }}</div>{% endif %}
+      {% if points %}<ul class="pts">{% for p in points %}<li><span>{{ p }}</span></li>{% endfor %}</ul>{% endif %}
+    </div></div>
+    <div class="foot">
+      <span>{{ brand.handle }}</span>
+      <span class="who">{% if index < total %}اسحب ←{% else %}احفظ ✓{% endif %}</span>
+    </div>
+  </div>
+</div>
+{% endblock %}

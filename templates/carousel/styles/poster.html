@@ -1,0 +1,56 @@
+{% extends "carousel/base.html" %}
+{# نمط «الملصق»: لون طاغٍ، رقم مائي عملاق، عنوان ضخم، نقاط داخل أقراص.
+   يناسب: الإعلانات، الرسائل القوية القصيرة، الحملات. #}
+
+{% block style %}
+.slide{ padding:76px 80px 64px; background:var(--navy); color:#FFF7EC }
+.slide.light{ background:var(--accent); color:#1A1206 }
+.slide.dark { background:var(--navy); color:#FFF7EC }
+.slide.cta  { background:var(--kick); color:#FFF2EE }
+
+/* رقم مائي عملاق مقصوص عند الحافة */
+.wm{ position:absolute; bottom:-130px; left:-60px; font-size:620px; font-weight:800; line-height:.8;
+     opacity:.12; direction:ltr; pointer-events:none }
+.blob{ position:absolute; top:-180px; right:-140px; width:560px; height:560px; border-radius:50%;
+       background:rgba(255,255,255,.08); pointer-events:none }
+
+.top{ position:relative; display:flex; justify-content:space-between; align-items:center;
+      font-size:27px; font-weight:700; direction:ltr; opacity:.85 }
+.top .name{ direction:rtl }
+
+.kicker{ display:inline-flex; align-items:center; background:rgba(255,255,255,.16); border-radius:100px;
+         padding:.38em .9em; font-size:.5em; font-weight:800; margin-bottom:.9em; letter-spacing:.04em }
+.light .kicker{ background:rgba(26,18,6,.14) }
+.title{ font-weight:800; line-height:1.18; font-size:2.1em; letter-spacing:-.02em }
+.cover .title{ font-size:2.5em }
+.sub{ margin-top:.8em; line-height:1.7; font-size:.64em; font-weight:600; opacity:.9; max-width:92% }
+.pts{ margin-top:1.3em; display:flex; flex-wrap:wrap; gap:.5em }
+.pts li{ background:rgba(255,255,255,.14); border-radius:100px; padding:.45em 1em;
+         font-size:.56em; line-height:1.5; font-weight:700 }
+.light .pts li{ background:rgba(26,18,6,.12) }
+
+.foot{ position:relative; display:flex; justify-content:space-between; align-items:center;
+       font-size:26px; font-weight:700; direction:ltr; opacity:.9 }
+.foot .pill{ border:2.5px solid currentColor; border-radius:100px; padding:.34em 1em; direction:rtl }
+{% endblock %}
+
+{% block slide %}
+<div class="slide {{ theme }} {{ kind }}">
+  <div class="blob"></div>
+  <div class="wm">{{ '%02d' % index }}</div>
+  <div class="top">
+    <span>{{ '%02d' % index }}/{{ '%02d' % total }}</span>
+    <span class="name">{{ brand.name }}</span>
+  </div>
+  <div class="body-area" id="area"><div class="inner" id="inner">
+    {% if kicker %}<div class="kicker">{{ kicker }}</div>{% endif %}
+    <div class="title">{{ title }}</div>
+    {% if body %}<div class="sub">{{ body }}</div>{% endif %}
+    {% if points %}<ul class="pts">{% for p in points %}<li>{{ p }}</li>{% endfor %}</ul>{% endif %}
+  </div></div>
+  <div class="foot">
+    <span>{{ brand.handle }}</span>
+    <span class="pill">{% if index < total %}اسحب ←{% else %}احفظ ✓{% endif %}</span>
+  </div>
+</div>
+{% endblock %}

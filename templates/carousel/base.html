@@ -1,0 +1,47 @@
+{# الأساس المشترك لكل أنماط الكاروسيل: الخطوط، المقاس، وتصغير النص تلقائياً.
+   كل نمط يرث هذا الملف ويملأ كتلتَي style و slide بتصميمه الخاص. #}
+<!doctype html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="utf-8">
+<style>
+{% for f in fonts %}
+@font-face { font-family: "BrandFont"; src: url("{{ f.uri }}"); font-weight: {{ f.weight }}; font-style: normal; }
+{% endfor %}
+:root{
+  --cream: {{ brand.colors.cream or "#F5F1E8" }};
+  --ink:   {{ brand.colors.ink or "#0E1A2B" }};
+  --kick:  {{ brand.colors.kicker or "#C8452B" }};
+  --accent:{{ brand.colors.accent or "#F4B942" }};
+  --teal:  {{ brand.colors.teal or "#14B8A6" }};
+  --navy:  {{ brand.colors.navy or "#0B1F3A" }};
+}
+*{ box-sizing:border-box; margin:0; padding:0 }
+html,body{ width:{{ w }}px; height:{{ h }}px; overflow:hidden }
+body{ font-family:"BrandFont","Cairo","Segoe UI",Tahoma,sans-serif; }
+.slide{ position:relative; width:{{ w }}px; height:{{ h }}px; overflow:hidden; display:flex; flex-direction:column }
+/* منطقة النص: يتقلّص خطها تلقائياً إن طال المحتوى فلا يُقتطع أبداً */
+.body-area{ position:relative; flex:1; min-height:0; overflow:hidden; display:flex; flex-direction:column;
+            font-size:calc(var(--base,44px) * var(--k,1)) }
+.inner{ margin:var(--m, auto 0); width:100% }
+ul{ list-style:none }
+{% block style %}{% endblock %}
+</style>
+</head>
+<body>
+{% block slide %}{% endblock %}
+<script>
+(async () => {
+  await document.fonts.ready;
+  const area = document.getElementById('area'), inner = document.getElementById('inner');
+  let k = 1;
+  if (area && inner) {
+    while (inner.offsetHeight > area.clientHeight && k > 0.4) {
+      k -= 0.03; area.style.setProperty('--k', k.toFixed(2));
+    }
+  }
+  window.__ready = true;
+})();
+</script>
+</body>
+</html>

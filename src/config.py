@@ -29,5 +29,10 @@ TEMPLATES = {
     "carousel": (1080, 1350),
 }
 
+# أنماط الكاروسيل: لكلٍّ لغة بصرية مختلفة بنيوياً لا لوناً فقط.
+# blueprint = مخطط هندسي · editorial = مجلّة · terminal = نافذة كود
+# poster = ملصق لوني · sticky = ورقة ملصقة · duo = لوحان بشريط جانبي
+CAROUSEL_STYLES = ("blueprint", "editorial", "terminal", "poster", "sticky", "duo")
+
 PLATFORMS = ("facebook", "instagram", "threads", "telegram")
 LIMITS = {"threads": 500, "instagram": 2200, "facebook": 63000, "telegram": 4096}

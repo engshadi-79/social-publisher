@@ -1,13 +1,13 @@
 """تحويل قوالب HTML إلى PNG عبر Playwright."""
+import hashlib
 from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
 
-from config import OUT_DIR, ROOT, TEMPLATES, TEMPLATES_DIR
+from config import CAROUSEL_STYLES, OUT_DIR, ROOT, TEMPLATES, TEMPLATES_DIR
 from queue_io import load_brand
 
 _env = Environment(loader=FileSystemLoader(str(TEMPLATES_DIR)), autoescape=True)
-
 
 def _fonts() -> list[dict]:
     out = []
@@ -68,7 +68,7 @@ class Renderer:
     def render_slides(self, post: dict, out_dir: Path) -> list[Path]:
         brand = load_brand()
         w, h = TEMPLATES["carousel"]
-        tpl = _env.get_template("carousel/slide.html")
+        tpl = _env.get_template(f"carousel/styles/{carousel_style(post)}.html")
         outs = []
         for spec in slide_specs(post):
             html = tpl.render(brand=brand, w=w, h=h, fonts=_fonts(), **spec)
@@ -80,6 +80,19 @@ class Renderer:
         if post["template"] == "carousel":
             return self.render_slides(post, out_dir)
         return [self.render(post, out_dir / f"{post['id']}.png", bg)]
+
+
+def carousel_style(post: dict) -> str:
+    """نمط الكاروسيل: من `image.style` إن حُدّد، وإلا يُشتق من معرّف المنشور.
+
+    الاشتقاق ثابت لنفس المعرّف (فالصور لا تتغيّر بين معاينة ونشر)، ويوزّع
+    المنشورات على الأنماط فلا يخرج منشوران متتاليان بنفس التصميم.
+    """
+    name = str(post.get("image", {}).get("style") or "").strip().lower()
+    if name in CAROUSEL_STYLES:
+        return name
+    digest = hashlib.sha1(str(post.get("id", "")).encode("utf-8")).digest()
+    return CAROUSEL_STYLES[digest[0] % len(CAROUSEL_STYLES)]
 
 
 def slide_specs(post: dict) -> list[dict]:

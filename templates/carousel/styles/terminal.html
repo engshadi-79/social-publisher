@@ -1,0 +1,67 @@
+{% extends "carousel/base.html" %}
+{# نمط «الطرفية»: نافذة محرّر كود — شريط علوي بنقاط، اسم ملف، مؤشر، وشريط حالة.
+   يناسب: المحتوى البرمجي، الأدوات، الشرح التقني. #}
+
+{% block style %}
+.slide{ padding:0; background:#07101c; color:#E6EDF3 }
+.slide.light{ background:#0B1623 }
+.slide.cta  { background:#07101c }
+
+.chrome{ display:flex; align-items:center; gap:14px; padding:26px 34px; background:#0E1A2B;
+         border-bottom:1px solid rgba(230,237,243,.1); direction:ltr; flex:0 0 auto }
+.dots{ display:flex; gap:10px }
+.dots i{ width:16px; height:16px; border-radius:50% }
+.dots i:nth-child(1){ background:#FF5F57 } .dots i:nth-child(2){ background:#FEBC2E } .dots i:nth-child(3){ background:#28C840 }
+.fname{ font-family:ui-monospace,Consolas,"Courier New",monospace; font-size:24px; color:rgba(230,237,243,.55); margin-inline-start:12px }
+.chrome .who{ margin-inline-start:auto; direction:rtl; font-size:24px; font-weight:700; color:rgba(230,237,243,.75) }
+
+.pane{ position:relative; flex:1; min-height:0; display:flex; padding:52px 44px 52px 34px }
+/* عمود أرقام الأسطر */
+.gutter{ flex:0 0 auto; width:64px; text-align:center; font-family:ui-monospace,Consolas,monospace;
+         font-size:26px; line-height:2.1; color:rgba(230,237,243,.22); direction:ltr; border-inline-end:1px solid rgba(230,237,243,.08) }
+.code{ flex:1; min-width:0; padding-inline-start:34px; display:flex; flex-direction:column }
+
+.kicker{ font-family:ui-monospace,Consolas,monospace; font-size:.5em; color:#7EE787; margin-bottom:1em; direction:rtl }
+.kicker::before{ content:"// "; color:rgba(230,237,243,.35) }
+.title{ font-weight:800; line-height:1.38; font-size:1.6em; color:#E6EDF3 }
+.cover .title{ font-size:1.9em }
+/* المؤشر سطرٌ مستقلّ بعد المحتوى، لا لاحقةٌ للعنوان:
+   اللاحقة كانت تنزل وحدها إلى سطر جديد كلّما امتلأ آخر سطر من العنوان. */
+.caret{ display:flex; align-items:center; gap:.4em; margin-top:.9em;
+        font-family:ui-monospace,Consolas,monospace; font-size:.52em; color:rgba(230,237,243,.35); direction:ltr }
+.caret b{ display:inline-block; width:.55em; height:1.05em; background:var(--teal) }
+.sub{ margin-top:.9em; color:rgba(230,237,243,.62); line-height:1.8; font-size:.62em; font-weight:500 }
+.pts{ margin-top:1.2em; display:flex; flex-direction:column; gap:.6em }
+.pts li{ display:flex; gap:.6em; align-items:flex-start; font-size:.66em; line-height:1.6; font-weight:600 }
+.pts li::before{ content:"▸"; color:var(--teal); flex:0 0 auto; font-family:ui-monospace,monospace }
+.cover .pts li::before{ content:"✓"; color:#7EE787 }
+
+.status{ display:flex; justify-content:space-between; align-items:center; padding:20px 34px; background:var(--teal);
+         color:#06201d; font-family:ui-monospace,Consolas,monospace; font-size:24px; font-weight:700; direction:ltr; flex:0 0 auto }
+.status .r{ direction:rtl; font-family:"BrandFont",sans-serif }
+{% endblock %}
+
+{% block slide %}
+<div class="slide {{ theme }} {{ kind }}">
+  <div class="chrome">
+    <span class="dots"><i></i><i></i><i></i></span>
+    <span class="fname">slide-{{ '%02d' % index }}.md</span>
+    <span class="who">{{ brand.name }}</span>
+  </div>
+  <div class="pane">
+    <div class="gutter">{% for i in range(1, 13) %}{{ i }}<br>{% endfor %}</div>
+    <div class="code body-area" id="area"><div class="inner" id="inner">
+      {% if kicker %}<div class="kicker">{{ kicker }}</div>{% endif %}
+      <div class="title">{{ title }}</div>
+      {% if body %}<div class="sub">{{ body }}</div>{% endif %}
+      {% if points %}<ul class="pts">{% for p in points %}<li><span>{{ p }}</span></li>{% endfor %}</ul>{% endif %}
+      <div class="caret"><span>&gt;</span><b></b></div>
+    </div></div>
+  </div>
+  <div class="status">
+    <span>{{ brand.handle }}</span>
+    <span>{{ index }}:{{ total }}</span>
+    <span class="r">{% if index < total %}اسحب ←{% else %}احفظ ✓{% endif %}</span>
+  </div>
+</div>
+{% endblock %}

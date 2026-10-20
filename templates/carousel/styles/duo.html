@@ -1,0 +1,82 @@
+{% extends "carousel/base.html" %}
+{# نمط «المنقسم»: شريط لوني على حافة البداية يحمل الرقم والعنوان الفرعي عمودياً،
+   والمحتوى في اللوح المقابل. يناسب: المقارنات، الخطوات، المحتوى المنظّم. #}
+
+{% block style %}
+.slide{ padding:0; flex-direction:row; background:var(--cream); color:var(--ink) }
+.slide.dark{ background:#131E2E; color:#F2EEE4 }
+.slide.cta { background:var(--cream); color:var(--ink) }
+
+/* الشريط الجانبي */
+.band{ flex:0 0 232px; background:var(--navy); color:#FFF7EC; position:relative;
+       display:flex; flex-direction:column; align-items:center; justify-content:space-between; padding:54px 0 48px }
+.light .band{ background:var(--navy) }
+.dark  .band{ background:var(--teal); color:#06201d }
+.cta   .band{ background:var(--kick); color:#FFF2EE }
+.band .num{ font-size:132px; font-weight:800; line-height:1; direction:ltr }
+.band .of{ font-size:28px; opacity:.72; direction:ltr; margin-top:6px }
+/* العنوان الفرعي مُدار ٩٠ درجة.
+   لا نستعمل writing-mode: فهو يفصل الحروف العربية عن بعضها ويكسر شكل الكلمة. */
+/* الحاوية تحجز مكان النص في التدفّق، والنص يدور داخلها.
+   لا نستعمل writing-mode: فهو يفصل الحروف العربية عن بعضها ويكسر شكل الكلمة. */
+.band .vwrap{ position:relative; width:100%; height:430px }
+.band .vert{ position:absolute; top:50%; left:50%; width:400px; text-align:center;
+             transform:translate(-50%,-50%) rotate(-90deg); transform-origin:center center;
+             white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+             font-size:30px; font-weight:800; letter-spacing:.04em; opacity:.95 }
+.band .mark{ width:62px; height:62px; border:3px solid currentColor; border-radius:50%;
+             display:grid; place-items:center; font-size:26px; font-weight:800 }
+
+/* لوح المحتوى */
+.panel{ flex:1; min-width:0; display:flex; flex-direction:column; padding:72px 66px 58px }
+.panel .head{ display:flex; justify-content:space-between; align-items:center; font-size:25px;
+              color:rgba(14,26,43,.5); direction:ltr; margin-bottom:30px }
+.dark .panel .head{ color:rgba(242,238,228,.55) }
+.panel .head .name{ direction:rtl; font-weight:700 }
+
+.title{ font-weight:800; line-height:1.3; font-size:1.72em }
+.cover .title{ font-size:2em }
+.title::before{ content:""; display:block; width:88px; height:5px; background:var(--kick); margin-bottom:.45em; border-radius:4px }
+.dark .title::before{ background:var(--accent) }
+.sub{ margin-top:.85em; color:rgba(14,26,43,.64); line-height:1.8; font-size:.63em; font-weight:500 }
+.dark .sub{ color:rgba(242,238,228,.66) }
+.pts{ margin-top:1.25em; display:flex; flex-direction:column; gap:.55em }
+.pts li{ display:flex; gap:.65em; align-items:flex-start; font-size:.65em; line-height:1.6; font-weight:600;
+         background:rgba(14,26,43,.05); border-radius:12px; padding:.5em .75em }
+.dark .pts li{ background:rgba(242,238,228,.07) }
+.pts li::before{ content:"—"; color:var(--kick); flex:0 0 auto }
+.dark .pts li::before{ color:var(--accent) }
+
+.foot{ display:flex; justify-content:space-between; align-items:center; font-size:26px;
+       color:rgba(14,26,43,.52); direction:ltr; margin-top:26px }
+.dark .foot{ color:rgba(242,238,228,.58) }
+.foot .who{ direction:rtl; font-weight:700 }
+{% endblock %}
+
+{% block slide %}
+<div class="slide {{ theme }} {{ kind }}">
+  <div class="band">
+    <div class="mark">◎</div>
+    <div style="text-align:center">
+      <div class="num">{{ '%02d' % index }}</div>
+      <div class="of">— {{ '%02d' % total }}</div>
+    </div>
+    <div class="vwrap"><div class="vert">{{ kicker or brand.name }}</div></div>
+  </div>
+  <div class="panel">
+    <div class="head">
+      <span>{{ brand.handle }}</span>
+      <span class="name">{{ brand.name }}</span>
+    </div>
+    <div class="body-area" id="area"><div class="inner" id="inner">
+      <div class="title">{{ title }}</div>
+      {% if body %}<div class="sub">{{ body }}</div>{% endif %}
+      {% if points %}<ul class="pts">{% for p in points %}<li><span>{{ p }}</span></li>{% endfor %}</ul>{% endif %}
+    </div></div>
+    <div class="foot">
+      <span>{{ '%02d' % index }} / {{ '%02d' % total }}</span>
+      <span class="who">{% if index < total %}اسحب ←{% else %}احفظ ✓{% endif %}</span>
+    </div>
+  </div>
+</div>
+{% endblock %}
