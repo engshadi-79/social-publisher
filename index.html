@@ -69,7 +69,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
 <body>
 <div id="editBox"><div class="box">
   <h2 id="eHead">تعديل منشور</h2><div class="hint" id="eNote"></div>
-  <label>الموضوع</label><select id="eTopic"><option value="">— اختر —</option><option value="tmvet3asy">الذكاء الصناعي</option><option value="tmvgcv3kj">تطبيقات الذكاء الاصطناعي في تطوير الويب والأنظمة (Technical &amp; How-To)</option></select>
+  <label>الموضوع</label><select id="eTopic"><option value="">— اختر —</option><option value="tmvet3asy">الذكاء الصناعي</option><option value="tmvgcv3kj">تطبيقات الذكاء الاصطناعي في تطوير الويب والأنظمة (Technical &amp; How-To)</option><option value="tmvgcvmh5">نصائح للمطورين والمبتدئين (Mindset &amp; Career)</option></select>
   <label>شكل الصورة</label>
   <select id="eTemplate"><option value="carousel">كاروسيل</option><option value="infographic">إنفوجرافك</option><option value="split">صورة + لوحة نص</option><option value="photo">صورة كاملة</option><option value="tip">نصيحة</option><option value="quote">اقتباس</option><option value="announcement">إعلان</option><option value="story">ستوري</option></select>
   <label>العنوان على الصورة *</label><input id="eTitle">
@@ -125,7 +125,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
 <div id="lb"><button id="lbPrev" aria-label="السابق">›</button><img alt=""><button id="lbNext" aria-label="التالي">‹</button><span id="lbCtr"></span></div>
 <div class="wrap">
 <h1>لوحة النشر</h1>
-<div class="upd">آخر تحديث: <bdi dir="ltr">2026-10-20 10:22</bdi></div>
+<div class="upd">آخر تحديث: <bdi dir="ltr">2026-10-20 10:23</bdi></div>
 
 <div class="summary">يوجد 1 منشور مجدول، وأقربها يوم الأربعاء 21 أكتوبر الساعة 8:32 صباحاً. تم نشر 4 منشور حتى الآن.</div>
 
@@ -192,6 +192,25 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
       <small></small></div>
       <button class="del" data-del="tmvgcv3kj">حذف</button></div>
     
+    <div class="tp"><div><b>نصائح للمطورين والمبتدئين (Mindset &amp; Career)</b><small>«هل ستحل أدوات الذكاء الاصطناعي محل المبرمجين؟»
+
+الفكرة: توضيح الفرق بين &#34;كتابة الكود&#34; و&#34;هندسة وتصميم وبناء الحلول&#34;، مع التركيز على أن المبرمج الذي يستخدم الذكاء الاصطناعي سيتفوق على من لا يستخدمه.
+
+القالب المقترح: منشور نقاشي / ثريد على Threads + نصيحة على إنستغرام.
+
+«3 أخطاء شائعة عند الاعتماد على الذكاء الاصطناعي في كتابة الأكواد»
+
+الفكرة: مشاكل أمن البيانات (Security vulnerabilities)، الهلوسة في المكتبات، والاعتماد الأعمى دون مراجعة معمارية النظام.
+
+القالب المقترح: كاروسيل من 5 شرائح.
+
+«كيف تصيغ البرومبت (Prompt) البرمجي لتحصل على كود نظيف وخالٍ من الأخطاء؟»
+
+الفكرة: نصائح عملية لصياغة تعليمات واضحة لأدوات الذكاء الاصطناعي.</small>
+      <small>الجمهور: — · النبرة: —</small>
+      <small></small></div>
+      <button class="del" data-del="tmvgcvmh5">حذف</button></div>
+    
     </div>
   </div>
 
@@ -232,7 +251,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
     <div class="msg ok">آخر توليد: وُلِّدت 3 مسودات عن «الذكاء الصناعي» <span class="hint">(Gemini gemini-3.8-flash | ترند Google: 45 عنصر)</span></div>
     
     <label>الموضوع *</label>
-    <select id="gTopic"><option value="tmvet3asy">الذكاء الصناعي</option><option value="tmvgcv3kj">تطبيقات الذكاء الاصطناعي في تطوير الويب والأنظمة (Technical &amp; How-To)</option></select>
+    <select id="gTopic"><option value="tmvet3asy">الذكاء الصناعي</option><option value="tmvgcv3kj">تطبيقات الذكاء الاصطناعي في تطوير الويب والأنظمة (Technical &amp; How-To)</option><option value="tmvgcvmh5">نصائح للمطورين والمبتدئين (Mindset &amp; Career)</option></select>
     
     <label>شكل الصورة</label>
     <select id="gStyle"><option value="carousel">كاروسيل: عدة شرائح بأسلوب دراسة حالة (مقترح)</option><option value="infographic">إنفوجرافك: نقاط مرقّمة تلخّص الفكرة (مقترح)</option><option value="photo">صورة حقيقية تمثّل الفكرة</option></select>
@@ -250,7 +269,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
     <p class="hint">يُحفظ كمسودة، وخلال دقيقتين تراه بصورته في «بانتظار موافقتك»، ثم توافق عليه من بطاقته.</p>
     
     <label>الموضوع *</label>
-    <select id="pTopic"><option value="">— اختر —</option><option value="tmvet3asy">الذكاء الصناعي</option><option value="tmvgcv3kj">تطبيقات الذكاء الاصطناعي في تطوير الويب والأنظمة (Technical &amp; How-To)</option></select>
+    <select id="pTopic"><option value="">— اختر —</option><option value="tmvet3asy">الذكاء الصناعي</option><option value="tmvgcv3kj">تطبيقات الذكاء الاصطناعي في تطوير الويب والأنظمة (Technical &amp; How-To)</option><option value="tmvgcvmh5">نصائح للمطورين والمبتدئين (Mindset &amp; Career)</option></select>
     
     <label>شكل الصورة</label>
     <select id="pTemplate">
