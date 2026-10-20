@@ -1,0 +1,24 @@
+# الحسابات/الصفحات التي يمكن النشر عليها. لكل منصة حساب افتراضي واحد على الأقل (default: true).
+# - إن لم يحدد المنشور targets فيُنشر على الحسابات الافتراضية لكل منصة.
+# - secrets: أسماء أسرار GitHub (لا قيمها). تُضاف حسابات جديدة بسكربت: python scripts/add_account.py
+accounts:
+  - id: fb-alwan
+    platform: facebook
+    label: "فيسبوك — الوان"
+    default: true
+    secrets: {page_id: FB_PAGE_ID, token: FB_PAGE_TOKEN}
+  - id: ig-engshadi2011
+    platform: instagram
+    label: "إنستغرام — engshadi2011"
+    default: true
+    secrets: {user_id: IG_USER_ID, token: IG_PAGE_TOKEN, fallback_token: FB_PAGE_TOKEN}
+  - id: threads-engshadi2011
+    platform: threads
+    label: "ثريدز — engshadi2011"
+    default: true
+    secrets: {user_id: THREADS_USER_ID, token: THREADS_TOKEN}
+  - id: telegram-channel
+    platform: telegram
+    label: "تيليجرام — القناة"
+    default: true
+    secrets: {token: TELEGRAM_BOT_TOKEN, chat_id: TELEGRAM_CHANNEL_ID}

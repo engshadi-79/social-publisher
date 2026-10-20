@@ -7,6 +7,7 @@ from datetime import datetime
 
 from PIL import Image
 
+import accounts
 import imagegen
 import notify
 from config import MAX_ATTEMPTS, OUT_DIR, PLATFORM_DELAY_SEC
@@ -24,25 +25,32 @@ def redact(text: str) -> str:
         s = os.environ.get(v)
         if s:
             text = text.replace(s, "***")
+    for v in accounts.secret_values():          # كل أسرار المستودع (حسابات إضافية أيضاً)
+        text = text.replace(v, "***")
     return text
 
 
-def pending_platforms(post: dict, state: dict) -> list[str]:
+def pending_targets(post: dict, state: dict) -> list[accounts.Target]:
+    """الأهداف (منصة + حساب) التي لم تُنشر بعد ولم تستنفد محاولاتها."""
     done = state.get(post["id"], {})
     out = []
-    for name in post["platforms"]:
-        st = done.get(name, {})
+    for t in accounts.targets_of(post):
+        st = done.get(t.key, {})
         if st.get("status") == "published":
             continue
         if st.get("status") == "failed" or st.get("attempts", 0) >= MAX_ATTEMPTS:
             continue
-        out.append(name)
+        out.append(t)
     return out
+
+
+def pending_platforms(post: dict, state: dict) -> list[str]:
+    return [t.key for t in pending_targets(post, state)]
 
 
 def due_posts(queue, state, now):
     return [p for p in queue
-            if p["approved"] and parse_when(p["publish_at"]) <= now and pending_platforms(p, state)]
+            if p["approved"] and parse_when(p["publish_at"]) <= now and pending_targets(p, state)]
 
 
 def main() -> int:
@@ -69,7 +77,7 @@ def main() -> int:
     with Renderer() as r:
         for post in posts:
             pid = post["id"]
-            todo = pending_platforms(post, state)
+            todo = pending_targets(post, state)
             warns: list[str] = []
             if post["template"] in ("carousel", "infographic"):
                 bg = None                      # قوالب نصّية بلا خلفية خارجية
@@ -86,36 +94,38 @@ def main() -> int:
                 jpgs.append(j)
             png, jpg = pngs[0], jpgs[0]
             post["_files"] = pngs              # للمنصات التي ترفع الملفات (تيليجرام)
-            print(f"[{pid}] صور: {len(pngs)}  منصات: {', '.join(todo)}")
+            print(f"[{pid}] صور: {len(pngs)}  أهداف: {', '.join(t.key for t in todo)}")
             if args.dry_run:
                 continue
 
             urls = {}
-            if any(PUBLISHERS[n].needs_url for n in todo):
+            if any(PUBLISHERS[t.platform].needs_url for t in todo):
                 try:
                     import hosting
                     urls = hosting.upload(jpgs)
                     post["_urls"] = [urls[j.name] for j in jpgs]
                 except Exception as e:  # noqa: BLE001
                     msg = redact(f"{type(e).__name__}: {e}")
-                    for n in todo:
-                        if PUBLISHERS[n].needs_url:
-                            _fail(state, pid, n, "فشل الاستضافة: " + msg)
+                    for t in todo:
+                        if PUBLISHERS[t.platform].needs_url:
+                            _fail(state, pid, t.key, "فشل الاستضافة: " + msg)
                     report.append(f"❌ {pid}: فشل رفع الصورة — {msg[:200]}")
-                    todo = [n for n in todo if not PUBLISHERS[n].needs_url]
+                    todo = [t for t in todo if not PUBLISHERS[t.platform].needs_url]
 
-            for i, name in enumerate(todo):
+            for i, t in enumerate(todo):
                 if i:
                     time.sleep(PLATFORM_DELAY_SEC)
-                entry = state.setdefault(pid, {}).setdefault(name, {"attempts": 0})
+                entry = state.setdefault(pid, {}).setdefault(t.key, {"attempts": 0})
                 try:
-                    ext_id = PUBLISHERS[name].publish(post, post["platforms"][name], png, urls.get(jpg.name))
+                    ext_id = PUBLISHERS[t.platform].publish(post, post["platforms"][t.platform], png,
+                                                            urls.get(jpg.name), t.account)
                     entry.update(status="published", platform_post_id=ext_id, error=None,
+                                 account=t.account.label,
                                  published_at=datetime.now().astimezone().isoformat(timespec="seconds"))
-                    report.append(f"✅ {pid} → {name}")
+                    report.append(f"✅ {pid} → {t.account.label}")
                 except Exception as e:  # noqa: BLE001
-                    _fail(state, pid, name, redact(f"{type(e).__name__}: {e}"))
-                    report.append(f"❌ {pid} → {name}: {entry['error'][:200]} (محاولة {entry['attempts']}/{MAX_ATTEMPTS})")
+                    _fail(state, pid, t.key, redact(f"{type(e).__name__}: {e}"))
+                    report.append(f"❌ {pid} → {t.account.label}: {entry['error'][:200]} (محاولة {entry['attempts']}/{MAX_ATTEMPTS})")
             for w in warns:
                 report.append(f"⚠️ {pid}: {w}")
             save_state(state)

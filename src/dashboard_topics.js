@@ -30,6 +30,33 @@ function slidesYaml(slides) {
 }
 const slidesError = (sl) => (sl.length < 3 || sl.length > 10) ? "الكاروسيل يحتاج من 3 إلى 10 شرائح." : (sl.some((s) => !s.title) ? "لكل شريحة عنوان («# العنوان»)." : "");
 
+
+// ---------- اختيار الحسابات المستهدفة ----------
+const ACC = JSON.parse(document.getElementById("accdata").textContent);
+const PLAT_AR = { facebook: "فيسبوك", instagram: "إنستغرام", threads: "ثريدز", telegram: "تيليجرام" };
+function accPicker(boxId, selected) {
+  const box = document.getElementById(boxId); if (!box) return; box.innerHTML = "";
+  Object.keys(PLAT_AR).forEach((pl) => {
+    const list = ACC.filter((a) => a.platform === pl); if (list.length < 2) return;
+    const chosen = (selected && selected[pl]) || list.filter((a) => a.default).map((a) => a.id);
+    box.insertAdjacentHTML("beforeend", '<div class="accrow"><b>' + PLAT_AR[pl] + ' — على أي حساب؟</b><br>' + list.map((a) =>
+      '<label><input type="checkbox" data-pl="' + pl + '" data-acc="' + a.id + '"' + (chosen.includes(a.id) ? " checked" : "") + "> " +
+      a.label.replace(/</g, "&lt;") + "</label>").join("") + "</div>");
+  });
+}
+function readTargets(boxId, activePlatforms) {
+  const out = {}, box = document.getElementById(boxId);
+  for (const pl of Object.keys(PLAT_AR)) {
+    const list = ACC.filter((a) => a.platform === pl); if (list.length < 2 || !box) continue;
+    const picked = [...box.querySelectorAll('input[data-pl="' + pl + '"]:checked')].map((i) => i.dataset.acc);
+    if (activePlatforms.includes(pl) && !picked.length) throw new Error("اختر حساباً واحداً على الأقل لمنصة " + PLAT_AR[pl] + ".");
+    const dfl = list.filter((a) => a.default).map((a) => a.id);
+    if (picked.slice().sort().join() !== dfl.slice().sort().join()) out[pl] = picked;
+  }
+  return out;
+}
+const targetsYaml = (t) => t && Object.keys(t).length ? "  targets:\n" + Object.entries(t).map(([pl, ids]) => "    " + pl + ":\n" + ids.map((i) => "      - " + q(i)).join("\n")).join("\n") + "\n" : "";
+
 // ---------- المواضيع ----------
 function addBlock(text, t) {
   const tags = (t.tags || []).map(q).join(", ");
@@ -81,6 +108,7 @@ function addPost(text, p) {
   if (p.vp) b += "    visual_prompt: " + q(p.vp) + "\n";
   b += "    seed: " + p.seed + "\n  platforms:\n";
   for (const k of p.platforms) b += "    " + k + ": " + q(p.text) + "\n";
+  b += targetsYaml(p.targets);
   let x = text.replace(/^\[\][ \t]*$/m, "");
   if (x.length && !x.endsWith("\n")) x += "\n";
   return x + b;
@@ -136,6 +164,7 @@ $("topicList").onclick = async (e) => {
 };
 
 // ---- منشورات: إضافة ----
+accPicker("pAcc", null);
 const updCount = () => { const n = $("pText").value.length; $("pCount").textContent = n + " حرفاً" + (n > 500 && $("pl_threads").checked ? " — ثريدز حدّه 500!" : ""); };
 $("pText").oninput = updCount; $("pl_threads").onchange = updCount;
 $("pAdd").onclick = async () => {
@@ -151,9 +180,11 @@ $("pAdd").onclick = async () => {
     (plats.includes("threads") && v("pText").length > 500) ? "نص ثريدز يجب ألا يتجاوز 500 حرف." :
     (plats.includes("instagram") && v("pText").length > 2200) ? "نص إنستغرام يجب ألا يتجاوز 2200 حرف." : "";
   if (err) { say(m, err, false); return; }
+  let targets;
+  try { targets = readTargets("pAcc", plats); } catch (e3) { say(m, e3.message, false); return; }
   const d = when.slice(0, 10);
   const p = { id: d + "-w" + Date.now().toString(36).slice(-4), when, template: $("pTemplate").value, topic: $("pTopic") ? v("pTopic") : "",
-    title: isCar ? slides[0].title : v("pTitle"), body: isCar ? "" : v("pBody"), slides, query: v("pQuery"), vp: v("pVP"), points: v("pPoints").split("\n").map((x) => x.trim()).filter(Boolean), seed: 1 + Math.floor(Math.random() * 90), platforms: plats, text: v("pText") };
+    title: isCar ? slides[0].title : v("pTitle"), body: isCar ? "" : v("pBody"), slides, query: v("pQuery"), vp: v("pVP"), points: v("pPoints").split("\n").map((x) => x.trim()).filter(Boolean), seed: 1 + Math.floor(Math.random() * 90), platforms: plats, targets, text: v("pText") };
   try {
     say(m, "جارٍ الحفظ…", true);
     await edit((x) => addPost(x, p), "queue: add " + p.id, QFILE);

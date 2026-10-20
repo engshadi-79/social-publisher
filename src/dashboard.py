@@ -9,6 +9,7 @@ import yaml
 from jinja2 import Environment, FileSystemLoader
 from PIL import Image
 
+import accounts as acc
 import imagegen
 from config import ROOT, MEDIA_DIR, OUT_DIR, PLATFORMS, TIMEZONE, TOPICS_PATH
 from queue_io import load_queue, load_state, now_local, parse_when
@@ -30,7 +31,10 @@ def join_ar(names):
     return " و".join(names)
 
 
-def _chip(name, text, st, scheduled_txt):
+IG_SWITCH = "2026-10-20T05:48"   # لحظة تحويل إنستغرام من ostoraplus إلى engshadi2011
+
+
+def _chip(name, text, st, scheduled_txt, label=None):
     status = st.get("status")
     if status == "published":
         txt, cls, hint = "✅ نُشر", "published", st.get("published_at", "")
@@ -43,7 +47,11 @@ def _chip(name, text, st, scheduled_txt):
     url = None
     if name == "facebook" and status == "published" and st.get("platform_post_id"):
         url = f"https://www.facebook.com/{st['platform_post_id']}"
-    return {"label": LABELS[name], "txt": txt, "status": cls, "hint": hint, "url": url,
+    if status == "published" and st.get("account"):
+        label = st["account"]
+    elif status == "published" and name == "instagram" and str(st.get("published_at", "9"))[:16] < IG_SWITCH:
+        label = "إنستغرام — ostoraplus"          # منشور قبل تحويل الحساب
+    return {"label": label or LABELS[name], "txt": txt, "status": cls, "hint": hint, "url": url,
             "text": text, "error": st.get("error") if status in ("failed", "retry") else None}
 
 
@@ -53,8 +61,11 @@ def build(posts, state, now):
         when = parse_when(p["publish_at"])
         st = state.get(p["id"], {})
         past = when <= now
-        chips = [_chip(n, t, st.get(n, {}), "⏳ ينتظر دوره" if past else "⏳ ينتظر موعده")
-                 for n, t in p["platforms"].items()]
+        tgs = acc.targets_of(p)
+        multi = {pl for pl in {t.platform for t in tgs} if sum(1 for t in tgs if t.platform == pl) > 1 or not next(t for t in tgs if t.platform == pl).account.default}
+        chips = [_chip(t.platform, p["platforms"][t.platform], st.get(t.key, {}), "⏳ ينتظر دوره" if past else "⏳ ينتظر موعده",
+                       label=t.account.label if t.platform in multi or len(acc.load_accounts()) > len(acc.defaults()) else None)
+                 for t in tgs]
         statuses = [c["status"] for c in chips]
         all_done = all(s == "published" for s in statuses)
         if not p["approved"]:
@@ -68,7 +79,7 @@ def build(posts, state, now):
             group, badge, badge_txt = "upcoming", "due", "سيُنشر خلال دقائق"
         else:
             group, badge, badge_txt = "upcoming", "scheduled", "سيُنشر في موعده"
-        pl = join_ar(LABELS[n] for n in p["platforms"])
+        pl = join_ar(dict.fromkeys(c["label"] for c in chips))
         line = {
             "draft": f"لن يُنشر حتى توافق عليه. الموعد المقترح: {when_ar(when)}. المنصات: {pl}.",
             "published": f"نُشر على: {pl}.",
@@ -157,6 +168,8 @@ def main() -> int:
             it["slides_json"] = json.dumps(fulls) if len(fulls) > 1 else ""
             it["slide_count"] = len(fulls)
 
+    acc_json = json.dumps([{"id": a.id, "platform": a.platform, "label": a.label, "default": a.default}
+                           for a in acc.load_accounts().values()], ensure_ascii=False).replace("</", "<\\/")
     group_of = {it["id"]: it["group"] for it in items}
     raw = {}
     for p in posts:
@@ -170,7 +183,7 @@ def main() -> int:
     html = env.get_template("dashboard_template.html").render(
         topics_js=((Path(__file__).parent / "dashboard_topics.js").read_text(encoding="utf-8") + "\n" +
                    (Path(__file__).parent / "dashboard_posts.js").read_text(encoding="utf-8")).replace("__REPO__", os.environ.get("GITHUB_REPOSITORY", "engshadi-79/social-publisher")),
-        gen_log=load_gen_log(), health=load_health(), posts_json=posts_json,
+        gen_log=load_gen_log(), health=load_health(), posts_json=posts_json, acc_json=acc_json,
         topics=load_topics(), repo=os.environ.get("GITHUB_REPOSITORY", "engshadi-79/social-publisher"),
         posts=items, counts=counts, next_post=nxt, tz=TIMEZONE,
         updated=now.strftime("%Y-%m-%d %H:%M"))

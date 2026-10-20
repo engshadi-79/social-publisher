@@ -16,6 +16,7 @@ function serializePost(p) {
   if (im.seed != null) b += "    seed: " + im.seed + "\n";
   b += "  platforms:\n";
   for (const [k, v] of Object.entries(p.platforms || {})) b += "    " + k + ": " + q(v) + "\n";
+  b += targetsYaml(p.targets);
   return b;
 }
 function replacePost(text, id, obj) {
@@ -50,6 +51,7 @@ function openEdit(id) {
   $("eTemplate").value = p.template; $("eWhen").value = (p.publish_at || "").replace(" ", "T");
   if ($("eTopic")) $("eTopic").value = p.topic || "";
   PLATS.forEach((k) => { $("ep_" + k).checked = !!(p.platforms && p.platforms[k]); $("et_" + k).value = (p.platforms && p.platforms[k]) || ""; });
+  accPicker("eAcc", p.targets || null);
   $("eHead").textContent = "تعديل: " + (im.title || id);
   $("eNote").textContent = p.approved ? "هذا المنشور معتمد: سيُنشر بالنص الجديد في موعده." : "";
   say($("eMsg"), "", true); $("editBox").classList.add("on");
@@ -70,7 +72,9 @@ $("eSave").onclick = async () => {
   const oi = old.image || {};
   const img = { title: tpl === "carousel" ? eSlides[0].title : v("eTitle"), body: tpl === "carousel" ? "" : v("eBody"), seed: oi.seed != null ? oi.seed : 1 };
   if (tpl === "carousel") img.slides = eSlides; else if (tpl === "infographic") img.points = points; else { img.photo_query = v("eQuery"); if (v("eVP")) img.visual_prompt = v("eVP"); }
-  const nu = { id: editId, approved: old.approved, publish_at: v("eWhen").replace("T", " "), template: tpl,
+  let targets;
+  try { targets = readTargets("eAcc", Object.keys(platforms)); } catch (e4) { say(m, e4.message, false); return; }
+  const nu = { id: editId, approved: old.approved, targets, publish_at: v("eWhen").replace("T", " "), template: tpl,
     topic: $("eTopic") ? v("eTopic") : old.topic, image: img, platforms };
   const imageChanged = tpl !== old.template || img.photo_query !== oi.photo_query || img.visual_prompt !== oi.visual_prompt;
   try {
@@ -177,6 +181,7 @@ function openRepub(id) {
   PLATS.forEach((k) => { $("rp_" + k).checked = !!(p.platforms && p.platforms[k]); $("rp_" + k).disabled = !(p.platforms && p.platforms[k]); });
   const d = new Date(Date.now() + 3600e3), p2 = (n) => String(n).padStart(2, "0");
   $("rWhen").value = ymd(d) + "T" + p2(d.getHours()) + ":" + p2(d.getMinutes());
+  accPicker("rAcc", p.targets || null);
   document.querySelector('input[name=rMode][value=now]').checked = true;
   say($("rMsg"), "", true); $("repBox").classList.add("on");
 }
@@ -190,7 +195,9 @@ $("rGo").onclick = async () => {
   const id = repId.replace(/-r[a-z0-9]{4}$/, "") + "-r" + Date.now().toString(36).slice(-4);
   const im = Object.assign({}, src.image);
   if (!["carousel", "infographic"].includes(src.template)) im.bg_from = (src.image && src.image.bg_from) || repId;
-  const copy = { id, approved: mode !== "draft", publish_at: when, template: src.template, topic: src.topic, image: im,
+  let targets;
+  try { targets = readTargets("rAcc", plats); } catch (e5) { say(m, e5.message, false); return; }
+  const copy = { id, approved: mode !== "draft", publish_at: when, template: src.template, topic: src.topic, image: im, targets,
     platforms: Object.fromEntries(plats.map((k) => [k, src.platforms[k]])) };
   try {
     say(m, "جارٍ الحفظ…", true);

@@ -111,6 +111,9 @@ Extra secrets: `CF_ACCOUNT_ID`, `CF_API_TOKEN` (token with Workers AI permission
 └── README.md                 # Arabic setup guide for the owner
 ```
 
+## Accounts / targets
+`content/accounts.yaml` lists every publishable account (Facebook pages, Instagram accounts, Threads, Telegram) with the NAMES of its secrets (never values). Each platform has default account(s). A queue post may set `targets: {facebook: [fb-<id>], instagram: [ig-<name>]}` to pick accounts; omitted = defaults. State keys: `platform` for the default account (legacy-compatible) else `platform:account-id`. Secrets of extra accounts are read from `ALL_SECRETS` (toJSON(secrets)), so adding an account never requires editing workflows. Add accounts with `scripts/add_account.py`.
+
 ## Content queue format (`content/queue.yaml`)
 ```yaml
 - id: 2026-10-20-001

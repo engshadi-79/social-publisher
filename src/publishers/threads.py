@@ -5,7 +5,7 @@ import requests
 
 from config import THREADS_VERSION
 
-from .base import Publisher, PublishError, check
+from .base import Publisher, PublishError, check, creds_for
 
 BASE = f"https://graph.threads.net/{THREADS_VERSION}"
 
@@ -26,10 +26,9 @@ def _wait_finished(cid: str, tok: str, what: str):
 class Threads(Publisher):
     name = "threads"
 
-    def publish(self, post, text, image_path, image_url):
-        uid, tok = os.environ.get("THREADS_USER_ID"), os.environ.get("THREADS_TOKEN")
-        if not (uid and tok):
-            raise PublishError("THREADS_USER_ID/THREADS_TOKEN غير مضبوطين")
+    def publish(self, post, text, image_path, image_url, acct=None):
+        c = creds_for("threads", acct)
+        uid, tok = c["user_id"], c["token"]
         urls = post.get("_urls") or []
         if post["template"] == "carousel" and len(urls) >= 2:
             kids = []

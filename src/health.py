@@ -9,6 +9,7 @@ from datetime import date, datetime, timezone
 
 import requests
 
+from accounts import load_accounts
 from config import GRAPH_VERSION, ROOT, THREADS_VERSION
 
 OUT = ROOT / "content" / "health.json"
@@ -85,20 +86,28 @@ def publish_runs():
         return item("تشغيل النشر الدوري", "warn", clean(f"تعذّر الفحص: {e}"))
 
 
+def check_account(a):
+    """فحص اتصال حساب واحد من accounts.yaml."""
+    c = a.creds()
+    if a.platform == "telegram":
+        ok = bool(c.get("token") and c.get("chat_id"))
+        return item(a.label, "ok" if ok else "off", "مُعدّ" if ok else "غير مُعدّ بعد (اختياري)")
+    need = ("page_id", "token") if a.platform == "facebook" else ("user_id", "token") if a.platform == "instagram" else ("token",)
+    if not all(c.get(r) for r in need):
+        return item(a.label, "bad", "الأسرار غير مضبوطة")
+    tok = {"access_token": c["token"]}
+    if a.platform == "facebook":
+        return graph_check(a.label, [], f"https://graph.facebook.com/{GRAPH_VERSION}/{c['page_id']}", {"fields": "name", **tok}, "name")
+    if a.platform == "instagram":
+        return graph_check(a.label, [], f"https://graph.facebook.com/{GRAPH_VERSION}/{c['user_id']}", {"fields": "username", **tok}, "username")
+    return graph_check(a.label, [], f"https://graph.threads.net/{THREADS_VERSION}/me", {"fields": "username", **tok}, "username")
+
+
 def main() -> int:
     sys.stdout.reconfigure(encoding="utf-8")
-    fb, thr = os.environ.get("FB_PAGE_ID"), os.environ.get("THREADS_USER_ID")
-    items = [
-        graph_check("فيسبوك", ["FB_PAGE_ID", "FB_PAGE_TOKEN"], f"https://graph.facebook.com/{GRAPH_VERSION}/{fb}",
-                    {"fields": "name", "access_token": os.environ.get("FB_PAGE_TOKEN", "")}, "name"),
-        graph_check("إنستغرام", ["IG_USER_ID"] + (["IG_PAGE_TOKEN"] if os.environ.get("IG_PAGE_TOKEN") else ["FB_PAGE_TOKEN"]),
-                    f"https://graph.facebook.com/{GRAPH_VERSION}/{os.environ.get('IG_USER_ID')}",
-                    {"fields": "username", "access_token": os.environ.get("IG_PAGE_TOKEN") or os.environ.get("FB_PAGE_TOKEN", "")}, "username"),
-        graph_check("ثريدز", ["THREADS_USER_ID", "THREADS_TOKEN"], f"https://graph.threads.net/{THREADS_VERSION}/me",
-                    {"fields": "username", "access_token": os.environ.get("THREADS_TOKEN", "")}, "username"),
+    items = [check_account(a) for a in load_accounts().values()]
+    items += [
         threads_expiry(),
-        item("تيليجرام", "ok" if os.environ.get("TELEGRAM_BOT_TOKEN") and os.environ.get("TELEGRAM_CHANNEL_ID") else "off",
-             "مُعدّ" if os.environ.get("TELEGRAM_BOT_TOKEN") else "غير مُعدّ بعد (اختياري)"),
         item("توليد النصوص (Gemini)", "ok" if os.environ.get("GEMINI_API_KEY") else "off",
              "مفتاح موجود" if os.environ.get("GEMINI_API_KEY") else "لا مفتاح: زر التوليد لن يعمل"),
         item("صور حقيقية", "ok", "Pixabay" if os.environ.get("PIXABAY_API_KEY") else

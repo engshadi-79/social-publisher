@@ -6,6 +6,7 @@ from zoneinfo import ZoneInfo
 
 import yaml
 
+import accounts as _acc
 from config import (BRAND_PATH, TOPICS_PATH, LIMITS, PLATFORMS, QUEUE_PATH, STATE_PATH,
                     TEMPLATES, TIMEZONE)
 
@@ -112,6 +113,18 @@ def validate(queue: list[dict]) -> list[str]:
         if not isinstance(plats, dict) or not plats:
             errors.append(f"{tag} platforms فارغة")
             continue
+        tg = p.get("targets")
+        if tg is not None:
+            known = _acc.load_accounts()
+            if not isinstance(tg, dict):
+                errors.append(f"{tag} targets يجب أن تكون قاموساً (منصة ← قائمة حسابات)")
+            else:
+                for plat, ids in tg.items():
+                    for i in (ids or []):
+                        if i not in known:
+                            errors.append(f"{tag} حساب غير معروف في targets: {i} (انظر content/accounts.yaml)")
+                        elif known[i].platform != plat:
+                            errors.append(f"{tag} الحساب {i} ليس لمنصة {plat}")
         for name, text in plats.items():
             if name not in PLATFORMS:
                 errors.append(f"{tag} منصة غير معروفة: {name}")

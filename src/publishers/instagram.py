@@ -5,7 +5,7 @@ import requests
 
 from config import GRAPH_VERSION
 
-from .base import Publisher, PublishError, check
+from .base import Publisher, PublishError, check, creds_for
 
 
 def _wait_finished(base: str, cid: str, tok: str, what: str):
@@ -25,11 +25,9 @@ def _wait_finished(base: str, cid: str, tok: str, what: str):
 class Instagram(Publisher):
     name = "instagram"
 
-    def publish(self, post, text, image_path, image_url):
-        uid = os.environ.get("IG_USER_ID")
-        tok = os.environ.get("IG_PAGE_TOKEN") or os.environ.get("FB_PAGE_TOKEN")   # توكن صفحة الحساب المربوط (قد تختلف عن صفحة فيسبوك)
-        if not (uid and tok):
-            raise PublishError("IG_USER_ID وتوكن الصفحة (IG_PAGE_TOKEN أو FB_PAGE_TOKEN) غير مضبوطين")
+    def publish(self, post, text, image_path, image_url, acct=None):
+        c = creds_for("instagram", acct)
+        uid, tok = c["user_id"], c["token"]
         base = f"https://graph.facebook.com/{GRAPH_VERSION}"
         urls = post.get("_urls") or []
         if post["template"] == "carousel" and len(urls) >= 2:

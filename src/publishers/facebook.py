@@ -5,16 +5,15 @@ import requests
 
 from config import GRAPH_VERSION
 
-from .base import Publisher, PublishError, check
+from .base import Publisher, PublishError, check, creds_for
 
 
 class Facebook(Publisher):
     name = "facebook"
 
-    def publish(self, post, text, image_path, image_url):
-        page, tok = os.environ.get("FB_PAGE_ID"), os.environ.get("FB_PAGE_TOKEN")
-        if not (page and tok):
-            raise PublishError("FB_PAGE_ID/FB_PAGE_TOKEN غير مضبوطين")
+    def publish(self, post, text, image_path, image_url, acct=None):
+        c = creds_for("facebook", acct)
+        page, tok = c["page_id"], c["token"]
         base = f"https://graph.facebook.com/{GRAPH_VERSION}/{page}"
         urls = post.get("_urls") or []
         if post["template"] == "carousel" and len(urls) >= 2:
