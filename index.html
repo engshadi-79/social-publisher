@@ -69,7 +69,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
 <body>
 <div id="editBox"><div class="box">
   <h2 id="eHead">تعديل منشور</h2><div class="hint" id="eNote"></div>
-  <label>الموضوع</label><select id="eTopic"><option value="">— اختر —</option><option value="tmvet3asy">الذكاء الصناعي</option><option value="tmvgcv3kj">تطبيقات الذكاء الاصطناعي في تطوير الويب والأنظمة (Technical &amp; How-To)</option><option value="tmvgcvmh5">نصائح للمطورين والمبتدئين (Mindset &amp; Career)</option></select>
+  <label>الموضوع</label><select id="eTopic"><option value="">— اختر —</option><option value="tmvet3asy">الذكاء الصناعي</option><option value="tmvgcv3kj">تطبيقات الذكاء الاصطناعي في تطوير الويب والأنظمة (Technical &amp; How-To)</option><option value="tmvgcvmh5">نصائح للمطورين والمبتدئين (Mindset &amp; Career)</option><option value="tmvgcw0d5">دراسات حالة وأتمتة الأعمال (Business &amp; Automation)</option><option value="tmvgcw9c3">اقتباسات سريعة وتفاعل خفيف (Quotes &amp; Engagement)</option></select>
   <label>شكل الصورة</label>
   <select id="eTemplate"><option value="carousel">كاروسيل</option><option value="infographic">إنفوجرافك</option><option value="split">صورة + لوحة نص</option><option value="photo">صورة كاملة</option><option value="tip">نصيحة</option><option value="quote">اقتباس</option><option value="announcement">إعلان</option><option value="story">ستوري</option></select>
   <label>العنوان على الصورة *</label><input id="eTitle">
@@ -211,6 +211,26 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
       <small></small></div>
       <button class="del" data-del="tmvgcvmh5">حذف</button></div>
     
+    <div class="tp"><div><b>دراسات حالة وأتمتة الأعمال (Business &amp; Automation)</b><small>«كيف بنيت نظام نشر آلي للسوشيال ميديا بواسطة الذكاء الاصطناعي؟» (Behind the Scenes)
+
+الفكرة: استعراض مشروع Social Publisher نفسه كدراسة حالة حقيقية تُظهر للعملاء والمتابعين قدرتك على ربط الأدوات (APIs، الجدولة، توليد المحتوى، القوالب).
+
+القالب المقترح: كاروسيل دراسة حالة (المشكلة، الفكرة، التنفيذ، النتيجة).
+
+«أتمتة خدمة العملاء: متى تحتاج شات بوت ذكي، ومتى يكفيك الرد التلقائي العادي؟»
+
+الفكرة: توجيه أصحاب الأعمال والمشاريع لكيفية اتخاذ القرار الصحيح في أنظمتهم.</small>
+      <small>الجمهور: — · النبرة: —</small>
+      <small></small></div>
+      <button class="del" data-del="tmvgcw0d5">حذف</button></div>
+    
+    <div class="tp"><div><b>اقتباسات سريعة وتفاعل خفيف (Quotes &amp; Engagement)</b><small>«الذكاء الاصطناعي أداة لتسريع يدك، لكن عقلك وتفكيرك الهندسي هو الذي يقود المشروع.»
+
+«سؤال للمطورين: ما هي أكثر مهمة روتينية مملة في مشروعك تتمنى لو يؤديها عنك الذكاء الاصطناعي بالكامل؟»</small>
+      <small>الجمهور: — · النبرة: —</small>
+      <small></small></div>
+      <button class="del" data-del="tmvgcw9c3">حذف</button></div>
+    
     </div>
   </div>
 
@@ -251,7 +271,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
     <div class="msg ok">آخر توليد: وُلِّدت 3 مسودات عن «الذكاء الصناعي» <span class="hint">(Gemini gemini-3.8-flash | ترند Google: 45 عنصر)</span></div>
     
     <label>الموضوع *</label>
-    <select id="gTopic"><option value="tmvet3asy">الذكاء الصناعي</option><option value="tmvgcv3kj">تطبيقات الذكاء الاصطناعي في تطوير الويب والأنظمة (Technical &amp; How-To)</option><option value="tmvgcvmh5">نصائح للمطورين والمبتدئين (Mindset &amp; Career)</option></select>
+    <select id="gTopic"><option value="tmvet3asy">الذكاء الصناعي</option><option value="tmvgcv3kj">تطبيقات الذكاء الاصطناعي في تطوير الويب والأنظمة (Technical &amp; How-To)</option><option value="tmvgcvmh5">نصائح للمطورين والمبتدئين (Mindset &amp; Career)</option><option value="tmvgcw0d5">دراسات حالة وأتمتة الأعمال (Business &amp; Automation)</option><option value="tmvgcw9c3">اقتباسات سريعة وتفاعل خفيف (Quotes &amp; Engagement)</option></select>
     
     <label>شكل الصورة</label>
     <select id="gStyle"><option value="carousel">كاروسيل: عدة شرائح بأسلوب دراسة حالة (مقترح)</option><option value="infographic">إنفوجرافك: نقاط مرقّمة تلخّص الفكرة (مقترح)</option><option value="photo">صورة حقيقية تمثّل الفكرة</option></select>
@@ -269,7 +289,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
     <p class="hint">يُحفظ كمسودة، وخلال دقيقتين تراه بصورته في «بانتظار موافقتك»، ثم توافق عليه من بطاقته.</p>
     
     <label>الموضوع *</label>
-    <select id="pTopic"><option value="">— اختر —</option><option value="tmvet3asy">الذكاء الصناعي</option><option value="tmvgcv3kj">تطبيقات الذكاء الاصطناعي في تطوير الويب والأنظمة (Technical &amp; How-To)</option><option value="tmvgcvmh5">نصائح للمطورين والمبتدئين (Mindset &amp; Career)</option></select>
+    <select id="pTopic"><option value="">— اختر —</option><option value="tmvet3asy">الذكاء الصناعي</option><option value="tmvgcv3kj">تطبيقات الذكاء الاصطناعي في تطوير الويب والأنظمة (Technical &amp; How-To)</option><option value="tmvgcvmh5">نصائح للمطورين والمبتدئين (Mindset &amp; Career)</option><option value="tmvgcw0d5">دراسات حالة وأتمتة الأعمال (Business &amp; Automation)</option><option value="tmvgcw9c3">اقتباسات سريعة وتفاعل خفيف (Quotes &amp; Engagement)</option></select>
     
     <label>شكل الصورة</label>
     <select id="pTemplate">
