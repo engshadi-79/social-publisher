@@ -27,6 +27,11 @@ function setWhen(text, id, when) {
   for (let i = s; i < e; i++) if (/^  publish_at:/.test(lines[i])) { lines[i] = "  publish_at: " + q(when); return lines.join("\n"); }
   throw new Error("لم أجد موعد المنشور.");
 }
+function liveApproved(text, id) {
+  const lines = text.split(String.fromCharCode(10)), [a, b] = postRange(lines, id);
+  for (let i = a; i < b; i++) { const m = lines[i].match(/^  approved:\s*(\w+)/); if (m) return m[1] === "true"; }
+  return false;
+}
 async function deleteBg(id) {
   const path = "content/media/" + id + "-bg.png";
   let sha; try { sha = (await gh("contents/" + path)).sha; } catch (e) { return; }
@@ -69,9 +74,13 @@ $("eSave").onclick = async () => {
   const imageChanged = tpl !== old.template || img.photo_query !== oi.photo_query || img.visual_prompt !== oi.visual_prompt;
   try {
     say(m, "جارٍ الحفظ…", true);
-    await edit((x) => replacePost(x, editId, nu), "queue: edit " + editId, QFILE);
+    await edit((x) => replacePost(x, editId, Object.assign({}, nu, { approved: liveApproved(x, editId) })), "queue: edit " + editId, QFILE);
     if (imageChanged) await deleteBg(editId);
-    say(m, "تم الحفظ ✅ تتحدّث اللوحة (وصورتها إن تغيّرت) خلال دقيقتين.", true);
+    POSTS[editId] = Object.assign({}, POSTS[editId], nu, { approved: POSTS[editId].approved, group: POSTS[editId].group });
+    const card = document.querySelector('.post [data-id="' + editId + '"]');
+    if (card) { const post = card.closest(".post"); const t = post.querySelector(".title"), ln = post.querySelector(".line");
+      if (t) t.textContent = img.title; if (ln) ln.textContent = "✎ حُفظ التعديل: الموعد " + nu.publish_at + " (تتحدّث بقية التفاصيل والصورة بعد دقائق)"; }
+    say(m, "تم الحفظ في المستودع ✅ تتحدّث بطاقة اللوحة (وصورتها إن تغيّرت) خلال دقائق.", true);
     setTimeout(() => $("editBox").classList.remove("on"), 1200);
   } catch (e) { say(m, e.message, false); }
 };

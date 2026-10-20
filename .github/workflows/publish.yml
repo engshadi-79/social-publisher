@@ -2,6 +2,10 @@ name: publish
 on:
   schedule:
     - cron: "11,41 * * * *"
+  push:
+    branches: [main]
+    paths:
+      - content/queue.yaml
   workflow_dispatch:
     inputs:
       dry_run:
