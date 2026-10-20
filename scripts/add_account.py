@@ -70,6 +70,34 @@ def append_yaml(text: str, blocks: list[str]) -> str:
     return out
 
 
+WORKFLOWS = (".github/workflows/publish.yml", ".github/workflows/health.yml")
+MARKER = "# ACCOUNT-SECRETS"
+
+
+def add_env_lines(text: str, names) -> str:
+    """يضيف سطر env لكل سرّ بعد علامة ACCOUNT-SECRETS (دون تكرار ما هو موجود)."""
+    nl = chr(10)
+    lines = text.split(nl)
+    for i, l in enumerate(lines):
+        if MARKER in l:
+            indent = l[: len(l) - len(l.lstrip())]
+            new = [indent + n + ": ${{ secrets." + n + " }}" for n in names if "secrets." + n + " }}" not in text]
+            lines[i + 1:i + 1] = new
+            return nl.join(lines)
+    raise SystemExit("لم أجد العلامة " + MARKER + " في ملف الـ workflow.")
+
+
+def update_workflows(names):
+    for path in WORKFLOWS:
+        cur = json.loads(gh("api", f"repos/{REPO}/contents/{path}"))
+        text = base64.b64decode(cur["content"]).decode("utf-8")
+        new = add_env_lines(text, names)
+        if new != text:
+            body = {"message": "workflows: expose secrets of a new account", "content": base64.b64encode(new.encode()).decode(), "sha": cur["sha"]}
+            gh("api", "-X", "PUT", f"repos/{REPO}/contents/{path}", "--input", "-", stdin=json.dumps(body))
+            print(f"✓ حُدّث {path}")
+
+
 def main():
     app_id = input("App ID (تطبيق social-publisher): ").strip()
     app_secret = getpass.getpass("App Secret (مخفي): ").strip()
@@ -103,6 +131,7 @@ def main():
         body = {"message": "accounts: add " + page["name"], "content": base64.b64encode(new_text.encode()).decode(), "sha": cur["sha"]}
         gh("api", "-X", "PUT", f"repos/{REPO}/contents/{ACC_PATH}", "--input", "-", stdin=json.dumps(body))
         print("✓ تم تحديث content/accounts.yaml")
+    update_workflows(list(secrets))
     print("تم. الحسابات الجديدة تظهر في اللوحة عند اختيار «على أي حساب؟» (خلال دقائق).")
 
 

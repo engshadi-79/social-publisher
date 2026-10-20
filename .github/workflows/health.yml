@@ -31,7 +31,7 @@ jobs:
           FB_PAGE_TOKEN: ${{ secrets.FB_PAGE_TOKEN }}
           IG_PAGE_TOKEN: ${{ secrets.IG_PAGE_TOKEN }}
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
-          ALL_SECRETS: ${{ toJSON(secrets) }}
+          # ACCOUNT-SECRETS (يُحدَّث تلقائياً بسكربت add_account.py)
           THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
           THREADS_TOKEN: ${{ secrets.THREADS_TOKEN }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}

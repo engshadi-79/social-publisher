@@ -1,4 +1,4 @@
-"""الحسابات/الصفحات المستهدفة بالنشر، وقراءة أسرارها (مباشرة من البيئة أو من ALL_SECRETS)."""
+"""الحسابات/الصفحات المستهدفة بالنشر، وقراءة أسرارها (متغيرات البيئة المعرَّفة في الـ workflows)."""
 import json
 import os
 from dataclasses import dataclass
@@ -50,9 +50,13 @@ def secret(name: str) -> str:
 
 
 def secret_values() -> list[str]:
-    """كل قيم الأسرار المعروفة (لإخفائها من رسائل الخطأ)."""
-    secret("-")                                   # يضمن تحميل ALL_SECRETS
-    vals = {v for v in (_all_cache or {}).values() if isinstance(v, str) and len(v) > 8}
+    """قيم أسرار كل الحسابات (لإخفائها من رسائل الخطأ)."""
+    vals = set()
+    for a in load_accounts().values():
+        for name in a.secrets.values():
+            v = secret(name)
+            if v and len(v) > 8:
+                vals.add(v)
     return sorted(vals, key=len, reverse=True)
 
 
