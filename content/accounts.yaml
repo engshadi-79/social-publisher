@@ -22,3 +22,9 @@ accounts:
     label: "تيليجرام — القناة"
     default: true
     secrets: {token: TELEGRAM_BOT_TOKEN, chat_id: TELEGRAM_CHANNEL_ID}
+  - id: x-engshadi
+    platform: x
+    label: "X — engshadi"
+    default: true
+    secrets: {api_key: X_API_KEY, api_secret: X_API_SECRET,
+              access_token: X_ACCESS_TOKEN, access_secret: X_ACCESS_SECRET}

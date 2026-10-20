@@ -4,7 +4,9 @@ from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
 
-from config import CAROUSEL_STYLES, OUT_DIR, ROOT, TEMPLATES, TEMPLATES_DIR
+import imagegen
+from config import (CAROUSEL_STYLES, CAROUSEL_STYLES_PHOTO, OUT_DIR, ROOT,
+                    TEMPLATES, TEMPLATES_DIR)
 from queue_io import load_brand
 
 _env = Environment(loader=FileSystemLoader(str(TEMPLATES_DIR)), autoescape=True)
@@ -68,10 +70,16 @@ class Renderer:
     def render_slides(self, post: dict, out_dir: Path) -> list[Path]:
         brand = load_brand()
         w, h = TEMPLATES["carousel"]
-        tpl = _env.get_template(f"carousel/styles/{carousel_style(post)}.html")
+        style = carousel_style(post)
+        tpl = _env.get_template(f"carousel/styles/{style}.html")
+        photos: dict[int, Path] = {}
+        if style in CAROUSEL_STYLES_PHOTO:
+            photos, _warns = imagegen.ensure_slide_photos(post)
         outs = []
         for spec in slide_specs(post):
-            html = tpl.render(brand=brand, w=w, h=h, fonts=_fonts(), **spec)
+            photo = photos.get(spec["index"])
+            html = tpl.render(brand=brand, w=w, h=h, fonts=_fonts(),
+                              photo=photo.as_uri() if photo else None, **spec)
             outs.append(self._shoot(html, f"{post['id']}-s{spec['index']}", w, h, out_dir / f"{post['id']}-s{spec['index']}.png"))
         return outs
 

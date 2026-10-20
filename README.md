@@ -36,7 +36,31 @@
 4. `GET https://graph.threads.net/v1.0/me?fields=id&access_token=...` ← `THREADS_USER_ID`.
 5. `refresh-tokens.yml` يجدّد التوكن كل أسبوع تلقائياً ويحدّث السرّ (يلزمه `GH_PAT`).
 
-## 5) Cloudflare (خلفيات الذكاء الاصطناعي، مجاني بلا بطاقة)
+## 5) منصة X (تويتر سابقاً)
+
+⚠️ **انتبه للتكلفة قبل أن تبدأ.** منذ شباط 2026 حوّلت X واجهتها إلى الدفع حسب الاستعمال،
+والمستوى المجاني لم يعد يُفتح للمطوّرين الجدد إلا استثناءً لتطبيقات المنفعة العامة. إن لم
+يكن لديك وصول مجاني قديم، فالنشر على X سيكلّفك مبلغاً بسيطاً لكل منشور — وهذا يخالف شرط
+«مجاني بالكامل» في بقية المشروع. تحقّق من صفحة الأسعار في بوابة المطوّرين قبل الاعتماد عليه.
+بقية المنصات لا تتأثر: المنشور الذي لا يحمل مفتاح `x` في `platforms` لا يمرّ على X أصلاً.
+
+الخطوات بعد أن يصير لك وصول:
+1. developer.x.com ← أنشئ Project ثم App.
+2. في إعدادات التطبيق: **User authentication settings** ← App permissions = **Read and write**،
+   ونوع التطبيق **Web App / Automated App or Bot**.
+3. من تبويب **Keys and tokens** انسخ:
+   - API Key ← `X_API_KEY`
+   - API Key Secret ← `X_API_SECRET`
+   - Access Token ← `X_ACCESS_TOKEN`
+   - Access Token Secret ← `X_ACCESS_SECRET`
+4. مهم: إن ولّدت Access Token قبل ضبط الصلاحية على Read and write، فأعد توليده بعدها،
+   وإلا رفض النشر بخطأ صلاحيات.
+5. هذه المفاتيح لا تنتهي صلاحيتها، فلا تحتاج تجديداً أسبوعياً مثل ثريدز.
+
+الحدود التي يراعيها النظام: 280 حرفاً للنص، و4 صور كحد أقصى للمنشور الواحد
+(الكاروسيل يُنشر على X بأول 4 شرائح، وكاملاً على بقية المنصات).
+
+## 6) Cloudflare (خلفيات الذكاء الاصطناعي، مجاني بلا بطاقة)
 dash.cloudflare.com ← Workers AI ← انسخ Account ID → `CF_ACCOUNT_ID`، وأنشئ API Token بصلاحية **Workers AI** فقط → `CF_API_TOKEN`. بدونهما يُستعمل Pollinations ثم خلفية متدرجة (لا يتوقف النشر).
 
 ## ما تفعله من اللوحة
@@ -69,10 +93,10 @@ dash.cloudflare.com ← Workers AI ← انسخ Account ID → `CF_ACCOUNT_ID`،
 ## Gemini (خلفيات أعلى جودة، مدفوع)
 إن وُجد سرّ `GEMINI_API_KEY` صار Gemini المزوّد الأول للخلفيات (نموذج `gemini-nano-banana-2.1`، نحو 0.03 دولار للصورة ولا حصة مجانية لتوليد الصور)، ويبقى Cloudflare ثم Pollinations احتياطاً. لإعادة توليد الخلفيات بعد تفعيله: شغّل workflow باسم `preview` واكتب `all` في خانة regen.
 
-## 6) أسرار GitHub
+## 7) أسرار GitHub
 Settings ← Secrets and variables ← Actions ← New repository secret، لكل مما يلي:
 
-`FB_PAGE_ID`, `FB_PAGE_TOKEN`, `IG_USER_ID`, `THREADS_USER_ID`, `THREADS_TOKEN`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHANNEL_ID`, `TELEGRAM_OWNER_CHAT_ID`, `CF_ACCOUNT_ID`, `CF_API_TOKEN`, `GH_PAT` (توكن دقيق الصلاحيات للمستودع نفسه: Secrets = Read and write)، واختيارياً `GEMINI_API_KEY`.
+`FB_PAGE_ID`, `FB_PAGE_TOKEN`, `IG_USER_ID`, `THREADS_USER_ID`, `THREADS_TOKEN`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHANNEL_ID`, `TELEGRAM_OWNER_CHAT_ID`, `X_API_KEY`, `X_API_SECRET`, `X_ACCESS_TOKEN`, `X_ACCESS_SECRET`, `CF_ACCOUNT_ID`, `CF_API_TOKEN`, `GH_PAT` (توكن دقيق الصلاحيات للمستودع نفسه: Secrets = Read and write)، واختيارياً `GEMINI_API_KEY`.
 
 لا تضع أي سرّ في الملفات. المنصة التي لا سرّ لها تفشل بوضوح وتصلك رسالة بالخطأ؛ احذف مفتاحها من `platforms` لتجاهلها.
 

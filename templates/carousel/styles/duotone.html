@@ -1,0 +1,70 @@
+{% extends "carousel/base.html" %}
+{# نمط «اللونان»: صورة معالَجة بلوني العلامة، وخطّ ضخم فوقها، وأشكال حادّة.
+   يناسب: الرسائل القوية، الحملات، المحتوى الجريء. #}
+
+{% block style %}
+.slide{ padding:0; background:var(--navy); color:#FFF4E2 }
+
+.ph{ position:absolute; inset:0; background:var(--navy) }
+.ph img{ width:100%; height:100%; object-fit:cover; display:block;
+         filter:grayscale(1) contrast(1.12) brightness(1.42) }
+/* ثنائية اللون: ضرب بلون فاتح يصبغ الإضاءات، وتفتيح بلون غامق يرفع الظلال */
+.ph::before,.ph::after{ content:""; position:absolute; inset:0 }
+.ph::before{ background:var(--accent); mix-blend-mode:multiply }
+.ph::after { background:var(--navy);   mix-blend-mode:lighten }
+.dark .ph::before{ background:var(--teal) }
+.cta  .ph::before{ background:#FFD9CE }
+.cta  .ph::after { background:#5E1A0E }
+.shade{ position:absolute; inset:0; background:
+        linear-gradient(200deg, rgba(6,14,26,0) 0%, rgba(6,14,26,.26) 50%, rgba(6,14,26,.56) 100%) }
+
+/* شريط قُطري يكسر رسمية الصورة */
+.slash{ position:absolute; left:-80px; right:-80px; top:300px; height:16px;
+        background:var(--kick); transform:rotate(-6deg) }
+.dark .slash{ background:var(--accent) }
+
+.wrap{ position:relative; flex:1; min-height:0; display:flex; flex-direction:column; padding:64px 66px 56px }
+.top{ display:flex; justify-content:space-between; align-items:center; font-size:27px; font-weight:800; direction:ltr }
+.top .name{ direction:rtl }
+.top .n{ background:#FFF4E2; color:var(--navy); border-radius:4px; padding:.26em .7em }
+
+.inner{ margin:auto 0 }
+.kicker{ font-size:.5em; font-weight:800; color:var(--accent); letter-spacing:.06em; margin-bottom:.5em }
+.dark .kicker{ color:#FFF4E2 }
+.title{ font-weight:800; line-height:1.18; font-size:2.05em; word-spacing:.08em;
+        text-shadow:0 6px 30px rgba(0,0,0,.6) }
+.cover .title{ font-size:2.5em }
+.sub{ margin-top:.65em; font-size:.6em; line-height:1.7; font-weight:700; opacity:.95;
+      text-shadow:0 2px 16px rgba(0,0,0,.6); max-width:92% }
+.pts{ margin-top:1em; display:flex; flex-direction:column; gap:.4em }
+.pts li{ display:inline-flex; align-self:flex-start; gap:.5em; font-size:.56em; line-height:1.5; font-weight:800;
+         background:#FFF4E2; color:var(--navy); border-radius:4px; padding:.36em .7em }
+
+.foot{ display:flex; justify-content:space-between; align-items:center; font-size:26px;
+       font-weight:800; direction:ltr; opacity:.95 }
+.foot .who{ direction:rtl; background:var(--kick); color:#FFF2EE; border-radius:4px; padding:.3em .9em }
+{% endblock %}
+
+{% block slide %}
+<div class="slide {{ theme }} {{ kind }}">
+  <div class="ph">{% if photo %}<img src="{{ photo }}" alt="">{% endif %}</div>
+  <div class="shade"></div>
+  <div class="slash"></div>
+  <div class="wrap">
+    <div class="top">
+      <span class="n">{{ '%02d' % index }} / {{ '%02d' % total }}</span>
+      <span class="name">{{ brand.name }}</span>
+    </div>
+    <div class="body-area" id="area"><div class="inner" id="inner">
+      {% if kicker %}<div class="kicker">{{ kicker }}</div>{% endif %}
+      <div class="title">{{ title }}</div>
+      {% if body %}<div class="sub">{{ body }}</div>{% endif %}
+      {% if points %}<ul class="pts">{% for p in points %}<li><span>{{ p }}</span></li>{% endfor %}</ul>{% endif %}
+    </div></div>
+    <div class="foot">
+      <span>{{ brand.handle }}</span>
+      <span class="who">{% if index < total %}اسحب ←{% else %}احفظ ✓{% endif %}</span>
+    </div>
+  </div>
+</div>
+{% endblock %}

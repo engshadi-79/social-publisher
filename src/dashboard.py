@@ -15,7 +15,7 @@ from config import ROOT, MEDIA_DIR, OUT_DIR, PLATFORMS, TIMEZONE, TOPICS_PATH
 from queue_io import load_queue, load_state, now_local, parse_when
 from render import Renderer
 
-LABELS = {"facebook": "فيسبوك", "instagram": "إنستغرام", "threads": "ثريدز", "telegram": "تيليجرام"}
+LABELS = {"facebook": "فيسبوك", "instagram": "إنستغرام", "threads": "ثريدز", "x": "X", "telegram": "تيليجرام"}
 SITE = OUT_DIR / "dashboard"
 DAYS = ["الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت", "الأحد"]
 MONTHS = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"]

@@ -31,6 +31,51 @@ def bg_path(post_id: str) -> Path:
     return MEDIA_DIR / f"{post_id}-bg.png"
 
 
+def slide_photo_path(post_id: str, index: int) -> Path:
+    return MEDIA_DIR / f"{post_id}-s{index:02d}.jpg"
+
+
+def ensure_slide_photos(post: dict, regen: bool = False) -> tuple[dict[int, Path], list[str]]:
+    """صورة فوتوغرافية حقيقية لكل شريحة من شرائح الكاروسيل.
+
+    تأخذ `photo_query` من الشريحة، وإلا من المنشور. تُخزَّن تحت content/media
+    فيوافق ما يراه صاحبها في المعاينة ما يُنشر. لا ترمي أبداً: الشريحة بلا
+    صورة ترجع إلى تصميمها اللوني.
+    """
+    warnings: list[str] = []
+    found: dict[int, Path] = {}
+    img = post.get("image") or {}
+    slides = img.get("slides") or []
+    base_query = str(img.get("photo_query") or "").strip()
+    src_id = img.get("bg_from") or post["id"]
+    size = TEMPLATES["carousel"]
+    for i, s in enumerate(slides, 1):
+        query = str((s or {}).get("photo_query") or "").strip() or base_query
+        if not query:
+            continue
+        path = slide_photo_path(src_id, i)
+        if path.exists() and not regen:
+            found[i] = path
+            continue
+        # ترتيب مختلف لكل شريحة حتى لا تتكرّر الصورة نفسها عبر الشرائح
+        pick = int(img.get("seed") or 0) + i * 3
+        for name, fn in (("Pexels", _pexels), ("Pixabay", _pixabay), ("Openverse", _openverse)):
+            try:
+                data = fn(query, size, pick)
+            except NotConfigured:
+                continue
+            except Exception as e:  # noqa: BLE001
+                warnings.append(f"الشريحة {i}: {name} فشل: {type(e).__name__}: {str(e)[:120]}")
+                continue
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(data)
+            found[i] = path
+            break
+        else:
+            warnings.append(f"الشريحة {i}: تعذّرت صورة لـ «{query}» — تصميم لوني بدلها")
+    return found, warnings
+
+
 def _prompt(post: dict) -> str:
     p = post["image"].get("visual_prompt", "").strip()
     if "photo" not in p.lower():

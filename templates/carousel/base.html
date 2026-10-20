@@ -33,6 +33,8 @@ ul{ list-style:none }
 <script>
 (async () => {
   await document.fonts.ready;
+  // الصور لا بدّ أن تكتمل قبل اللقطة وإلا خرجت الشريحة بمكان فارغ
+  await Promise.all([...document.images].map(i => i.complete ? null : i.decode().catch(() => null)));
   const area = document.getElementById('area'), inner = document.getElementById('inner');
   let k = 1;
   if (area && inner) {

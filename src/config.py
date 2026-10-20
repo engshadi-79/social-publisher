@@ -30,9 +30,13 @@ TEMPLATES = {
 }
 
 # أنماط الكاروسيل: لكلٍّ لغة بصرية مختلفة بنيوياً لا لوناً فقط.
-# blueprint = مخطط هندسي · editorial = مجلّة · terminal = نافذة كود
-# poster = ملصق لوني · sticky = ورقة ملصقة · duo = لوحان بشريط جانبي
-CAROUSEL_STYLES = ("blueprint", "editorial", "terminal", "poster", "sticky", "duo")
+# بلا صور: blueprint مخطط هندسي · editorial مجلّة · terminal نافذة كود
+#          poster ملصق لوني · sticky ورقة ملصقة · duo لوحان بشريط جانبي
+CAROUSEL_STYLES_FLAT = ("blueprint", "editorial", "terminal", "poster", "sticky", "duo")
+# بصور حقيقية: magazine غلاف مجلّة · polaroid صورة فورية · collage قصاصات
+#              duotone صورة بلونين · window بطاقة بنافذة · filmstrip شريط فيلم
+CAROUSEL_STYLES_PHOTO = ("magazine", "polaroid", "collage", "duotone", "window", "filmstrip")
+CAROUSEL_STYLES = CAROUSEL_STYLES_FLAT + CAROUSEL_STYLES_PHOTO
 
-PLATFORMS = ("facebook", "instagram", "threads", "telegram")
-LIMITS = {"threads": 500, "instagram": 2200, "facebook": 63000, "telegram": 4096}
+PLATFORMS = ("facebook", "instagram", "threads", "telegram", "x")
+LIMITS = {"threads": 500, "instagram": 2200, "facebook": 63000, "telegram": 4096, "x": 280}

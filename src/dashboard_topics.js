@@ -33,7 +33,7 @@ const slidesError = (sl) => (sl.length < 3 || sl.length > 10) ? "الكاروس�
 
 // ---------- اختيار الحسابات المستهدفة ----------
 const ACC = JSON.parse(document.getElementById("accdata").textContent);
-const PLAT_AR = { facebook: "فيسبوك", instagram: "إنستغرام", threads: "ثريدز", telegram: "تيليجرام" };
+const PLAT_AR = { facebook: "فيسبوك", instagram: "إنستغرام", threads: "ثريدز", x: "X", telegram: "تيليجرام" };
 function accPicker(boxId, selected) {
   const box = document.getElementById(boxId); if (!box) return; box.innerHTML = "";
   Object.keys(PLAT_AR).forEach((pl) => {
@@ -165,11 +165,15 @@ $("topicList").onclick = async (e) => {
 
 // ---- منشورات: إضافة ----
 accPicker("pAcc", null);
-const updCount = () => { const n = $("pText").value.length; $("pCount").textContent = n + " حرفاً" + (n > 500 && $("pl_threads").checked ? " — ثريدز حدّه 500!" : ""); };
-$("pText").oninput = updCount; $("pl_threads").onchange = updCount;
+const updCount = () => {
+  const n = $("pText").value.length;
+  const over = (n > 500 && $("pl_threads").checked ? " — ثريدز حدّه 500!" : "") + (n > 280 && $("pl_x").checked ? " — X حدّه 280!" : "");
+  $("pCount").textContent = n + " حرفاً" + over;
+};
+$("pText").oninput = updCount; $("pl_threads").onchange = updCount; $("pl_x").onchange = updCount;
 $("pAdd").onclick = async () => {
   const m = $("pMsg"), v = (i) => $(i).value.trim();
-  const plats = ["facebook", "instagram", "threads", "telegram"].filter((k) => $("pl_" + k).checked);
+  const plats = ["facebook", "instagram", "threads", "x", "telegram"].filter((k) => $("pl_" + k).checked);
   const when = v("pWhen").replace("T", " ");
   const isCar = $("pTemplate").value === "carousel", slides = isCar ? parseSlides($("pSlides").value) : [];
   const err = isCar && slidesError(slides) ? slidesError(slides) : (!isCar && !v("pTitle")) ? "اكتب عنوان الصورة." : !v("pText") ? "اكتب نص المنشور." : !plats.length ? "اختر منصة واحدة على الأقل." :
@@ -178,6 +182,7 @@ $("pAdd").onclick = async () => {
     (!isCar && $("pTemplate").value !== "infographic" && !(v("pQuery") || v("pVP"))) ? "اكتب كلمات إنجليزية للصورة (مثل: engineer construction site)." :
     ($("pTopic") && !v("pTopic")) ? "اختر الموضوع." :
     (plats.includes("threads") && v("pText").length > 500) ? "نص ثريدز يجب ألا يتجاوز 500 حرف." :
+    (plats.includes("x") && v("pText").length > 280) ? "نص X يجب ألا يتجاوز 280 حرفاً." :
     (plats.includes("instagram") && v("pText").length > 2200) ? "نص إنستغرام يجب ألا يتجاوز 2200 حرف." : "";
   if (err) { say(m, err, false); return; }
   let targets;

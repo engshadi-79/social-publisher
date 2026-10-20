@@ -6,12 +6,16 @@ Build a fully free, cloud-hosted system that automatically publishes scheduled p
 - Facebook Page
 - Instagram (Business/Creator account linked to the Facebook Page)
 - Threads
+- X (Twitter) — see the cost caveat under Platform notes
 - Telegram channel
 
 No paid services. No always-on server. Everything runs on GitHub Actions.
 
 ## Hard constraints
 - Zero cost: no paid APIs, no paid hosting, no n8n cloud, no Zapier/Make.
+  Exception, owner-accepted: X moved to pay-per-use in Feb 2026 and no longer opens its free
+  tier to new developers. X is wired up but stays dormant unless the owner adds the X secrets,
+  and a post reaches X only when it carries a `platforms.x` text. Never enable it silently.
 - Runtime: GitHub Actions scheduled workflows only. The owner's PC is never required.
 - Content generation does NOT call any paid LLM API at runtime. Posts are written ahead of
   time by Claude Code (inside the owner's subscription) into the content queue.
@@ -100,6 +104,7 @@ Extra secrets: `CF_ACCOUNT_ID`, `CF_API_TOKEN` (token with Workers AI permission
 │   │   ├── facebook.py
 │   │   ├── instagram.py
 │   │   ├── threads.py
+│   │   ├── x.py
 │   │   └── telegram.py
 │   ├── notify.py             # send success/failure summary to owner's private Telegram chat
 │   ├── refresh_tokens.py     # refresh Threads long-lived token
@@ -128,6 +133,7 @@ Extra secrets: `CF_ACCOUNT_ID`, `CF_API_TOKEN` (token with Workers AI permission
     facebook: "النص الكامل لفيسبوك مع الهاشتاقات"
     instagram: "نص إنستغرام مع الهاشتاقات"
     threads: "نص ثريدز (500 حرف كحد أقصى)"
+    x: "نص X (280 حرفاً كحد أقصى)"
     telegram: "نص تيليجرام"
 ```
 - A platform key that is missing means: skip that platform for this post.
@@ -155,6 +161,14 @@ Extra secrets: `CF_ACCOUNT_ID`, `CF_API_TOKEN` (token with Workers AI permission
   text) → wait for processing → `POST /{user-id}/threads_publish`. Long-lived token lasts
   60 days: `refresh-tokens.yml` refreshes it weekly via `th_refresh_token` and updates the
   GitHub Secret using `gh secret set` with a fine-grained PAT stored as `GH_PAT`.
+- **X**: OAuth 1.0a User Context (four keys: `X_API_KEY`, `X_API_SECRET`, `X_ACCESS_TOKEN`,
+  `X_ACCESS_SECRET`) — these never expire, so no weekly refresh. Upload each image from the
+  file (no public URL needed), then `POST api.x.com/2/tweets` with `media.media_ids`. Image
+  upload tries v1.1 `upload.twitter.com/1.1/media/upload.json` first, then the v2 chunked
+  initialize/append/finalize, because which one a given access level allows keeps changing;
+  `/2/tweets` falls back to `/2/posts` on 404. Limits: 280 chars, 4 images per post (a
+  carousel posts its first 4 slides on X and in full elsewhere). The App's permission must be
+  "Read and write" BEFORE the access token is generated, else publishing fails on permissions.
 - **Telegram**: Bot API `sendPhoto` to the channel (`@channel` or numeric id), caption up to
   1024 chars; if longer, send photo then text as a reply.
 - Pin the Graph API version in one config constant.
@@ -176,6 +190,7 @@ Extra secrets: `CF_ACCOUNT_ID`, `CF_API_TOKEN` (token with Workers AI permission
 ## Secrets (GitHub Actions)
 `FB_PAGE_ID`, `FB_PAGE_TOKEN`, `IG_USER_ID`, `THREADS_USER_ID`, `THREADS_TOKEN`,
 `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHANNEL_ID`, `TELEGRAM_OWNER_CHAT_ID`, `GH_PAT`,
+`X_API_KEY`, `X_API_SECRET`, `X_ACCESS_TOKEN`, `X_ACCESS_SECRET` (optional: without them X is skipped),
 `GEMINI_API_KEY` (text generation for the dashboard Generate button works on the free tier; image generation needs a paid project), optional `PEXELS_API_KEY` / `PIXABAY_API_KEY` (free, real photos).
 
 ## Weekly content workflow (done by Claude Code with the owner)

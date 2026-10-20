@@ -1,0 +1,71 @@
+{% extends "carousel/base.html" %}
+{# نمط «شريط الفيلم»: الصورة شريط رأسي بثقوبه على حافة الشريحة، والنص بجانبه.
+   يناسب: السلاسل المتتابعة، رحلة عمل، المحتوى الذي يحكي تسلسلاً. #}
+
+{% block style %}
+.slide{ padding:0; flex-direction:row; background:#FBF4E7; color:#1B1510 }
+.slide.dark{ background:#14202E; color:#F6EEE0 }
+.slide.cta { background:#FFE7DE; color:#3A120A }
+
+/* الشريط */
+.strip{ position:relative; flex:0 0 300px; background:#120E0A; display:flex; flex-direction:column;
+        padding:34px 0 }
+.strip .ph{ position:relative; flex:1; margin:0 34px; overflow:hidden;
+            background:linear-gradient(160deg, var(--teal), var(--navy)) }
+.strip .ph img{ width:100%; height:100%; object-fit:cover; display:block; filter:contrast(1.06) saturate(1.05) }
+/* ثقوب الشريط */
+.holes{ position:absolute; top:0; bottom:0; width:34px; display:flex; flex-direction:column;
+        justify-content:space-around; align-items:center; padding:18px 0 }
+.holes.l{ inset-inline-start:0 } .holes.r{ inset-inline-end:0 }
+.holes i{ width:16px; height:26px; border-radius:4px; background:#FBF4E7; opacity:.9 }
+.strip .no{ position:absolute; bottom:20px; inset-inline-start:50%; transform:translateX(50%);
+            color:#FBF4E7; font-size:26px; font-weight:800; direction:ltr; opacity:.8 }
+
+/* اللوح النصّي */
+.panel{ flex:1; min-width:0; display:flex; flex-direction:column; padding:62px 58px 52px }
+.top{ display:flex; justify-content:space-between; align-items:center; font-size:26px; font-weight:800;
+      opacity:.55; direction:ltr; margin-bottom:26px }
+.top .name{ direction:rtl }
+
+.kicker{ display:inline-block; font-size:.48em; font-weight:800; color:var(--kick);
+         border-bottom:4px solid var(--accent); padding-bottom:.12em; margin-bottom:.65em }
+.dark .kicker{ color:var(--accent) }
+.title{ font-weight:800; line-height:1.3; font-size:1.58em }
+.cover .title{ font-size:1.78em }
+.sub{ margin-top:.72em; opacity:.72; line-height:1.78; font-size:.6em; font-weight:600 }
+.pts{ margin-top:1.05em; display:flex; flex-direction:column; gap:.5em }
+.pts li{ display:flex; gap:.6em; align-items:flex-start; font-size:.6em; line-height:1.55; font-weight:700 }
+.pts li::before{ content:"▸"; color:var(--teal); flex:0 0 auto }
+
+.foot{ display:flex; justify-content:space-between; align-items:center; font-size:26px;
+       font-weight:800; opacity:.6; direction:ltr; margin-top:24px }
+.foot .who{ direction:rtl; color:var(--kick); opacity:1 }
+.dark .foot .who{ color:var(--accent) }
+{% endblock %}
+
+{% block slide %}
+<div class="slide {{ theme }} {{ kind }}">
+  <div class="strip">
+    <div class="holes l"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="holes r"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="ph">{% if photo %}<img src="{{ photo }}" alt="">{% endif %}</div>
+    <div class="no">{{ '%02d' % index }}/{{ '%02d' % total }}</div>
+  </div>
+  <div class="panel">
+    <div class="top">
+      <span>{{ brand.handle }}</span>
+      <span class="name">{{ brand.name }}</span>
+    </div>
+    <div class="body-area" id="area"><div class="inner" id="inner">
+      {% if kicker %}<div class="kicker">{{ kicker }}</div>{% endif %}
+      <div class="title">{{ title }}</div>
+      {% if body %}<div class="sub">{{ body }}</div>{% endif %}
+      {% if points %}<ul class="pts">{% for p in points %}<li><span>{{ p }}</span></li>{% endfor %}</ul>{% endif %}
+    </div></div>
+    <div class="foot">
+      <span>{{ '%02d' % index }} / {{ '%02d' % total }}</span>
+      <span class="who">{% if index < total %}اسحب ←{% else %}احفظ ✓{% endif %}</span>
+    </div>
+  </div>
+</div>
+{% endblock %}

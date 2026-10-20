@@ -101,8 +101,19 @@ def build_prompt(topic: dict, count: int, brand: dict, recent: list[str], trends
   "body": سطر صغير تحت العنوان (حتى 80 حرفاً، أو فارغ)،
 {style_fields}
   "text_long": نص كامل لفيسبوك وإنستغرام وتيليجرام مع الهاشتاجات في آخره (حتى 900 حرف){caption_style}،
-  "text_short": نص قصير لثريدز مع 2 إلى 3 هاشتاجات (حتى 380 حرفاً).
+  "text_short": نص قصير لثريدز مع 2 إلى 3 هاشتاجات (حتى 380 حرفاً)،
+  "text_x": نص مكتمل المعنى لمنصة X مع هاشتاجين على الأكثر (حتى 260 حرفاً، فالحد الصارم 280).
 أخرج مصفوفة JSON فقط بلا أي شرح قبلها أو بعدها."""
+
+
+def clip(text: str, limit: int) -> str:
+    """قصّ عند آخر مسافة قبل الحد، فلا تنقطع كلمة في منتصفها."""
+    text = text.strip()
+    if len(text) <= limit:
+        return text
+    cut = text[:limit]
+    space = cut.rfind(" ")
+    return (cut[:space] if space > limit * 0.6 else cut).rstrip(" ،.") + "…"
 
 
 def make_entries(items: list[dict], req: dict, topic: dict, existing_ids: set[str]) -> list[dict]:
@@ -117,7 +128,9 @@ def make_entries(items: list[dict], req: dict, topic: dict, existing_ids: set[st
             pid = f"{when:%Y-%m-%d}-g{n}"
         existing_ids.add(pid)
         long_t, short_t = str(it.get("text_long", "")).strip(), str(it.get("text_short", "")).strip()
-        texts = {"facebook": long_t, "instagram": long_t, "telegram": long_t, "threads": short_t or long_t}
+        x_t = str(it.get("text_x", "")).strip() or clip(short_t or long_t, 275)
+        texts = {"facebook": long_t, "instagram": long_t, "telegram": long_t,
+                 "threads": short_t or long_t, "x": x_t}
         entry = {
             "id": pid, "approved": False, "publish_at": f"{when:%Y-%m-%d %H:%M}",
             "template": ("carousel" if req.get("style") == "carousel" else "infographic" if req.get("style") == "infographic" else (req.get("template") or "split")),
@@ -145,7 +158,9 @@ def make_entries(items: list[dict], req: dict, topic: dict, existing_ids: set[st
                 img["visual_prompt"] = str(it["visual_prompt"]).strip()
         img["seed"] = 1 + (i * 7) % 90
         entry["image"] = img
-        entry["platforms"] = {p: texts[p][:480] if p == "threads" else texts[p] for p in platforms if texts.get(p)}
+        caps = {"threads": 480, "x": 280}
+        entry["platforms"] = {p: clip(texts[p], caps[p]) if p in caps else texts[p]
+                              for p in platforms if texts.get(p)}
         out.append(entry)
     return out
 

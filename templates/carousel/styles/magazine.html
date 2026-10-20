@@ -1,0 +1,61 @@
+{% extends "carousel/base.html" %}
+{# نمط «غلاف مجلّة»: صورة تملأ الشريحة، تدرّج يحمي النص، عنوان ضخم في الأسفل.
+   يناسب: القصص، التجارب الشخصية، المحتوى الذي يحتاج وجهاً أو مشهداً حيّاً. #}
+
+{% block style %}
+.slide{ padding:0; background:var(--navy); color:#FFF8EE }
+
+.ph{ position:absolute; inset:0; background:
+     linear-gradient(135deg, var(--navy), #123046 55%, var(--teal)) }
+.ph img{ width:100%; height:100%; object-fit:cover; display:block }
+/* حجاب يحمي قراءة النص دون أن يطفئ الصورة */
+.veil{ position:absolute; inset:0; background:
+       linear-gradient(to top, rgba(8,16,28,.93) 0%, rgba(8,16,28,.78) 32%,
+                               rgba(8,16,28,.22) 62%, rgba(8,16,28,.45) 100%) }
+.cta .veil{ background:linear-gradient(to top, rgba(140,42,24,.95), rgba(200,69,43,.72) 55%, rgba(200,69,43,.5)) }
+
+.wrap{ position:relative; flex:1; min-height:0; display:flex; flex-direction:column; padding:62px 66px 58px }
+.top{ display:flex; justify-content:space-between; align-items:flex-start; font-size:27px; font-weight:700; direction:ltr }
+.top .name{ direction:rtl; text-shadow:0 2px 12px rgba(0,0,0,.5) }
+.badge{ background:var(--accent); color:#1A1206; border-radius:100px; padding:.34em .95em; font-weight:800 }
+
+.inner{ margin:auto 0 0 }                 /* النص يستقرّ أسفل الصورة */
+.kicker{ display:inline-block; background:var(--kick); color:#FFF2EE; border-radius:6px;
+         padding:.3em .8em; font-size:.46em; font-weight:800; letter-spacing:.04em; margin-bottom:.6em }
+.title{ font-weight:800; line-height:1.22; font-size:1.95em; word-spacing:.06em;
+        text-shadow:0 4px 26px rgba(0,0,0,.55) }
+.cover .title{ font-size:2.25em }
+.sub{ margin-top:.6em; font-size:.6em; line-height:1.75; font-weight:600; opacity:.94;
+      text-shadow:0 2px 14px rgba(0,0,0,.5); max-width:94% }
+.pts{ margin-top:.95em; display:flex; flex-direction:column; gap:.42em }
+.pts li{ display:flex; gap:.55em; align-items:flex-start; font-size:.56em; line-height:1.55; font-weight:700;
+         background:rgba(255,248,238,.14); border-inline-start:5px solid var(--accent);
+         border-radius:0 12px 12px 0; padding:.45em .7em }
+
+.foot{ display:flex; justify-content:space-between; align-items:center; margin-top:34px;
+       font-size:26px; font-weight:700; direction:ltr; opacity:.92 }
+.foot .who{ direction:rtl; border:2.5px solid currentColor; border-radius:100px; padding:.3em .95em }
+{% endblock %}
+
+{% block slide %}
+<div class="slide {{ theme }} {{ kind }}">
+  <div class="ph">{% if photo %}<img src="{{ photo }}" alt="">{% endif %}</div>
+  <div class="veil"></div>
+  <div class="wrap">
+    <div class="top">
+      <span class="badge">{{ '%02d' % index }}/{{ '%02d' % total }}</span>
+      <span class="name">{{ brand.name }}</span>
+    </div>
+    <div class="body-area" id="area"><div class="inner" id="inner">
+      {% if kicker %}<div class="kicker">{{ kicker }}</div>{% endif %}
+      <div class="title">{{ title }}</div>
+      {% if body %}<div class="sub">{{ body }}</div>{% endif %}
+      {% if points %}<ul class="pts">{% for p in points %}<li><span>{{ p }}</span></li>{% endfor %}</ul>{% endif %}
+    </div></div>
+    <div class="foot">
+      <span>{{ brand.handle }}</span>
+      <span class="who">{% if index < total %}اسحب ←{% else %}احفظ ✓{% endif %}</span>
+    </div>
+  </div>
+</div>
+{% endblock %}
