@@ -87,9 +87,12 @@ class Renderer:
         return outs
 
     def render_post(self, post: dict, out_dir: Path, bg: Path | None = None) -> list[Path]:
-        """كل صور المنشور: صورة واحدة أو كل شرائح الكاروسيل."""
+        """مخرجات المنشور: صورة واحدة، أو شرائح الكاروسيل، أو ملف فيديو الريل."""
         if post["template"] == "carousel":
             return self.render_slides(post, out_dir)
+        if post["template"] == "reel":
+            import video
+            return [video.render_reel(self, post, out_dir)]
         return [self.render(post, out_dir / f"{post['id']}.png", bg)]
 
 

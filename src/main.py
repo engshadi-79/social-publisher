@@ -79,19 +79,22 @@ def main() -> int:
             pid = post["id"]
             todo = pending_targets(post, state)
             warns: list[str] = []
-            if post["template"] in ("carousel", "infographic"):
-                bg = None                      # قوالب نصّية بلا خلفية خارجية
+            if post["template"] in ("carousel", "infographic", "reel"):
+                bg = None                      # قوالب تبني صورها بنفسها
             elif args.dry_run:
                 bg = imagegen.post_bg_path(post)
                 bg = bg if bg.exists() else None
             else:
                 bg, warns = imagegen.ensure_background(post)
             pngs = r.render_post(post, OUT_DIR, bg)
-            jpgs = []
-            for f in pngs:
-                j = f.with_suffix(".jpg")
-                Image.open(f).convert("RGB").save(j, quality=92)
-                jpgs.append(j)
+            if post["template"] == "reel":          # ملف واحد، ولا تحويل: يُرفع كما هو
+                jpgs = list(pngs)
+            else:
+                jpgs = []
+                for f in pngs:
+                    j = f.with_suffix(".jpg")
+                    Image.open(f).convert("RGB").save(j, quality=92)
+                    jpgs.append(j)
             png, jpg = pngs[0], jpgs[0]
             post["_files"] = pngs              # للمنصات التي ترفع الملفات (تيليجرام)
             print(f"[{pid}] صور: {len(pngs)}  أهداف: {', '.join(t.key for t in todo)}")

@@ -100,6 +100,19 @@ def validate(queue: list[dict]) -> list[str]:
                         errors.append(f"{tag} الشريحة {n}: العنوان أو النص أطول من المسموح")
                     elif len(s_.get("points") or []) > 5:
                         errors.append(f"{tag} الشريحة {n}: أكثر من 5 نقاط")
+        elif p.get("template") == "reel":
+            sc = img.get("scenes")
+            if not (isinstance(sc, list) and 3 <= len(sc) <= 8):
+                errors.append(f"{tag} الريل يحتاج image.scenes من 3 إلى 8 مشاهد")
+            else:
+                for n, s_ in enumerate(sc, 1):
+                    if not (isinstance(s_, dict) and str(s_.get("title", "")).strip()):
+                        errors.append(f"{tag} المشهد {n} بلا عنوان")
+                    elif len(str(s_["title"])) > 70 or len(str(s_.get("body", ""))) > 150:
+                        errors.append(f"{tag} المشهد {n}: العنوان أطول من 70 حرفاً أو النص من 150 "
+                                      f"(الفيديو يُقرأ في ثوانٍ، فالنص القصير شرط لا تحسين)")
+                    elif not (1.5 <= float(s_.get("seconds") or 3.6) <= 8):
+                        errors.append(f"{tag} المشهد {n}: مدّة خارج المدى المسموح (1.5 إلى 8 ثوانٍ)")
         elif p.get("template") == "infographic":
             pts = img.get("points")
             if not (isinstance(pts, list) and 2 <= len(pts) <= 6 and all(isinstance(x, str) and x.strip() for x in pts)):

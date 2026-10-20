@@ -38,12 +38,12 @@ def main() -> int:
             if args.no_gen:
                 bg = imagegen.post_bg_path(p)
                 bg, warns = (bg if bg.exists() else None), []
-            elif p["template"] in ("carousel", "infographic"):
+            elif p["template"] in ("carousel", "infographic", "reel"):
                 bg, warns = None, []
             else:
                 bg, warns = imagegen.ensure_background(p, regen=args.regen == "all" or p["id"] == args.regen, seed=args.seed)
             outs = r.render_post(p, OUT_DIR, bg)
-            print(f"{p['id']}: {len(outs)} صورة" + ("" if bg or p["template"] in ("carousel", "infographic") else "  (خلفية متدرجة)"))
+            print(f"{p['id']}: {len(outs)} صورة" + ("" if bg or p["template"] in ("carousel", "infographic", "reel") else "  (خلفية متدرجة)"))
             for w in warns:
                 print("  ⚠️", w)
     return 0

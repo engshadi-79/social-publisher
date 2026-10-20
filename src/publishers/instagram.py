@@ -30,6 +30,14 @@ class Instagram(Publisher):
         uid, tok = c["user_id"], c["token"]
         base = f"https://graph.facebook.com/{GRAPH_VERSION}"
         urls = post.get("_urls") or []
+        if post["template"] == "reel":
+            data = {"media_type": "REELS", "video_url": image_url,
+                    "caption": text, "share_to_feed": "true", "access_token": tok}
+            cid = check(requests.post(f"{base}/{uid}/media", data=data, timeout=120), "instagram reel")["id"]
+            _wait_finished(base, cid, tok, "الفيديو")
+            pub = check(requests.post(f"{base}/{uid}/media_publish", timeout=120,
+                                      data={"creation_id": cid, "access_token": tok}), "instagram publish")
+            return str(pub["id"])
         if post["template"] == "carousel" and len(urls) >= 2:
             kids = []
             for i, u in enumerate(urls[:10], 1):               # الحد الأقصى في إنستغرام 10

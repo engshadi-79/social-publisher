@@ -16,6 +16,11 @@ class Facebook(Publisher):
         page, tok = c["page_id"], c["token"]
         base = f"https://graph.facebook.com/{GRAPH_VERSION}/{page}"
         urls = post.get("_urls") or []
+        if post["template"] == "reel":
+            d = check(requests.post(f"{base}/videos", timeout=300,
+                                    data={"file_url": image_url, "description": text,
+                                          "access_token": tok}), "facebook videos")
+            return str(d.get("post_id") or d["id"])
         if post["template"] == "carousel" and len(urls) >= 2:
             # ألبوم: ارفع كل صورة غير منشورة ثم أنشئ منشوراً واحداً يرفقها كلها
             data = {"message": text, "access_token": tok}

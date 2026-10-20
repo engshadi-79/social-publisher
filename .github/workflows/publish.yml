@@ -43,6 +43,8 @@ jobs:
         if: steps.pw.outputs.cache-hit != 'true'
       - run: playwright install-deps chromium
         if: steps.pw.outputs.cache-hit == 'true'
+      - name: Ensure ffmpeg
+        run: command -v ffmpeg >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg; }
       - name: Publish
         working-directory: src
         env:

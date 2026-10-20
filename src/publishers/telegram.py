@@ -16,6 +16,18 @@ class Telegram(Publisher):
         api = f"https://api.telegram.org/bot{tok}"
         short = len(text) <= 1024
         files = post.get("_files") or []
+        if post["template"] == "reel":
+            with open(image_path, "rb") as f:
+                r = requests.post(f"{api}/sendVideo", timeout=300,
+                                  data={"chat_id": chat, "supports_streaming": "true",
+                                        **({"caption": text} if short else {})},
+                                  files={"video": f})
+            first = check(r, "telegram sendVideo")["result"]
+            if not short:
+                r2 = requests.post(f"{api}/sendMessage", timeout=30, json={
+                    "chat_id": chat, "text": text, "reply_to_message_id": first["message_id"]})
+                check(r2, "telegram sendMessage")
+            return str(first["message_id"])
         if post["template"] == "carousel" and len(files) >= 2:
             media, handles = [], {}
             try:

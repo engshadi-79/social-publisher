@@ -35,7 +35,7 @@ def slide_photo_path(post_id: str, index: int) -> Path:
     return MEDIA_DIR / f"{post_id}-s{index:02d}.jpg"
 
 
-def ensure_slide_photos(post: dict, regen: bool = False) -> tuple[dict[int, Path], list[str]]:
+def ensure_slide_photos(post: dict, regen: bool = False, key: str = "slides") -> tuple[dict[int, Path], list[str]]:
     """صورة فوتوغرافية حقيقية لكل شريحة من شرائح الكاروسيل.
 
     تأخذ `photo_query` من الشريحة، وإلا من المنشور. تُخزَّن تحت content/media
@@ -45,17 +45,19 @@ def ensure_slide_photos(post: dict, regen: bool = False) -> tuple[dict[int, Path
     warnings: list[str] = []
     found: dict[int, Path] = {}
     img = post.get("image") or {}
-    slides = img.get("slides") or []
+    slides = img.get(key) or []
     base_query = str(img.get("photo_query") or "").strip()
     src_id = img.get("bg_from") or post["id"]
     size = TEMPLATES["carousel"]
     for i, s in enumerate(slides, 1):
-        query = str((s or {}).get("photo_query") or "").strip() or base_query
-        if not query:
-            continue
         path = slide_photo_path(src_id, i)
+        # الصورة المحفوظة تُستعمل ولو لم تبقَ كلمات بحث: النسخ وإعادات النشر
+        # تشير بـ bg_from إلى صور منشور آخر، ولا تحمل استعلاماً خاصاً بها.
         if path.exists() and not regen:
             found[i] = path
+            continue
+        query = str((s or {}).get("photo_query") or "").strip() or base_query
+        if not query:
             continue
         # ترتيب مختلف لكل شريحة حتى لا تتكرّر الصورة نفسها عبر الشرائح
         pick = int(img.get("seed") or 0) + i * 3

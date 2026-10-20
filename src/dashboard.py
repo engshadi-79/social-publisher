@@ -155,7 +155,11 @@ def main() -> int:
         for it in items:
             post = by_id[it["id"]]
             bg = imagegen.post_bg_path(post)
-            pngs = r.render_post(post, OUT_DIR / "_tmp", bg if bg.exists() else None)
+            if post["template"] == "reel":      # لقطة غلاف بدل بناء الفيديو كاملاً
+                import video
+                pngs = [video.render_poster(r, post, OUT_DIR / "_tmp" / f"{post['id']}-poster.png")]
+            else:
+                pngs = r.render_post(post, OUT_DIR / "_tmp", bg if bg.exists() else None)
             fulls = []
             for n, png in enumerate(pngs, 1):
                 im = Image.open(png).convert("RGB")

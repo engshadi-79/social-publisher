@@ -71,7 +71,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
   <h2 id="eHead">تعديل منشور</h2><div class="hint" id="eNote"></div>
   {% if topics %}<label>الموضوع</label><select id="eTopic"><option value="">— اختر —</option>{% for t in topics %}<option value="{{ t.id }}">{{ t.name }}</option>{% endfor %}</select>{% endif %}
   <label>شكل الصورة</label>
-  <select id="eTemplate"><option value="carousel">كاروسيل</option><option value="infographic">إنفوجرافك</option><option value="split">صورة + لوحة نص</option><option value="photo">صورة كاملة</option><option value="tip">نصيحة</option><option value="quote">اقتباس</option><option value="announcement">إعلان</option><option value="story">ستوري</option></select>
+  <select id="eTemplate"><option value="carousel">كاروسيل</option><option value="reel">ريل (فيديو عمودي)</option><option value="infographic">إنفوجرافك</option><option value="split">صورة + لوحة نص</option><option value="photo">صورة كاملة</option><option value="tip">نصيحة</option><option value="quote">اقتباس</option><option value="announcement">إعلان</option><option value="story">ستوري</option></select>
   <label>العنوان على الصورة *</label><input id="eTitle">
   <label>النص الصغير</label><input id="eBody">
   <label>شرائح الكاروسيل (انظر التنسيق في نموذج الإضافة)</label><textarea id="eSlides" rows="10"></textarea>

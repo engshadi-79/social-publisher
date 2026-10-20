@@ -87,6 +87,7 @@ Extra secrets: `CF_ACCOUNT_ID`, `CF_API_TOKEN` (token with Workers AI permission
 │   ├── photo/      (1080x1350)  full photo, light gradient, text at the bottom
 │   ├── infographic/ (1080x1350) numbered key points (image.points)
 │   ├── carousel/   (1080x1350)  multi-slide album: image.slides (3-10); six visual styles in carousel/styles/
+│   ├── reel/       (1080x1920)  vertical VIDEO: image.scenes (3-8), built by src/video.py
 │   ├── tip/        (1080x1350)
 │   └── story/      (1080x1920)
 ├── content/
@@ -95,6 +96,7 @@ Extra secrets: `CF_ACCOUNT_ID`, `CF_API_TOKEN` (token with Workers AI permission
 ├── src/
 │   ├── main.py               # entry: find due posts, render, publish, record state
 │   ├── render.py             # HTML -> PNG via Playwright
+│   ├── video.py              # HTML -> frames -> MP4 via Playwright + ffmpeg
 │   ├── hosting.py            # push PNG to gh-pages, return public URL
 │   ├── publishers/
 │   │   ├── base.py
@@ -173,6 +175,29 @@ Extra secrets: `CF_ACCOUNT_ID`, `CF_API_TOKEN` (token with Workers AI permission
   1024 chars; if longer, send photo then text as a reply.
 - Pin the Graph API version in one config constant.
 - Respect rate limits; add small delays between platforms.
+
+## Video posts (`reel` template)
+There is NO free AI text-to-video API (every option is trial credits or paid), and the
+zero-cost rule stands, so a reel is **motion design, not generated footage**: the brand's own
+scene template animated over a real stock photo. The AI writes the script and picks the photo
+query; it never generates the frames. Never describe it to the owner as AI-generated video.
+
+- `image.scenes`: 3–8 scenes, each `{kicker, title (≤70 chars), body (≤150), seconds (1.5–8),
+  photo_query}`. Short text is a hard requirement, not a style preference: a viewer reads a
+  scene in ~3 seconds.
+- `src/video.py` captures frames one by one by calling `window.seek(t)` in the page before each
+  screenshot — the animation is computed in JS, never with CSS animations, so the same post
+  always produces the identical video regardless of machine speed.
+- Frames are JPEG, not PNG: PNG encoding measured 691 ms/frame versus 111 ms, six times slower.
+  20 fps, H.264 + yuv420p + faststart — the one encoding all five platforms accept.
+- The dashboard shows a poster frame (`render_poster`, ~2 s) instead of building the whole
+  video (~90 s) for every preview.
+- Publishing: Telegram `sendVideo` (file upload) · Facebook `/{page}/videos` with `file_url` ·
+  Instagram `media_type=REELS` + `video_url` · Threads `media_type=VIDEO` ·
+  LinkedIn `feedshare-video` recipe then `shareMediaCategory: VIDEO`.
+  Instagram, Threads and Facebook need the public gh-pages URL, so the MP4 is uploaded there
+  unchanged (no JPEG conversion).
+- `publish.yml` installs ffmpeg if the runner lacks it.
 
 ## Rendering rules
 - `<html dir="rtl" lang="ar">`, Cairo font loaded via local `@font-face`.

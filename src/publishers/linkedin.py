@@ -33,11 +33,11 @@ def _fail(resp, what: str):
     raise PublishError(f"{what}: HTTP {resp.status_code} {(msg or resp.text)[:300]}")
 
 
-def _upload(token: str, author: str, path: Path) -> str:
-    """يسجّل الصورة ثم يرفع بايتاتها، ويرجع معرّف الأصل (asset URN)."""
+def _upload(token: str, author: str, path: Path, kind: str = "image") -> str:
+    """يسجّل الوسيط ثم يرفع بايتاته، ويرجع معرّف الأصل (asset URN)."""
     r = requests.post(f"{API}/assets?action=registerUpload", timeout=60, headers=_headers(token),
                       json={"registerUploadRequest": {
-                          "recipes": ["urn:li:digitalmediaRecipe:feedshare-image"],
+                          "recipes": [f"urn:li:digitalmediaRecipe:feedshare-{kind}"],
                           "owner": author,
                           "serviceRelationships": [{"relationshipType": "OWNER",
                                                     "identifier": "urn:li:userGeneratedContent"}]}})
@@ -51,7 +51,7 @@ def _upload(token: str, author: str, path: Path) -> str:
         raise PublishError("linkedin registerUpload: لا رابط رفع في الرد") from None
     if not asset:
         raise PublishError("linkedin registerUpload: لا معرّف أصل في الرد")
-    up = requests.put(url, data=path.read_bytes(), timeout=180,
+    up = requests.put(url, data=path.read_bytes(), timeout=600,
                       headers={"Authorization": f"Bearer {token}", "Content-Type": "application/octet-stream"})
     if up.status_code >= 400:
         _fail(up, "linkedin رفع الصورة")
@@ -65,15 +65,20 @@ class LinkedIn(Publisher):
     def publish(self, post, text, image_path, image_url, acct=None):
         c = creds_for("linkedin", acct)
         token, author = c["token"], c["author_urn"]
-        files = post.get("_files") or [image_path]
-        media = [{"status": "READY", "media": _upload(token, author, Path(f))}
-                 for f in files[:MAX_MEDIA]]
+        if post["template"] == "reel":
+            category = "VIDEO"
+            media = [{"status": "READY", "media": _upload(token, author, Path(image_path), "video")}]
+        else:
+            category = "IMAGE"
+            files = post.get("_files") or [image_path]
+            media = [{"status": "READY", "media": _upload(token, author, Path(f))}
+                     for f in files[:MAX_MEDIA]]
         body = {
             "author": author,
             "lifecycleState": "PUBLISHED",
             "specificContent": {"com.linkedin.ugc.ShareContent": {
                 "shareCommentary": {"text": text},
-                "shareMediaCategory": "IMAGE",
+                "shareMediaCategory": category,
                 "media": media,
             }},
             "visibility": {"com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC"},
