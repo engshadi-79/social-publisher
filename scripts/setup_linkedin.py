@@ -10,6 +10,7 @@ import json
 import subprocess
 import sys
 import urllib.parse
+import webbrowser
 from datetime import date
 from pathlib import Path
 
@@ -40,6 +41,14 @@ def check(r, what):
 
 
 def main():
+    sys.stdout.reconfigure(encoding="utf-8")
+    print("قبل أن تبدأ، في linkedin.com/developers:")
+    print("  1. Create app (تُربط بصفحة شركة، والنشر يبقى على حسابك الشخصي).")
+    print("  2. تبويب Products: أضف «Share on LinkedIn» و«Sign In with LinkedIn using OpenID Connect».")
+    print("  3. تبويب Auth ثم Authorized redirect URLs، أضف هذا الرابط بالضبط:")
+    print(f"     {REDIRECT}")
+    print("  4. من تبويب Auth انسخ Client ID و Client Secret.")
+    print("")
     client_id = input("LinkedIn Client ID: ").strip()
     client_secret = getpass.getpass("LinkedIn Client Secret (مخفي): ").strip()
 
@@ -48,6 +57,10 @@ def main():
         "scope": SCOPES, "state": "shadi"})
     print("\nافتح هذا الرابط ووافق، ثم انسخ رابط الصفحة التي حُوّلت إليها كاملاً:")
     print(url + "\n")
+    try:
+        webbrowser.open(url)        # توفيراً لخطوة نسخ الرابط ولصقه
+    except Exception:  # noqa: BLE001
+        pass
     code = input("الرابط أو قيمة code: ").strip()
     if "code=" in code:
         code = urllib.parse.parse_qs(urllib.parse.urlparse(code).query).get("code", [code])[0]
