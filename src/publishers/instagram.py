@@ -26,9 +26,10 @@ class Instagram(Publisher):
     name = "instagram"
 
     def publish(self, post, text, image_path, image_url):
-        uid, tok = os.environ.get("IG_USER_ID"), os.environ.get("FB_PAGE_TOKEN")
+        uid = os.environ.get("IG_USER_ID")
+        tok = os.environ.get("IG_PAGE_TOKEN") or os.environ.get("FB_PAGE_TOKEN")   # توكن صفحة الحساب المربوط (قد تختلف عن صفحة فيسبوك)
         if not (uid and tok):
-            raise PublishError("IG_USER_ID/FB_PAGE_TOKEN غير مضبوطين")
+            raise PublishError("IG_USER_ID وتوكن الصفحة (IG_PAGE_TOKEN أو FB_PAGE_TOKEN) غير مضبوطين")
         base = f"https://graph.facebook.com/{GRAPH_VERSION}"
         urls = post.get("_urls") or []
         if post["template"] == "carousel" and len(urls) >= 2:

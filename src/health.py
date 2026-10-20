@@ -13,7 +13,7 @@ from config import GRAPH_VERSION, ROOT, THREADS_VERSION
 
 OUT = ROOT / "content" / "health.json"
 DATES = ROOT / "content" / "token_dates.json"
-SECRETS = ("FB_PAGE_TOKEN", "THREADS_TOKEN", "TELEGRAM_BOT_TOKEN", "CF_API_TOKEN", "GH_PAT",
+SECRETS = ("FB_PAGE_TOKEN", "IG_PAGE_TOKEN", "THREADS_TOKEN", "TELEGRAM_BOT_TOKEN", "CF_API_TOKEN", "GH_PAT",
            "GEMINI_API_KEY", "PEXELS_API_KEY", "PIXABAY_API_KEY", "GITHUB_TOKEN")
 THREADS_LIFETIME_DAYS = 60
 
@@ -91,9 +91,9 @@ def main() -> int:
     items = [
         graph_check("فيسبوك", ["FB_PAGE_ID", "FB_PAGE_TOKEN"], f"https://graph.facebook.com/{GRAPH_VERSION}/{fb}",
                     {"fields": "name", "access_token": os.environ.get("FB_PAGE_TOKEN", "")}, "name"),
-        graph_check("إنستغرام", ["IG_USER_ID", "FB_PAGE_TOKEN"],
+        graph_check("إنستغرام", ["IG_USER_ID"] + (["IG_PAGE_TOKEN"] if os.environ.get("IG_PAGE_TOKEN") else ["FB_PAGE_TOKEN"]),
                     f"https://graph.facebook.com/{GRAPH_VERSION}/{os.environ.get('IG_USER_ID')}",
-                    {"fields": "username", "access_token": os.environ.get("FB_PAGE_TOKEN", "")}, "username"),
+                    {"fields": "username", "access_token": os.environ.get("IG_PAGE_TOKEN") or os.environ.get("FB_PAGE_TOKEN", "")}, "username"),
         graph_check("ثريدز", ["THREADS_USER_ID", "THREADS_TOKEN"], f"https://graph.threads.net/{THREADS_VERSION}/me",
                     {"fields": "username", "access_token": os.environ.get("THREADS_TOKEN", "")}, "username"),
         threads_expiry(),
