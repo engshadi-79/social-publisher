@@ -41,7 +41,7 @@ async function deleteBg(id) {
 }
 
 // ---------- نافذة التعديل ----------
-const PLATS = ["facebook", "instagram", "threads", "x", "telegram"];
+const PLATS = ["facebook", "instagram", "threads", "telegram"];
 let editId = null;
 function openEdit(id) {
   const p = POSTS[id]; if (!p) return;
@@ -66,7 +66,6 @@ $("eSave").onclick = async () => {
     !v("eWhen") ? "اختر الموعد." : (tpl === "infographic" && (points.length < 2 || points.length > 6)) ? "الإنفوجرافك يحتاج من 2 إلى 6 نقاط." :
     (tpl !== "infographic" && tpl !== "carousel" && !(v("eQuery") || v("eVP"))) ? "اكتب كلمات إنجليزية للصورة." :
     (platforms.threads && platforms.threads.length > 500) ? "نص ثريدز أطول من 500 حرف." :
-    (platforms.x && platforms.x.length > 280) ? "نص X أطول من 280 حرفاً." :
     (platforms.instagram && platforms.instagram.length > 2200) ? "نص إنستغرام أطول من 2200 حرف." :
     ($("eTopic") && !v("eTopic")) ? "اختر الموضوع." : "";
   if (err) { say(m, err, false); return; }

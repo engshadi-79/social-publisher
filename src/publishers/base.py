@@ -6,8 +6,7 @@ class PublishError(Exception):
 
 
 REQUIRED = {"facebook": ("page_id", "token"), "instagram": ("user_id", "token"),
-            "threads": ("user_id", "token"), "telegram": ("token", "chat_id"),
-            "x": ("api_key", "api_secret", "access_token", "access_secret")}
+            "threads": ("user_id", "token"), "telegram": ("token", "chat_id")}
 
 
 def creds_for(platform: str, acct=None) -> dict:

@@ -15,8 +15,7 @@ from config import GRAPH_VERSION, ROOT, THREADS_VERSION
 OUT = ROOT / "content" / "health.json"
 DATES = ROOT / "content" / "token_dates.json"
 SECRETS = ("FB_PAGE_TOKEN", "IG_PAGE_TOKEN", "THREADS_TOKEN", "TELEGRAM_BOT_TOKEN", "CF_API_TOKEN", "GH_PAT",
-           "GEMINI_API_KEY", "PEXELS_API_KEY", "PIXABAY_API_KEY", "GITHUB_TOKEN",
-           "X_API_SECRET", "X_ACCESS_TOKEN", "X_ACCESS_SECRET")
+           "GEMINI_API_KEY", "PEXELS_API_KEY", "PIXABAY_API_KEY", "GITHUB_TOKEN")
 THREADS_LIFETIME_DAYS = 60
 
 
@@ -93,8 +92,6 @@ def check_account(a):
     if a.platform == "telegram":
         ok = bool(c.get("token") and c.get("chat_id"))
         return item(a.label, "ok" if ok else "off", "مُعدّ" if ok else "غير مُعدّ بعد (اختياري)")
-    if a.platform == "x":
-        return x_check(a, c)
     need = ("page_id", "token") if a.platform == "facebook" else ("user_id", "token") if a.platform == "instagram" else ("token",)
     if not all(c.get(r) for r in need):
         return item(a.label, "bad", "الأسرار غير مضبوطة")
@@ -104,24 +101,6 @@ def check_account(a):
     if a.platform == "instagram":
         return graph_check(a.label, [], f"https://graph.facebook.com/{GRAPH_VERSION}/{c['user_id']}", {"fields": "username", **tok}, "username")
     return graph_check(a.label, [], f"https://graph.threads.net/{THREADS_VERSION}/me", {"fields": "username", **tok}, "username")
-
-
-def x_check(a, c):
-    """X لا يعمل بتوكن واحد بل بأربعة مفاتيح OAuth 1.0a، فيحتاج فحصاً خاصاً."""
-    need = ("api_key", "api_secret", "access_token", "access_secret")
-    if not all(c.get(r) for r in need):
-        return item(a.label, "off", "غير مُعدّ بعد (اختياري): تنقص مفاتيح X")
-    try:
-        from requests_oauthlib import OAuth1
-        r = requests.get("https://api.x.com/2/users/me", timeout=30,
-                         auth=OAuth1(c["api_key"], c["api_secret"], c["access_token"], c["access_secret"]))
-        d = r.json() if r.content else {}
-        if r.status_code != 200:
-            return item(a.label, "bad", clean(str((d.get("errors") or [{}])[0].get("message")
-                                                  or d.get("detail") or r.text)))
-        return item(a.label, "ok", f"متصل: @{(d.get('data') or {}).get('username', '')}")
-    except Exception as e:  # noqa: BLE001
-        return item(a.label, "bad", clean(f"{type(e).__name__}: {e}"))
 
 
 def main() -> int:

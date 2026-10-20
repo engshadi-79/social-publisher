@@ -38,5 +38,5 @@ CAROUSEL_STYLES_FLAT = ("blueprint", "editorial", "terminal", "poster", "sticky"
 CAROUSEL_STYLES_PHOTO = ("magazine", "polaroid", "collage", "duotone", "window", "filmstrip")
 CAROUSEL_STYLES = CAROUSEL_STYLES_FLAT + CAROUSEL_STYLES_PHOTO
 
-PLATFORMS = ("facebook", "instagram", "threads", "telegram", "x")
-LIMITS = {"threads": 500, "instagram": 2200, "facebook": 63000, "telegram": 4096, "x": 280}
+PLATFORMS = ("facebook", "instagram", "threads", "telegram")
+LIMITS = {"threads": 500, "instagram": 2200, "facebook": 63000, "telegram": 4096}
