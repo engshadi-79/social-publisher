@@ -15,8 +15,9 @@ from config import GRAPH_VERSION, ROOT, THREADS_VERSION
 OUT = ROOT / "content" / "health.json"
 DATES = ROOT / "content" / "token_dates.json"
 SECRETS = ("FB_PAGE_TOKEN", "IG_PAGE_TOKEN", "THREADS_TOKEN", "TELEGRAM_BOT_TOKEN", "CF_API_TOKEN", "GH_PAT",
-           "GEMINI_API_KEY", "PEXELS_API_KEY", "PIXABAY_API_KEY", "GITHUB_TOKEN")
+           "GEMINI_API_KEY", "PEXELS_API_KEY", "PIXABAY_API_KEY", "GITHUB_TOKEN", "LINKEDIN_TOKEN")
 THREADS_LIFETIME_DAYS = 60
+LINKEDIN_LIFETIME_DAYS = 60
 
 
 def clean(msg: str) -> str:
@@ -63,6 +64,24 @@ def threads_expiry():
     return item("صلاحية توكن ثريدز", "ok", f"ينتهي بعد {left} يوماً ويتجدد تلقائياً")
 
 
+def linkedin_expiry():
+    """توكن لينكدإن يعيش 60 يوماً، والتجديد البرمجي مقصور على شركاء MDP،
+    فلا مفرّ من تذكير صاحب الحساب قبل انتهائه."""
+    if not os.environ.get("LINKEDIN_TOKEN"):
+        return item("صلاحية توكن لينكدإن", "off", "لا توكن بعد")
+    try:
+        issued = date.fromisoformat(json.loads(DATES.read_text(encoding="utf-8")).get("linkedin_token_issued", ""))
+    except Exception:  # noqa: BLE001
+        return item("صلاحية توكن لينكدإن", "warn", "تاريخ الإصدار غير معروف")
+    left = LINKEDIN_LIFETIME_DAYS - (date.today() - issued).days
+    how = "جدّده بـ python scripts/setup_linkedin.py"
+    if left <= 3:
+        return item("صلاحية توكن لينكدإن", "bad", f"ينتهي خلال {max(left, 0)} يوم! {how}")
+    if left <= 14:
+        return item("صلاحية توكن لينكدإن", "warn", f"ينتهي بعد {left} يوماً. {how}")
+    return item("صلاحية توكن لينكدإن", "ok", f"ينتهي بعد {left} يوماً (التجديد يدوي)")
+
+
 def publish_runs():
     tok, repo = os.environ.get("GITHUB_TOKEN"), os.environ.get("GITHUB_REPOSITORY")
     if not (tok and repo):
@@ -92,6 +111,17 @@ def check_account(a):
     if a.platform == "telegram":
         ok = bool(c.get("token") and c.get("chat_id"))
         return item(a.label, "ok" if ok else "off", "مُعدّ" if ok else "غير مُعدّ بعد (اختياري)")
+    if a.platform == "linkedin":
+        if not (c.get("token") and c.get("author_urn")):
+            return item(a.label, "off", "غير مُعدّ بعد (اختياري): شغّل scripts/setup_linkedin.py")
+        try:
+            r = requests.get("https://api.linkedin.com/v2/userinfo", timeout=30,
+                             headers={"Authorization": f"Bearer {c['token']}"})
+            if r.status_code != 200:
+                return item(a.label, "bad", clean(str((r.json() if r.content else {}).get("message") or r.text)))
+            return item(a.label, "ok", f"متصل: {(r.json() or {}).get('name', '')}")
+        except Exception as e:  # noqa: BLE001
+            return item(a.label, "bad", clean(f"{type(e).__name__}: {e}"))
     need = ("page_id", "token") if a.platform == "facebook" else ("user_id", "token") if a.platform == "instagram" else ("token",)
     if not all(c.get(r) for r in need):
         return item(a.label, "bad", "الأسرار غير مضبوطة")
@@ -108,6 +138,7 @@ def main() -> int:
     items = [check_account(a) for a in load_accounts().values()]
     items += [
         threads_expiry(),
+        linkedin_expiry(),
         item("توليد النصوص (Gemini)", "ok" if os.environ.get("GEMINI_API_KEY") else "off",
              "مفتاح موجود" if os.environ.get("GEMINI_API_KEY") else "لا مفتاح: زر التوليد لن يعمل"),
         item("صور حقيقية", "ok", "Pixabay" if os.environ.get("PIXABAY_API_KEY") else

@@ -127,7 +127,8 @@ def make_entries(items: list[dict], req: dict, topic: dict, existing_ids: set[st
             pid = f"{when:%Y-%m-%d}-g{n}"
         existing_ids.add(pid)
         long_t, short_t = str(it.get("text_long", "")).strip(), str(it.get("text_short", "")).strip()
-        texts = {"facebook": long_t, "instagram": long_t, "telegram": long_t, "threads": short_t or long_t}
+        texts = {"facebook": long_t, "instagram": long_t, "telegram": long_t,
+                 "linkedin": long_t, "threads": short_t or long_t}
         entry = {
             "id": pid, "approved": False, "publish_at": f"{when:%Y-%m-%d %H:%M}",
             "template": ("carousel" if req.get("style") == "carousel" else "infographic" if req.get("style") == "infographic" else (req.get("template") or "split")),

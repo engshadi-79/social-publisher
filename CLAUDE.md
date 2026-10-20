@@ -6,6 +6,7 @@ Build a fully free, cloud-hosted system that automatically publishes scheduled p
 - Facebook Page
 - Instagram (Business/Creator account linked to the Facebook Page)
 - Threads
+- LinkedIn (personal profile, via the free self-serve Share on LinkedIn product)
 - Telegram channel
 
 No paid services. No always-on server. Everything runs on GitHub Actions.
@@ -100,6 +101,7 @@ Extra secrets: `CF_ACCOUNT_ID`, `CF_API_TOKEN` (token with Workers AI permission
 │   │   ├── facebook.py
 │   │   ├── instagram.py
 │   │   ├── threads.py
+│   │   ├── linkedin.py
 │   │   └── telegram.py
 │   ├── notify.py             # send success/failure summary to owner's private Telegram chat
 │   ├── refresh_tokens.py     # refresh Threads long-lived token
@@ -128,6 +130,7 @@ Extra secrets: `CF_ACCOUNT_ID`, `CF_API_TOKEN` (token with Workers AI permission
     facebook: "النص الكامل لفيسبوك مع الهاشتاقات"
     instagram: "نص إنستغرام مع الهاشتاقات"
     threads: "نص ثريدز (500 حرف كحد أقصى)"
+    linkedin: "نص لينكدإن (3000 حرف كحد أقصى)"
     telegram: "نص تيليجرام"
 ```
 - A platform key that is missing means: skip that platform for this post.
@@ -155,6 +158,17 @@ Extra secrets: `CF_ACCOUNT_ID`, `CF_API_TOKEN` (token with Workers AI permission
   text) → wait for processing → `POST /{user-id}/threads_publish`. Long-lived token lasts
   60 days: `refresh-tokens.yml` refreshes it weekly via `th_refresh_token` and updates the
   GitHub Secret using `gh secret set` with a fine-grained PAT stored as `GH_PAT`.
+- **LinkedIn**: the free self-serve **Share on LinkedIn** product (scope `w_member_social`,
+  no partner review). Per image: `POST /v2/assets?action=registerUpload` → PUT the bytes to
+  the returned `uploadUrl` → collect the asset URN; then `POST /v2/ugcPosts` with
+  `shareMediaCategory: IMAGE` and every asset in `media[]` (max 9). The post id comes back in
+  the `x-restli-id` response header, not the body. Deliberately NOT the newer `/rest/posts`:
+  its `commentary` field requires backslash-escaping `#`, `(`, `)`, `_` and more, which would
+  mangle our Arabic hashtags. Author is `LINKEDIN_AUTHOR_URN` — switch it to
+  `urn:li:organization:<id>` to post to a company page (needs Community Management approval,
+  no code change). Limits: 3000 chars, 9 images, 150 requests/day per member.
+  Token lives 60 days and programmatic refresh is MDP-partners-only, so the owner must re-run
+  `scripts/setup_linkedin.py` every two months; `health.py` warns from 14 days out.
 - **Telegram**: Bot API `sendPhoto` to the channel (`@channel` or numeric id), caption up to
   1024 chars; if longer, send photo then text as a reply.
 - Pin the Graph API version in one config constant.
@@ -176,6 +190,7 @@ Extra secrets: `CF_ACCOUNT_ID`, `CF_API_TOKEN` (token with Workers AI permission
 ## Secrets (GitHub Actions)
 `FB_PAGE_ID`, `FB_PAGE_TOKEN`, `IG_USER_ID`, `THREADS_USER_ID`, `THREADS_TOKEN`,
 `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHANNEL_ID`, `TELEGRAM_OWNER_CHAT_ID`, `GH_PAT`,
+`LINKEDIN_TOKEN`, `LINKEDIN_AUTHOR_URN` (optional: without them LinkedIn is skipped),
 `GEMINI_API_KEY` (text generation for the dashboard Generate button works on the free tier; image generation needs a paid project), optional `PEXELS_API_KEY` / `PIXABAY_API_KEY` (free, real photos).
 
 ## Weekly content workflow (done by Claude Code with the owner)

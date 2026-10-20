@@ -36,7 +36,33 @@
 4. `GET https://graph.threads.net/v1.0/me?fields=id&access_token=...` ← `THREADS_USER_ID`.
 5. `refresh-tokens.yml` يجدّد التوكن كل أسبوع تلقائياً ويحدّث السرّ (يلزمه `GH_PAT`).
 
-## 5) Cloudflare (خلفيات الذكاء الاصطناعي، مجاني بلا بطاقة)
+## 5) لينكدإن (مجاني بالكامل)
+
+منتج **Share on LinkedIn** ذاتي الخدمة: بلا رسوم وبلا مراجعة شراكة، يُفعَّل فوراً وينشر
+على حسابك الشخصي.
+
+1. linkedin.com/developers ← Create app (يطلب ربطها بصفحة شركة، وهذا شرط إنشاء التطبيق
+   فقط؛ النشر سيكون على حسابك الشخصي).
+2. تبويب **Products** ← أضف **Share on LinkedIn** و**Sign In with LinkedIn using OpenID
+   Connect**. يُمنحان فوراً.
+3. تبويب **Auth** ← أضف في Authorized redirect URLs الرابط:
+   `https://engshadi-79.github.io/social-publisher/`
+4. شغّل: `python scripts/setup_linkedin.py` — يفتح لك رابط الموافقة، ثم يضبط السرّين
+   `LINKEDIN_TOKEN` و`LINKEDIN_AUTHOR_URN` ويسجّل تاريخ الإصدار. ادفع
+   `content/token_dates.json` بعدها.
+
+⚠️ **التوكن يعيش 60 يوماً فقط.** التجديد البرمجي مقصور على شركاء MDP المعتمدين، فلا سبيل
+إلى تجديد تلقائي مثل ثريدز: أعد تشغيل `scripts/setup_linkedin.py` كل شهرين. تُنبّهك اللوحة
+قبل أسبوعين من الانتهاء، وتصيح قبل ثلاثة أيام.
+
+الحدود: 3000 حرف للنص، و9 صور للمنشور الواحد. المنشور الذي لا يحمل مفتاح `linkedin` في
+`platforms` لا يمرّ على لينكدإن أصلاً.
+
+للنشر على **صفحة شركة** بدل حسابك الشخصي: يلزم منتج Community Management API وموافقة من
+لينكدإن (مجاني أيضاً لكن بمراجعة). بعدها يكفي تغيير `LINKEDIN_AUTHOR_URN` إلى
+`urn:li:organization:<رقم الصفحة>` دون أي تعديل في الكود.
+
+## 6) Cloudflare (خلفيات الذكاء الاصطناعي، مجاني بلا بطاقة)
 dash.cloudflare.com ← Workers AI ← انسخ Account ID → `CF_ACCOUNT_ID`، وأنشئ API Token بصلاحية **Workers AI** فقط → `CF_API_TOKEN`. بدونهما يُستعمل Pollinations ثم خلفية متدرجة (لا يتوقف النشر).
 
 ## ما تفعله من اللوحة
@@ -69,10 +95,10 @@ dash.cloudflare.com ← Workers AI ← انسخ Account ID → `CF_ACCOUNT_ID`،
 ## Gemini (خلفيات أعلى جودة، مدفوع)
 إن وُجد سرّ `GEMINI_API_KEY` صار Gemini المزوّد الأول للخلفيات (نموذج `gemini-nano-banana-2.1`، نحو 0.03 دولار للصورة ولا حصة مجانية لتوليد الصور)، ويبقى Cloudflare ثم Pollinations احتياطاً. لإعادة توليد الخلفيات بعد تفعيله: شغّل workflow باسم `preview` واكتب `all` في خانة regen.
 
-## 6) أسرار GitHub
+## 7) أسرار GitHub
 Settings ← Secrets and variables ← Actions ← New repository secret، لكل مما يلي:
 
-`FB_PAGE_ID`, `FB_PAGE_TOKEN`, `IG_USER_ID`, `THREADS_USER_ID`, `THREADS_TOKEN`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHANNEL_ID`, `TELEGRAM_OWNER_CHAT_ID`, `CF_ACCOUNT_ID`, `CF_API_TOKEN`, `GH_PAT` (توكن دقيق الصلاحيات للمستودع نفسه: Secrets = Read and write)، واختيارياً `GEMINI_API_KEY`.
+`FB_PAGE_ID`, `FB_PAGE_TOKEN`, `IG_USER_ID`, `THREADS_USER_ID`, `THREADS_TOKEN`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHANNEL_ID`, `TELEGRAM_OWNER_CHAT_ID`, `LINKEDIN_TOKEN`, `LINKEDIN_AUTHOR_URN`, `CF_ACCOUNT_ID`, `CF_API_TOKEN`, `GH_PAT` (توكن دقيق الصلاحيات للمستودع نفسه: Secrets = Read and write)، واختيارياً `GEMINI_API_KEY`.
 
 لا تضع أي سرّ في الملفات. المنصة التي لا سرّ لها تفشل بوضوح وتصلك رسالة بالخطأ؛ احذف مفتاحها من `platforms` لتجاهلها.
 

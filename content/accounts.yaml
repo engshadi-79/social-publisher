@@ -22,3 +22,8 @@ accounts:
     label: "تيليجرام — القناة"
     default: true
     secrets: {token: TELEGRAM_BOT_TOKEN, chat_id: TELEGRAM_CHANNEL_ID}
+  - id: linkedin-engshadi
+    platform: linkedin
+    label: "لينكدإن — المهندس شادي"
+    default: true
+    secrets: {token: LINKEDIN_TOKEN, author_urn: LINKEDIN_AUTHOR_URN}

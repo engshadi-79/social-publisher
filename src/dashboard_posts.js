@@ -41,7 +41,7 @@ async function deleteBg(id) {
 }
 
 // ---------- نافذة التعديل ----------
-const PLATS = ["facebook", "instagram", "threads", "telegram"];
+const PLATS = ["facebook", "instagram", "threads", "linkedin", "telegram"];
 let editId = null;
 function openEdit(id) {
   const p = POSTS[id]; if (!p) return;
@@ -67,6 +67,7 @@ $("eSave").onclick = async () => {
     (tpl !== "infographic" && tpl !== "carousel" && !(v("eQuery") || v("eVP"))) ? "اكتب كلمات إنجليزية للصورة." :
     (platforms.threads && platforms.threads.length > 500) ? "نص ثريدز أطول من 500 حرف." :
     (platforms.instagram && platforms.instagram.length > 2200) ? "نص إنستغرام أطول من 2200 حرف." :
+    (platforms.linkedin && platforms.linkedin.length > 3000) ? "نص لينكدإن أطول من 3000 حرف." :
     ($("eTopic") && !v("eTopic")) ? "اختر الموضوع." : "";
   if (err) { say(m, err, false); return; }
   const oi = old.image || {};
