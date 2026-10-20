@@ -21,7 +21,7 @@ from config import TOPICS_PATH
 
 REQUEST = ROOT / "content" / "generate_request.yaml"
 LOG = ROOT / "content" / "generate_log.json"
-DEFAULT_PLATFORMS = ["facebook", "instagram", "threads"]
+DEFAULT_PLATFORMS = ["facebook", "instagram", "threads", "linkedin"]
 
 
 def load_topic(req: dict) -> dict:
