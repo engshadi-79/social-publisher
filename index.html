@@ -98,7 +98,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
 <div id="lb"><button id="lbPrev" aria-label="السابق">›</button><img alt=""><button id="lbNext" aria-label="التالي">‹</button><span id="lbCtr"></span></div>
 <div class="wrap">
 <h1>لوحة النشر</h1>
-<div class="upd">آخر تحديث: <bdi dir="ltr">2026-10-20 08:08</bdi></div>
+<div class="upd">آخر تحديث: <bdi dir="ltr">2026-10-20 08:11</bdi></div>
 
 <div class="summary">يوجد 3 منشور مجدول، وأقربها يوم الثلاثاء 20 أكتوبر الساعة 8:10 صباحاً. تم نشر 1 منشور حتى الآن.</div>
 
@@ -245,16 +245,16 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
 <article class="post" data-s="upcoming">
   <div class="imgwrap"><img loading="lazy" src="images/thumb-2026-10-22-car1.jpg" data-full="images/full-2026-10-22-car1-s1.jpg" data-slides='[&#34;images/full-2026-10-22-car1-s1.jpg&#34;, &#34;images/full-2026-10-22-car1-s2.jpg&#34;, &#34;images/full-2026-10-22-car1-s3.jpg&#34;, &#34;images/full-2026-10-22-car1-s4.jpg&#34;, &#34;images/full-2026-10-22-car1-s5.jpg&#34;, &#34;images/full-2026-10-22-car1-s6.jpg&#34;, &#34;images/full-2026-10-22-car1-s7.jpg&#34;, &#34;images/full-2026-10-22-car1-s8.jpg&#34;]' alt="كيف أجعل الذكاء الاصطناعي مساعد برمجة لا بديلاً عني" title="اضغط لعرض الصورة كاملة"><span class="scount">8 شرائح ▤</span></div>
   <div class="body">
-    <span class="badge b-scheduled">سيُنشر في موعده</span>
+    <span class="badge b-due">سيُنشر خلال دقائق</span>
     <div class="title">كيف أجعل الذكاء الاصطناعي مساعد برمجة لا بديلاً عني</div>
-    <div class="line">سيُنشر يوم الثلاثاء 20 أكتوبر الساعة 8:10 صباحاً على: فيسبوك وإنستغرام وثريدز.</div>
+    <div class="line">حان موعده وسيُنشر خلال دقائق على: فيسبوك وإنستغرام وثريدز.</div>
     <div class="plats">
       
-      <span class="chip ">فيسبوك: ⏳ ينتظر موعده</span>
+      <span class="chip ">فيسبوك: ⏳ ينتظر دوره</span>
       
-      <span class="chip ">إنستغرام: ⏳ ينتظر موعده</span>
+      <span class="chip ">إنستغرام: ⏳ ينتظر دوره</span>
       
-      <span class="chip ">ثريدز: ⏳ ينتظر موعده</span>
+      <span class="chip ">ثريدز: ⏳ ينتظر دوره</span>
       
     </div>
     
@@ -688,6 +688,11 @@ function setWhen(text, id, when) {
   for (let i = s; i < e; i++) if (/^  publish_at:/.test(lines[i])) { lines[i] = "  publish_at: " + q(when); return lines.join("\n"); }
   throw new Error("لم أجد موعد المنشور.");
 }
+function liveApproved(text, id) {
+  const lines = text.split(String.fromCharCode(10)), [a, b] = postRange(lines, id);
+  for (let i = a; i < b; i++) { const m = lines[i].match(/^  approved:\s*(\w+)/); if (m) return m[1] === "true"; }
+  return false;
+}
 async function deleteBg(id) {
   const path = "content/media/" + id + "-bg.png";
   let sha; try { sha = (await gh("contents/" + path)).sha; } catch (e) { return; }
@@ -730,9 +735,13 @@ $("eSave").onclick = async () => {
   const imageChanged = tpl !== old.template || img.photo_query !== oi.photo_query || img.visual_prompt !== oi.visual_prompt;
   try {
     say(m, "جارٍ الحفظ…", true);
-    await edit((x) => replacePost(x, editId, nu), "queue: edit " + editId, QFILE);
+    await edit((x) => replacePost(x, editId, Object.assign({}, nu, { approved: liveApproved(x, editId) })), "queue: edit " + editId, QFILE);
     if (imageChanged) await deleteBg(editId);
-    say(m, "تم الحفظ ✅ تتحدّث اللوحة (وصورتها إن تغيّرت) خلال دقيقتين.", true);
+    POSTS[editId] = Object.assign({}, POSTS[editId], nu, { approved: POSTS[editId].approved, group: POSTS[editId].group });
+    const card = document.querySelector('.post [data-id="' + editId + '"]');
+    if (card) { const post = card.closest(".post"); const t = post.querySelector(".title"), ln = post.querySelector(".line");
+      if (t) t.textContent = img.title; if (ln) ln.textContent = "✎ حُفظ التعديل: الموعد " + nu.publish_at + " (تتحدّث بقية التفاصيل والصورة بعد دقائق)"; }
+    say(m, "تم الحفظ في المستودع ✅ تتحدّث بطاقة اللوحة (وصورتها إن تغيّرت) خلال دقائق.", true);
     setTimeout(() => $("editBox").classList.remove("on"), 1200);
   } catch (e) { say(m, e.message, false); }
 };
