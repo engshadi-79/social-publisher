@@ -36,7 +36,7 @@ def main() -> int:
     with Renderer() as r:
         for p in posts:
             if args.no_gen:
-                bg = imagegen.bg_path(p["id"])
+                bg = imagegen.post_bg_path(p)
                 bg, warns = (bg if bg.exists() else None), []
             elif p["template"] in ("carousel", "infographic"):
                 bg, warns = None, []

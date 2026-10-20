@@ -22,6 +22,11 @@ SUFFIX = "no text, no letters, no words, no watermark"
 REALISM = "photorealistic, real photograph, natural lighting, shot on a DSLR camera, sharp focus"
 
 
+def post_bg_path(post: dict) -> Path:
+    """مسار الخلفية المخزّنة: للنسخة المعاد نشرها يشير image.bg_from إلى المنشور الأصلي."""
+    return bg_path((post.get("image") or {}).get("bg_from") or post["id"])
+
+
 def bg_path(post_id: str) -> Path:
     return MEDIA_DIR / f"{post_id}-bg.png"
 
@@ -197,7 +202,7 @@ def _pollinations(prompt: str, seed: int | None, size: tuple[int, int]) -> bytes
 def ensure_background(post: dict, regen: bool = False, seed: int | None = None):
     """يرجع (المسار أو None، قائمة تحذيرات). لا يرمي أبداً حتى لا يتوقف النشر."""
     warnings: list[str] = []
-    path = bg_path(post["id"])
+    path = post_bg_path(post)
     if path.exists() and not regen:
         return path, warnings
     if not (post["image"].get("visual_prompt") or post["image"].get("photo_query")):

@@ -11,6 +11,7 @@ function serializePost(p) {
   if (im.points && im.points.length) b += "    points:\n" + im.points.map((x) => "      - " + q(x)).join("\n") + "\n";
   if (im.slides && im.slides.length) b += slidesYaml(im.slides);
   if (im.photo_query) b += "    photo_query: " + q(im.photo_query) + "\n";
+  if (im.bg_from) b += "    bg_from: " + q(im.bg_from) + "\n";
   if (im.visual_prompt) b += "    visual_prompt: " + q(im.visual_prompt) + "\n";
   if (im.seed != null) b += "    seed: " + im.seed + "\n";
   b += "  platforms:\n";
@@ -165,3 +166,38 @@ $("calDistribute").onclick = async () => {
     say(m, "تم التوزيع ✅ تظهر المواعيد الجديدة خلال دقيقة تقريباً.", true);
   } catch (e) { say(m, e.message, false); }
 };
+
+
+// ---------- إعادة نشر منشور (نسخة جديدة بنفس المحتوى والصورة) ----------
+let repId = null;
+function nowLocal() { const d = new Date(), p2 = (n) => String(n).padStart(2, "0"); return ymd(d) + " " + p2(d.getHours()) + ":" + p2(d.getMinutes()); }
+function openRepub(id) {
+  const p = POSTS[id]; if (!p) return;
+  repId = id; $("rTitle").textContent = (p.image && p.image.title) || id;
+  PLATS.forEach((k) => { $("rp_" + k).checked = !!(p.platforms && p.platforms[k]); $("rp_" + k).disabled = !(p.platforms && p.platforms[k]); });
+  const d = new Date(Date.now() + 3600e3), p2 = (n) => String(n).padStart(2, "0");
+  $("rWhen").value = ymd(d) + "T" + p2(d.getHours()) + ":" + p2(d.getMinutes());
+  document.querySelector('input[name=rMode][value=now]').checked = true;
+  say($("rMsg"), "", true); $("repBox").classList.add("on");
+}
+$("rCancel").onclick = () => $("repBox").classList.remove("on");
+$("rGo").onclick = async () => {
+  const m = $("rMsg"), src = POSTS[repId], mode = document.querySelector("input[name=rMode]:checked").value;
+  const plats = PLATS.filter((k) => $("rp_" + k).checked && src.platforms[k]);
+  if (!plats.length) { say(m, "اختر منصة واحدة على الأقل.", false); return; }
+  if (mode === "later" && !$("rWhen").value) { say(m, "اختر الموعد.", false); return; }
+  const when = mode === "later" ? $("rWhen").value.replace("T", " ") : nowLocal();
+  const id = repId.replace(/-r[a-z0-9]{4}$/, "") + "-r" + Date.now().toString(36).slice(-4);
+  const im = Object.assign({}, src.image);
+  if (!["carousel", "infographic"].includes(src.template)) im.bg_from = (src.image && src.image.bg_from) || repId;
+  const copy = { id, approved: mode !== "draft", publish_at: when, template: src.template, topic: src.topic, image: im,
+    platforms: Object.fromEntries(plats.map((k) => [k, src.platforms[k]])) };
+  try {
+    say(m, "جارٍ الحفظ…", true);
+    await edit((x) => (x.endsWith("\n") ? x : x + "\n") + serializePost(copy), "queue: republish " + repId + " as " + id, QFILE);
+    say(m, mode === "draft" ? "حُفظت نسخة مسودة ✅ تظهر في «بانتظار موافقتك» خلال دقائق."
+      : mode === "now" ? "بدأ النشر ✅ تظهر النتيجة في اللوحة بعد دقائق." : "جُدولت ✅ ستُنشر في الموعد المحدد.", true);
+    setTimeout(() => $("repBox").classList.remove("on"), 1800);
+  } catch (e) { say(m, e.message, false); }
+};
+document.addEventListener("click", (e) => { const b = e.target.closest('[data-act="repub"]'); if (b) openRepub(b.dataset.id); });

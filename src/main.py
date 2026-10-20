@@ -74,7 +74,7 @@ def main() -> int:
             if post["template"] in ("carousel", "infographic"):
                 bg = None                      # قوالب نصّية بلا خلفية خارجية
             elif args.dry_run:
-                bg = imagegen.bg_path(pid)
+                bg = imagegen.post_bg_path(post)
                 bg = bg if bg.exists() else None
             else:
                 bg, warns = imagegen.ensure_background(post)
