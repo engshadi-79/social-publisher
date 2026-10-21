@@ -139,5 +139,36 @@
       "account": "لينكدإن — المهندس شادي",
       "published_at": "2026-10-20T16:38:47+00:00"
     }
+  },
+  "2026-10-21-g1": {
+    "facebook": {
+      "attempts": 0,
+      "status": "published",
+      "platform_post_id": "197449247358013_1612730160866639",
+      "error": null,
+      "account": "فيسبوك — الوان",
+      "published_at": "2026-10-21T05:33:48+00:00"
+    },
+    "instagram": {
+      "attempts": 0,
+      "status": "published",
+      "platform_post_id": "17996235504012056",
+      "error": null,
+      "account": "إنستغرام — engshadi2011",
+      "published_at": "2026-10-21T05:34:07+00:00"
+    },
+    "threads": {
+      "attempts": 1,
+      "error": "PublishError: threads publish: HTTP 400 The requested resource does not exist",
+      "status": "retry"
+    },
+    "linkedin": {
+      "attempts": 0,
+      "status": "published",
+      "platform_post_id": "urn:li:share:7518545201104048128",
+      "error": null,
+      "account": "لينكدإن — المهندس شادي",
+      "published_at": "2026-10-21T05:34:24+00:00"
+    }
   }
 }
