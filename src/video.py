@@ -52,8 +52,9 @@ def _encode(frames_dir: Path, out_mp4: Path, fps: int = FPS) -> Path:
     out_mp4.parent.mkdir(parents=True, exist_ok=True)
     cmd = [ffmpeg_bin(), "-y", "-loglevel", "error",
            "-framerate", str(fps), "-i", str(frames_dir / "%05d.jpg"),
+           "-vf", "scale=in_range=full:out_range=tv,format=yuv420p",   # إطارات JPEG مداها كامل؛ المنصات تتوقع yuv420p القياسي
            "-c:v", "libx264", "-preset", "medium", "-crf", "20",
-           "-pix_fmt", "yuv420p", "-movflags", "+faststart", str(out_mp4)]
+           "-color_range", "tv", "-movflags", "+faststart", str(out_mp4)]
     p = subprocess.run(cmd, capture_output=True, text=True)
     if p.returncode or not out_mp4.exists():
         raise VideoError(f"فشل ffmpeg: {(p.stderr or '')[:300]}")

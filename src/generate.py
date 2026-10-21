@@ -73,6 +73,14 @@ def build_prompt(topic: dict, count: int, brand: dict, recent: list[str], trends
                         'الأخيرة: سؤال تفاعلي للمتابع في "title" ودعوة لحفظ المنشور والتعليق في "body".\n'
                         '  "photo_query": 2 إلى 4 كلمات إنجليزية تمثّل موضوع المنشور كله (تُستعمل للشريحة التي بلا كلمات خاصة)،\n  "visual_prompt": "" (اتركه فارغاً)،\n'
                         '  ملاحظة: "title" و"body" الخارجيان للمنشور ككل: "title" هو عنوان الغلاف و"body" فارغ.')
+    elif style == "reel":
+        n = max(3, min(int(slides_n or 5), 8))
+        style_fields = (f'  "scenes": مصفوفة من {n} مشاهد لفيديو عمودي قصير (ريل)، كل مشهد كائن فيه: '
+                        '"kicker" (كلمة أو كلمتان فوق العنوان مثل: المشكلة، الفكرة، الخطوة)، "title" (جملة قوية حتى 60 حرفاً تُقرأ في ثلاث ثوانٍ)، '
+                        '"body" (جملة قصيرة حتى 120 حرفاً، أو فارغ)، "seconds" (رقم بين 2.5 و4)، '
+                        '"photo_query" (2 إلى 4 كلمات إنجليزية للبحث عن صورة فوتوغرافية حقيقية تمثّل هذا المشهد: شيء ملموس مرئي).\n'
+                        '    المشهد الأول خطّاف يوقف التمرير (سؤال أو مشكلة). الوسطى فكرة واحدة لكل مشهد. الأخير سؤال للمتابع ودعوة للحفظ والتعليق.\n'
+                        '  "photo_query": "" (اتركه فارغاً)،\n  "visual_prompt": "" (اتركه فارغاً)،')
     elif style == "infographic":
         style_fields = ('  "points": من 3 إلى 5 نقاط قصيرة ومفيدة تلخّص المنشور كإنفوجرافك (كل نقطة حتى 60 حرفاً، بلا ترقيم)،\n'
                         '  "photo_query": "" (اتركه فارغاً)،\n  "visual_prompt": "" (اتركه فارغاً)،')
@@ -131,7 +139,7 @@ def make_entries(items: list[dict], req: dict, topic: dict, existing_ids: set[st
                  "linkedin": long_t, "threads": short_t or long_t}
         entry = {
             "id": pid, "approved": False, "publish_at": f"{when:%Y-%m-%d %H:%M}",
-            "template": ("carousel" if req.get("style") == "carousel" else "infographic" if req.get("style") == "infographic" else (req.get("template") or "split")),
+            "template": ("reel" if req.get("style") == "reel" else "carousel" if req.get("style") == "carousel" else "infographic" if req.get("style") == "infographic" else (req.get("template") or "split")),
         }
         if topic.get("id"):
             entry["topic"] = topic["id"]
@@ -152,6 +160,23 @@ def make_entries(items: list[dict], req: dict, topic: dict, existing_ids: set[st
             img["body"] = ""
             if str(it.get("photo_query", "") or "").strip():      # احتياط الشرائح بلا كلمات خاصة
                 img["photo_query"] = str(it["photo_query"]).strip()[:60]
+        elif req.get("style") == "reel":
+            scenes = []
+            for sc in (it.get("scenes") or [])[:8]:
+                if not isinstance(sc, dict) or not str(sc.get("title", "")).strip():
+                    continue
+                one = {"kicker": str(sc.get("kicker", "") or "").strip()[:30], "title": str(sc["title"]).strip()[:70],
+                       "body": str(sc.get("body", "") or "").strip()[:150]}
+                try:
+                    one["seconds"] = round(min(8.0, max(1.5, float(sc.get("seconds") or 3.4))), 1)
+                except (TypeError, ValueError):
+                    one["seconds"] = 3.4
+                if str(sc.get("photo_query", "") or "").strip():
+                    one["photo_query"] = str(sc["photo_query"]).strip()[:60]
+                scenes.append(one)
+            img["scenes"] = scenes
+            img["title"] = scenes[0]["title"] if scenes else img["title"]
+            img["body"] = ""
         elif req.get("style") == "infographic":
             pts = [str(x).strip() for x in (it.get("points") or []) if str(x).strip()][:5]
             img["points"] = [x[:88] for x in pts]
@@ -190,7 +215,7 @@ def main() -> int:
         if not isinstance(items, list) or not items:
             raise generator.GeneratorError("قائمة المنشورات فارغة")
         entries = make_entries(items[:count], req, topic, {p["id"] for p in queue})
-        entries = [e for e in entries if e["image"]["title"] and e["platforms"] and (e["template"] != "infographic" or len(e["image"].get("points", [])) >= 2) and (e["template"] != "carousel" or len(e["image"].get("slides", [])) >= 3)]
+        entries = [e for e in entries if e["image"]["title"] and e["platforms"] and (e["template"] != "infographic" or len(e["image"].get("points", [])) >= 2) and (e["template"] != "carousel" or len(e["image"].get("slides", [])) >= 3) and (e["template"] != "reel" or len(e["image"].get("scenes", [])) >= 3)]
         if not entries:
             raise generator.GeneratorError("لم يصلح أي منشور مولَّد")
         errors = fatal(validate(queue + entries))

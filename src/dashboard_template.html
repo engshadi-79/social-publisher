@@ -74,7 +74,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
   <select id="eTemplate"><option value="carousel">كاروسيل</option><option value="reel">ريل (فيديو عمودي)</option><option value="infographic">إنفوجرافك</option><option value="split">صورة + لوحة نص</option><option value="photo">صورة كاملة</option><option value="tip">نصيحة</option><option value="quote">اقتباس</option><option value="announcement">إعلان</option><option value="story">ستوري</option></select>
   <label>العنوان على الصورة *</label><input id="eTitle">
   <label>النص الصغير</label><input id="eBody">
-  <label>شرائح الكاروسيل (انظر التنسيق في نموذج الإضافة)</label><textarea id="eSlides" rows="10"></textarea>
+  <label>شرائح الكاروسيل أو مشاهد الريل (انظر التنسيق في نموذج الإضافة)</label><textarea id="eSlides" rows="10"></textarea>
   <label>نقاط الإنفوجرافك (سطر لكل نقطة)</label><textarea id="ePoints" rows="4"></textarea>
   <label>كلمات إنجليزية للصورة <span class="hint">(تغييرها يعيد توليد الصورة)</span></label><input id="eQuery" dir="ltr">
   <label>وصف بديل للصورة (إنجليزي)</label><textarea id="eVP" dir="ltr" rows="2"></textarea>
@@ -189,9 +189,9 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
     <label>الموضوع *</label><input id="gTopicText" placeholder="مثل: تنظيم الوقت">
     {% endif %}
     <label>شكل الصورة</label>
-    <select id="gStyle"><option value="carousel">كاروسيل: عدة شرائح بأسلوب دراسة حالة (مقترح)</option><option value="infographic">إنفوجرافك: نقاط مرقّمة تلخّص الفكرة (مقترح)</option><option value="photo">صورة حقيقية تمثّل الفكرة</option></select>
-    <label>عدد الشرائح (للكاروسيل)</label>
-    <select id="gSlides"><option>5</option><option selected>7</option><option>8</option><option>10</option></select>
+    <select id="gStyle"><option value="carousel">كاروسيل: عدة شرائح بأسلوب دراسة حالة (مقترح)</option><option value="infographic">إنفوجرافك: نقاط مرقّمة تلخّص الفكرة (مقترح)</option><option value="reel">ريل: فيديو عمودي بمشاهد وصور حقيقية (يُبنى عند النشر)</option><option value="photo">صورة حقيقية تمثّل الفكرة</option></select>
+    <label>عدد الشرائح أو المشاهد (للكاروسيل والريل)</label>
+    <select id="gSlides"><option>3</option><option>4</option><option>5</option><option selected>7</option><option>8</option><option>10</option></select>
     <label>عدد المنشورات</label>
     <select id="gCount"><option>1</option><option>2</option><option selected>3</option><option>5</option><option>7</option></select>
     <label>موعد أول منشور (ثم واحد كل يوم في نفس الوقت)</label><input id="gWhen" type="datetime-local">
@@ -209,6 +209,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
     <label>شكل الصورة</label>
     <select id="pTemplate">
       <option value="carousel">كاروسيل (عدة شرائح، أسلوب دراسة حالة)</option>
+      <option value="reel">ريل — فيديو عمودي (مشاهد بصور حقيقية)</option>
       <option value="infographic">إنفوجرافك (نقاط مرقّمة)</option>
       <option value="split">صورة في الأعلى ولوحة نص أسفلها (الأنسب للصور الحقيقية)</option>
       <option value="photo">صورة كاملة والنص أسفلها (تحتاج صورة عالية الدقة)</option>
@@ -219,9 +220,10 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
     </select>
     <label>العنوان الذي يظهر على الصورة *</label><input id="pTitle" placeholder="جملة قصيرة وواضحة">
     <label>نص صغير تحت العنوان (اختياري)</label><input id="pBody">
-    <label>شرائح الكاروسيل <span class="hint">— لقالب الكاروسيل فقط</span></label>
+    <label>شرائح الكاروسيل أو مشاهد الريل <span class="hint">— للكاروسيل والريل فقط</span></label>
     <textarea id="pSlides" rows="9" placeholder="# عنوان الغلاف&#10;@ دراسة حالة&#10;جملة تحت العنوان&#10;- نقطة&#10;---&#10;# عنوان الشريحة الثانية&#10;شرح قصير"></textarea>
     <div class="hint">كل شريحة تبدأ بسطر «# العنوان»؛ «@ ...» للسطر الصغير فوق العنوان؛ «- ...» للنقاط؛ وبقية الأسطر شرحٌ. وتفصل بين الشرائح بسطر «---». من 3 إلى 10 شرائح.</div>
+    <div class="hint">للريل: نفس الصيغة لكل مشهد (من 3 إلى 8)، وأضف «~ 3.5» لمدّة المشهد بالثواني و«? kind of photo» لكلمات صورته الإنجليزية (وإلا استُعملت الكلمات العامة أدناه). الفيديو يُبنى عند النشر ويستغرق دقائق، وتظهر في اللوحة لقطة الغلاف فقط.</div>
     <label>نقاط الإنفوجرافك (كل نقطة في سطر، من 2 إلى 6) <span class="hint">— لقالب الإنفوجرافك فقط</span></label><textarea id="pPoints" rows="4"></textarea>
     <label>كلمات إنجليزية للصورة الحقيقية <span class="hint">(2 إلى 4 كلمات، لغير الإنفوجرافك)</span></label><input id="pQuery" dir="ltr" placeholder="civil engineer construction site">
     <label>وصف بديل للصورة بالإنجليزية (اختياري)</label><textarea id="pVP" dir="ltr" rows="2"></textarea>

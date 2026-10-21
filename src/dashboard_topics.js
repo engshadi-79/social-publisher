@@ -28,6 +28,29 @@ function slidesYaml(slides) {
   return "    slides:\n" + slides.map((s) => "      - kicker: " + q(s.kicker || "") + "\n        title: " + q(s.title) + "\n        body: " + q(s.body || "") +
     (s.points && s.points.length ? "\n        points:\n" + s.points.map((x) => "          - " + q(x)).join("\n") : "")).join("\n") + "\n";
 }
+// مشاهد الريل: نفس صيغة الشرائح مع سطرين إضافيين: «~ 3.5» للثواني و«? كلمات» للصورة
+function parseScenes(text) {
+  return text.split(/^\s*---\s*$/m).map((blk) => {
+    const sc = { kicker: "", title: "", body: "", seconds: 3.4, photo_query: "" }, body = [];
+    blk.split("\n").map((l) => l.trim()).filter(Boolean).forEach((l) => {
+      if (l.startsWith("# ")) sc.title = l.slice(2).trim();
+      else if (l.startsWith("@ ")) sc.kicker = l.slice(2).trim();
+      else if (l.startsWith("~ ")) sc.seconds = parseFloat(l.slice(2)) || 3.4;
+      else if (l.startsWith("? ")) sc.photo_query = l.slice(2).trim();
+      else body.push(l);
+    });
+    sc.body = body.join(" "); return sc;
+  }).filter((s) => s.title || s.body);
+}
+function scenesToText(scenes) {
+  return (scenes || []).map((s) => [s.title ? "# " + s.title : "", s.kicker ? "@ " + s.kicker : "", s.body || "",
+    s.seconds ? "~ " + s.seconds : "", s.photo_query ? "? " + s.photo_query : ""].filter(Boolean).join("\n")).join("\n---\n");
+}
+function scenesYaml(scenes) {
+  return "    scenes:\n" + scenes.map((s) => "      - kicker: " + q(s.kicker || "") + "\n        title: " + q(s.title) + "\n        body: " + q(s.body || "") +
+    "\n        seconds: " + (Math.min(8, Math.max(1.5, s.seconds || 3.4))) + (s.photo_query ? "\n        photo_query: " + q(s.photo_query) : "")).join("\n") + "\n";
+}
+const scenesError = (sc) => (sc.length < 3 || sc.length > 8) ? "الريل يحتاج من 3 إلى 8 مشاهد." : (sc.some((s) => !s.title) ? "لكل مشهد عنوان («# العنوان»)." : (sc.some((s) => s.title.length > 70) ? "عنوان المشهد أطول من 70 حرفاً." : (sc.some((s) => s.body.length > 150) ? "نص المشهد أطول من 150 حرفاً." : "")));
 const slidesError = (sl) => (sl.length < 3 || sl.length > 10) ? "الكاروسيل يحتاج من 3 إلى 10 شرائح." : (sl.some((s) => !s.title) ? "لكل شريحة عنوان («# العنوان»)." : "");
 
 
@@ -103,7 +126,7 @@ function addPost(text, p) {
   if (p.topic) b += "  topic: " + q(p.topic) + "\n";
   b += "  image:\n    title: " + q(p.title) + "\n    body: " + q(p.body) + "\n";
   if (p.points && p.points.length) b += "    points:\n" + p.points.map((x) => "      - " + q(x)).join("\n") + "\n";
-  if (p.slides && p.slides.length) b += slidesYaml(p.slides);
+  if (p.slides && p.slides.length) b += p.template === "reel" ? scenesYaml(p.slides) : slidesYaml(p.slides);
   if (p.query) b += "    photo_query: " + q(p.query) + "\n";
   if (p.vp) b += "    visual_prompt: " + q(p.vp) + "\n";
   b += "    seed: " + p.seed + "\n  platforms:\n";
@@ -171,8 +194,9 @@ $("pAdd").onclick = async () => {
   const m = $("pMsg"), v = (i) => $(i).value.trim();
   const plats = ["facebook", "instagram", "threads", "linkedin", "telegram"].filter((k) => $("pl_" + k).checked);
   const when = v("pWhen").replace("T", " ");
-  const isCar = $("pTemplate").value === "carousel", slides = isCar ? parseSlides($("pSlides").value) : [];
-  const err = isCar && slidesError(slides) ? slidesError(slides) : (!isCar && !v("pTitle")) ? "اكتب عنوان الصورة." : !v("pText") ? "اكتب نص المنشور." : !plats.length ? "اختر منصة واحدة على الأقل." :
+  const tplv = $("pTemplate").value, isCar = tplv === "carousel" || tplv === "reel", slides = tplv === "reel" ? parseScenes($("pSlides").value) : isCar ? parseSlides($("pSlides").value) : [];
+  const mErr = tplv === "reel" ? scenesError(slides) : isCar ? slidesError(slides) : "";
+  const err = mErr ? mErr : (!isCar && !v("pTitle")) ? "اكتب عنوان الصورة." : !v("pText") ? "اكتب نص المنشور." : !plats.length ? "اختر منصة واحدة على الأقل." :
     !when ? "اختر موعد النشر." :
     (isCar ? false : $("pTemplate").value === "infographic" && (v("pPoints").split("\n").filter((x) => x.trim()).length < 2)) ? "الإنفوجرافك يحتاج نقطتين على الأقل (كل نقطة في سطر)." :
     (!isCar && $("pTemplate").value !== "infographic" && !(v("pQuery") || v("pVP"))) ? "اكتب كلمات إنجليزية للصورة (مثل: engineer construction site)." :

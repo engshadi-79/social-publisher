@@ -10,6 +10,7 @@ function serializePost(p) {
   b += "  image:\n    title: " + q(im.title || "") + "\n    body: " + q(im.body || "") + "\n";
   if (im.points && im.points.length) b += "    points:\n" + im.points.map((x) => "      - " + q(x)).join("\n") + "\n";
   if (im.slides && im.slides.length) b += slidesYaml(im.slides);
+  if (im.scenes && im.scenes.length) b += scenesYaml(im.scenes);
   if (im.photo_query) b += "    photo_query: " + q(im.photo_query) + "\n";
   if (im.bg_from) b += "    bg_from: " + q(im.bg_from) + "\n";
   if (im.visual_prompt) b += "    visual_prompt: " + q(im.visual_prompt) + "\n";
@@ -46,7 +47,7 @@ let editId = null;
 function openEdit(id) {
   const p = POSTS[id]; if (!p) return;
   editId = id; const im = p.image || {};
-  $("eTitle").value = im.title || ""; $("eBody").value = im.body || ""; $("ePoints").value = (im.points || []).join("\n"); $("eSlides").value = slidesToText(im.slides);
+  $("eTitle").value = im.title || ""; $("eBody").value = im.body || ""; $("ePoints").value = (im.points || []).join("\n"); $("eSlides").value = p.template === "reel" ? scenesToText(im.scenes) : slidesToText(im.slides);
   $("eQuery").value = im.photo_query || ""; $("eVP").value = im.visual_prompt || "";
   $("eTemplate").value = p.template; $("eWhen").value = (p.publish_at || "").replace(" ", "T");
   if ($("eTopic")) $("eTopic").value = p.topic || "";
@@ -61,18 +62,18 @@ $("eSave").onclick = async () => {
   const m = $("eMsg"), v = (i) => $(i).value.trim(), old = POSTS[editId];
   const platforms = {};
   PLATS.forEach((k) => { if ($("ep_" + k).checked && v("et_" + k)) platforms[k] = v("et_" + k); });
-  const tpl = $("eTemplate").value, eSlides = tpl === "carousel" ? parseSlides($("eSlides").value) : [], points = v("ePoints").split("\n").map((x) => x.trim()).filter(Boolean);
-  const err = (tpl === "carousel" && slidesError(eSlides)) ? slidesError(eSlides) : (tpl !== "carousel" && !v("eTitle")) ? "العنوان مطلوب." : !Object.keys(platforms).length ? "اختر منصة واحدة على الأقل بنص غير فارغ." :
+  const tpl = $("eTemplate").value, eSlides = tpl === "carousel" ? parseSlides($("eSlides").value) : tpl === "reel" ? parseScenes($("eSlides").value) : [], points = v("ePoints").split("\n").map((x) => x.trim()).filter(Boolean);
+  const multi = tpl === "carousel" || tpl === "reel", err = (tpl === "carousel" && slidesError(eSlides)) ? slidesError(eSlides) : (tpl === "reel" && scenesError(eSlides)) ? scenesError(eSlides) : (!multi && !v("eTitle")) ? "العنوان مطلوب." : !Object.keys(platforms).length ? "اختر منصة واحدة على الأقل بنص غير فارغ." :
     !v("eWhen") ? "اختر الموعد." : (tpl === "infographic" && (points.length < 2 || points.length > 6)) ? "الإنفوجرافك يحتاج من 2 إلى 6 نقاط." :
-    (tpl !== "infographic" && tpl !== "carousel" && !(v("eQuery") || v("eVP"))) ? "اكتب كلمات إنجليزية للصورة." :
+    (tpl !== "infographic" && !multi && !(v("eQuery") || v("eVP"))) ? "اكتب كلمات إنجليزية للصورة." :
     (platforms.threads && platforms.threads.length > 500) ? "نص ثريدز أطول من 500 حرف." :
     (platforms.instagram && platforms.instagram.length > 2200) ? "نص إنستغرام أطول من 2200 حرف." :
     (platforms.linkedin && platforms.linkedin.length > 3000) ? "نص لينكدإن أطول من 3000 حرف." :
     ($("eTopic") && !v("eTopic")) ? "اختر الموضوع." : "";
   if (err) { say(m, err, false); return; }
   const oi = old.image || {};
-  const img = { title: tpl === "carousel" ? eSlides[0].title : v("eTitle"), body: tpl === "carousel" ? "" : v("eBody"), seed: oi.seed != null ? oi.seed : 1 };
-  if (tpl === "carousel") img.slides = eSlides; else if (tpl === "infographic") img.points = points; else { img.photo_query = v("eQuery"); if (v("eVP")) img.visual_prompt = v("eVP"); }
+  const img = { title: multi ? eSlides[0].title : v("eTitle"), body: multi ? "" : v("eBody"), seed: oi.seed != null ? oi.seed : 1 };
+  if (tpl === "carousel") img.slides = eSlides; else if (tpl === "reel") { img.scenes = eSlides; if (v("eQuery")) img.photo_query = v("eQuery"); } else if (tpl === "infographic") img.points = points; else { img.photo_query = v("eQuery"); if (v("eVP")) img.visual_prompt = v("eVP"); }
   let targets;
   try { targets = readTargets("eAcc", Object.keys(platforms)); } catch (e4) { say(m, e4.message, false); return; }
   const nu = { id: editId, approved: old.approved, targets, publish_at: v("eWhen").replace("T", " "), template: tpl,
