@@ -42,7 +42,11 @@ def main() -> int:
                 bg, warns = None, []
             else:
                 bg, warns = imagegen.ensure_background(p, regen=args.regen == "all" or p["id"] == args.regen, seed=args.seed)
-            outs = r.render_post(p, OUT_DIR, bg)
+            if p["template"] == "reel":     # لقطة غلاف تكفي للمعاينة، وتحفظ صور المشاهد في الكاش؛ الفيديو الكامل يُبنى عند النشر فقط
+                import video
+                outs = [video.render_poster(r, p, OUT_DIR / f"{p['id']}-poster.png")]
+            else:
+                outs = r.render_post(p, OUT_DIR, bg)
             print(f"{p['id']}: {len(outs)} صورة" + ("" if bg or p["template"] in ("carousel", "infographic", "reel") else "  (خلفية متدرجة)"))
             for w in warns:
                 print("  ⚠️", w)
