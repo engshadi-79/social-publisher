@@ -49,7 +49,7 @@ ol{padding-inline-start:20px;color:var(--mute);font-size:.9rem}
 select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
 .acts{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.acts button.act{margin-top:0;padding:5px 14px}
 @media (max-width:560px){.post{flex-direction:column}.post img{width:100%;min-width:0;max-width:420px;margin:0 auto}}
-#lb{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;z-index:50;padding:16px;cursor:zoom-out}#lb.on{display:flex}#lb img{max-width:100%;max-height:100%;object-fit:contain;border-radius:6px}
+#lb{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;z-index:50;padding:16px;cursor:zoom-out}#lb.on{display:flex}#lb img,#lb video{max-width:100%;max-height:100%;object-fit:contain;border-radius:6px}#lb video{cursor:auto}
 .health{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 16px;margin-bottom:12px}.health summary{cursor:pointer;font-weight:700}.health ul{list-style:none;padding:0;margin:8px 0 0}.health li{padding:3px 0;font-size:.92rem}.h-bad{color:var(--bad)}.h-warn{color:var(--warn)}.h-off{color:var(--mute)}
 .calbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin-bottom:10px}
 .cgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:8px;margin-bottom:10px}
@@ -107,7 +107,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
   <button class="act" id="rGo">🔁 أعِد النشر</button> <button class="del" id="rCancel" style="color:var(--ink);border-color:var(--line)">إغلاق</button>
   <div class="msg" id="rMsg"></div>
 </div></div>
-<div id="lb"><button id="lbPrev" aria-label="السابق">›</button><img alt=""><button id="lbNext" aria-label="التالي">‹</button><span id="lbCtr"></span></div>
+<div id="lb"><button id="lbPrev" aria-label="السابق">›</button><img alt=""><video id="lbVid" controls playsinline hidden></video><button id="lbNext" aria-label="التالي">‹</button><span id="lbCtr"></span></div>
 <div class="wrap">
 <h1>لوحة النشر</h1>
 <div class="upd">آخر تحديث: <bdi dir="ltr">{{ updated }}</bdi></div>
@@ -189,7 +189,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
     <label>الموضوع *</label><input id="gTopicText" placeholder="مثل: تنظيم الوقت">
     {% endif %}
     <label>شكل الصورة</label>
-    <select id="gStyle"><option value="carousel">كاروسيل: عدة شرائح بأسلوب دراسة حالة (مقترح)</option><option value="infographic">إنفوجرافك: نقاط مرقّمة تلخّص الفكرة (مقترح)</option><option value="reel">ريل: فيديو عمودي بمشاهد وصور حقيقية (يُبنى عند النشر)</option><option value="photo">صورة حقيقية تمثّل الفكرة</option></select>
+    <select id="gStyle"><option value="infographic">إنفوجرافك: نقاط مرقّمة تلخّص الفكرة</option><option value="carousel">كاروسيل: عدة شرائح بتصاميم متنوعة بلا صور</option><option value="reel">ريل: فيديو عمودي بتصاميم متحرّكة بلا صور</option></select>
     <label>عدد الشرائح أو المشاهد (للكاروسيل والريل)</label>
     <select id="gSlides"><option>3</option><option>4</option><option>5</option><option selected>7</option><option>8</option><option>10</option></select>
     <label>عدد المنشورات</label>
@@ -208,11 +208,9 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
     {% endif %}
     <label>شكل الصورة</label>
     <select id="pTemplate">
-      <option value="carousel">كاروسيل (عدة شرائح، أسلوب دراسة حالة)</option>
-      <option value="reel">ريل — فيديو عمودي (مشاهد بصور حقيقية)</option>
       <option value="infographic">إنفوجرافك (نقاط مرقّمة)</option>
-      <option value="split">صورة في الأعلى ولوحة نص أسفلها (الأنسب للصور الحقيقية)</option>
-      <option value="photo">صورة كاملة والنص أسفلها (تحتاج صورة عالية الدقة)</option>
+      <option value="carousel">كاروسيل (عدة شرائح، أسلوب دراسة حالة)</option>
+      <option value="reel">ريل — فيديو عمودي بتصاميم متحرّكة</option>
       <option value="tip">نصيحة (بطاقة)</option>
       <option value="quote">اقتباس</option>
       <option value="announcement">إعلان</option>
@@ -223,9 +221,9 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
     <label>شرائح الكاروسيل أو مشاهد الريل <span class="hint">— للكاروسيل والريل فقط</span></label>
     <textarea id="pSlides" rows="9" placeholder="# عنوان الغلاف&#10;@ دراسة حالة&#10;جملة تحت العنوان&#10;- نقطة&#10;---&#10;# عنوان الشريحة الثانية&#10;شرح قصير"></textarea>
     <div class="hint">كل شريحة تبدأ بسطر «# العنوان»؛ «@ ...» للسطر الصغير فوق العنوان؛ «- ...» للنقاط؛ وبقية الأسطر شرحٌ. وتفصل بين الشرائح بسطر «---». من 3 إلى 10 شرائح.</div>
-    <div class="hint">للريل: نفس الصيغة لكل مشهد (من 3 إلى 8)، وأضف «~ 3.5» لمدّة المشهد بالثواني و«? kind of photo» لكلمات صورته الإنجليزية (وإلا استُعملت الكلمات العامة أدناه). الفيديو يُبنى عند النشر ويستغرق دقائق، وتظهر في اللوحة لقطة الغلاف فقط.</div>
+    <div class="hint">للريل: نفس الصيغة لكل مشهد (من 3 إلى 8)، وأضف «~ 3.5» لمدّة المشهد بالثواني . الفيديو يُبنى عند النشر ويستغرق دقائق، وتظهر في اللوحة لقطة الغلاف فقط.</div>
     <label>نقاط الإنفوجرافك (كل نقطة في سطر، من 2 إلى 6) <span class="hint">— لقالب الإنفوجرافك فقط</span></label><textarea id="pPoints" rows="4"></textarea>
-    <label>كلمات إنجليزية للصورة الحقيقية <span class="hint">(2 إلى 4 كلمات، لغير الإنفوجرافك)</span></label><input id="pQuery" dir="ltr" placeholder="civil engineer construction site">
+    <label>كلمات إنجليزية لصورة خلفية <span class="hint">(اختياري، غير مستحسن: التصاميم الآن بلا صور)</span></label><input id="pQuery" dir="ltr" placeholder="civil engineer construction site">
     <label>وصف بديل للصورة بالإنجليزية (اختياري)</label><textarea id="pVP" dir="ltr" rows="2"></textarea>
     <label>موعد النشر *</label><input id="pWhen" type="datetime-local">
     <label>المنصات</label>
@@ -247,7 +245,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
 <div class="list" id="grid">
 {% for p in posts %}
 <article class="post" data-s="{{ p.group }}">
-  <div class="imgwrap"><img loading="lazy" src="images/thumb-{{ p.id }}.jpg" data-full="images/full-{{ p.id }}{% if p.slide_count > 1 %}-s1{% endif %}.jpg"{% if p.slides_json %} data-slides='{{ p.slides_json }}'{% endif %} alt="{{ p.title }}" title="اضغط لعرض الصورة كاملة">{% if p.slide_count > 1 %}<span class="scount">{{ p.slide_count }} شرائح ▤</span>{% endif %}{% if p.reel_scenes %}<span class="scount">▶ فيديو · {{ p.reel_scenes }} مشاهد (لقطة الغلاف)</span>{% endif %}</div>
+  <div class="imgwrap"><img loading="lazy" src="images/thumb-{{ p.id }}.jpg" {% if p.reel_scenes and p.group == "published" %}data-video="images/{{ p.id }}.mp4" {% endif %}data-full="images/full-{{ p.id }}{% if p.slide_count > 1 %}-s1{% endif %}.jpg"{% if p.slides_json %} data-slides='{{ p.slides_json }}'{% endif %} alt="{{ p.title }}" title="اضغط لعرض الصورة كاملة">{% if p.slide_count > 1 %}<span class="scount">{{ p.slide_count }} شرائح ▤</span>{% endif %}{% if p.reel_scenes %}<span class="scount">▶ فيديو · {{ p.reel_scenes }} مشاهد {% if p.group == "published" %}— اضغط للتشغيل{% else %}(لقطة الغلاف){% endif %}</span>{% endif %}</div>
   <div class="body">
     <span class="badge b-{{ p.badge }}">{{ p.badge_txt }}</span>
     <div class="title">{{ p.title }}</div>
@@ -301,14 +299,15 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
 const tabs=document.querySelectorAll('#tabs button'),posts=document.querySelectorAll('.post'),empty=document.getElementById('empty');
 function show(f){const PN={topics:'topicsPanel',addpost:'postPanel',calendar:'calPanel'};const tp=f in PN;Object.entries(PN).forEach(([k,id])=>document.getElementById(id).hidden=f!==k);document.getElementById('grid').hidden=tp;let n=0;posts.forEach(p=>{const ok=!tp&&(f==='all'||p.dataset.s===f);p.hidden=!ok;if(ok)n++});empty.hidden=tp||n>0;tabs.forEach(b=>b.setAttribute('aria-pressed',b.dataset.f===f))}
 tabs.forEach(b=>b.onclick=()=>show(b.dataset.f));
-const lb=document.getElementById('lb'),lbImg=lb.querySelector('img');let lbList=[],lbI=0;
+const lb=document.getElementById('lb'),lbImg=lb.querySelector('img'),lbVid=document.getElementById('lbVid');let lbList=[],lbI=0;
 function lbShow(){lbImg.src=lbList[lbI];document.getElementById('lbCtr').textContent=lbList.length>1?(lbI+1)+' / '+lbList.length:'';lb.classList.toggle('multi',lbList.length>1)}
 function lbMove(d){lbI=(lbI+d+lbList.length)%lbList.length;lbShow()}
 document.addEventListener('click',e=>{const i=e.target.closest('.post img');
-  if(i){lbList=i.dataset.slides?JSON.parse(i.dataset.slides):[i.dataset.full];lbI=0;lbShow();lb.classList.add('on');return}
+  if(i&&i.dataset.video){lbVid.src=i.dataset.video;lbVid.hidden=false;lbImg.hidden=true;lb.classList.remove('multi');lb.classList.add('on');lbVid.play().catch(()=>{});return}
+  if(i){lbVid.hidden=true;lbImg.hidden=false;lbList=i.dataset.slides?JSON.parse(i.dataset.slides):[i.dataset.full];lbI=0;lbShow();lb.classList.add('on');return}
   if(e.target.id==='lbPrev'){lbMove(-1);return}if(e.target.id==='lbNext'){lbMove(1);return}
-  if(lb.classList.contains('on')&&lb.contains(e.target)&&e.target.tagName!=='BUTTON')lb.classList.remove('on')});
-document.addEventListener('keydown',e=>{if(!lb.classList.contains('on'))return;if(e.key==='Escape')lb.classList.remove('on');if(e.key==='ArrowLeft')lbMove(1);if(e.key==='ArrowRight')lbMove(-1)});
+  if(lb.classList.contains('on')&&lb.contains(e.target)&&e.target.tagName!=='BUTTON'&&e.target.tagName!=='VIDEO'){lb.classList.remove('on');lbVid.pause()}});
+document.addEventListener('keydown',e=>{if(!lb.classList.contains('on'))return;if(e.key==='Escape'){lb.classList.remove('on');lbVid.pause()}if(e.key==='ArrowLeft')lbMove(1);if(e.key==='ArrowRight')lbMove(-1)});
 </script>
 <script>{{ topics_js|safe }}</script>
 </body>

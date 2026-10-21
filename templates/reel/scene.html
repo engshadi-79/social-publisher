@@ -50,13 +50,63 @@ body{ font-family:"BrandFont","Cairo","Segoe UI",Tahoma,sans-serif; color:#FFF8E
        align-items:center; font-size:30px; font-weight:700; opacity:.85; direction:ltr; z-index:3 }
 .foot .who{ direction:rtl; border:3px solid currentColor; border-radius:99px; padding:.26em .9em }
 
+/* بلا صورة: خلفية تصميمية متحرّكة تتنوّع حسب رقم المشهد (شبكة، حلقات، شرائح، نقاط) */
+.nophoto .scrim{ display:none }
+.art{ position:absolute; inset:0; overflow:hidden }
+.art svg{ position:absolute; inset:0; width:100%; height:100% }
+.mv{ transform-box:fill-box; transform-origin:center }
+.ghost{ position:absolute; top:150px; inset-inline-end:40px; font-size:620px; font-weight:800; line-height:1;
+        color:#fff; opacity:.07; direction:ltr; z-index:1 }
+.v0 .bg{ background:linear-gradient(160deg, #0B1F3A, #11314a 60%, #0f4c5c) }
+.v1 .bg{ background:linear-gradient(200deg, #1b1f4b, #0B1F3A 55%, #0b3a45) }
+.v2 .bg{ background:linear-gradient(140deg, #0B1F3A, #14304f 50%, #6b2f2a) }
+.v3 .bg{ background:linear-gradient(180deg, #0f2a3d, #0B1F3A 60%, #123a3a) }
+.accentline{ position:absolute; z-index:3; inset-inline:70px; bottom:170px; height:6px; border-radius:99px;
+             background:var(--accent); transform-origin:right center; opacity:.9 }
+
 /* العناصر المتحرّكة تبدأ مخفية: seek(t) هو ما يُظهرها */
 .anim{ opacity:0 }
 </style>
 </head>
 <body>
-<div class="stage">
+<div class="stage {% if not photo %}nophoto v{{ (index - 1) % 4 }}{% endif %}">
   <div class="bg" id="bg">{% if photo %}<img src="{{ photo }}" alt="">{% endif %}</div>
+  {% if not photo %}
+  <div class="art">
+    {% set v = (index - 1) % 4 %}
+    {% if v == 0 %}
+    <svg viewBox="0 0 1080 1920" preserveAspectRatio="none">
+      <g class="mv" data-dy="90" stroke="#5fd0c4" stroke-opacity=".16" stroke-width="2">
+        {% for y in range(-120, 2100, 120) %}<line x1="0" y1="{{ y }}" x2="1080" y2="{{ y }}"/>{% endfor %}
+        {% for x in range(0, 1100, 120) %}<line x1="{{ x }}" y1="-120" x2="{{ x }}" y2="2100"/>{% endfor %}
+      </g>
+      <circle class="mv" data-ds=".18" cx="860" cy="520" r="330" fill="none" stroke="#F4B942" stroke-opacity=".55" stroke-width="6"/>
+      <circle class="mv" data-ds="-.12" cx="860" cy="520" r="190" fill="#14B8A6" fill-opacity=".14"/>
+    </svg>
+    {% elif v == 1 %}
+    <svg viewBox="0 0 1080 1920" preserveAspectRatio="none">
+      {% for r in [140, 260, 380, 500, 620, 740] %}
+      <circle class="mv" data-ds="{{ 0.05 + loop.index * 0.03 }}" cx="220" cy="560" r="{{ r }}" fill="none" stroke="#F4B942" stroke-opacity="{{ 0.5 - loop.index * 0.06 }}" stroke-width="5"/>
+      {% endfor %}
+      <circle class="mv" data-dx="40" data-dy="-60" cx="900" cy="1180" r="120" fill="#C8452B" fill-opacity=".28"/>
+    </svg>
+    {% elif v == 2 %}
+    <svg viewBox="0 0 1080 1920" preserveAspectRatio="none">
+      <g transform="rotate(-18 540 335)"><rect class="mv" data-dx="-160" x="-200" y="260" width="1500" height="150" fill="#F4B942" fill-opacity=".16"/></g>
+      <g transform="rotate(-18 540 690)"><rect class="mv" data-dx="140" x="-260" y="560" width="1500" height="260" fill="#14B8A6" fill-opacity=".13"/></g>
+      <g transform="rotate(-18 540 1035)"><rect class="mv" data-dx="-120" x="-200" y="980" width="1500" height="110" fill="#C8452B" fill-opacity=".22"/></g>
+    </svg>
+    {% else %}
+    <svg viewBox="0 0 1080 1920" preserveAspectRatio="none">
+      <defs><pattern id="dots" width="60" height="60" patternUnits="userSpaceOnUse"><circle cx="30" cy="30" r="5" fill="#5fd0c4" fill-opacity=".30"/></pattern></defs>
+      <rect class="mv" data-dy="-70" x="0" y="0" width="1080" height="2100" fill="url(#dots)"/>
+      <circle class="mv" data-dx="-60" data-dy="80" data-ds=".1" cx="780" cy="640" r="280" fill="#F4B942" fill-opacity=".18"/>
+      <circle class="mv" data-dx="50" data-dy="-40" cx="260" cy="1000" r="150" fill="none" stroke="#14B8A6" stroke-opacity=".5" stroke-width="6"/>
+    </svg>
+    {% endif %}
+  </div>
+  <div class="ghost">{{ '%02d' % index }}</div>
+  {% endif %}
   <div class="scrim"></div>
   <div class="bars" id="bars">
     {% for i in range(total) %}<i><b></b></i>{% endfor %}
@@ -85,6 +135,7 @@ const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
 const ease = (x) => 1 - Math.pow(1 - clamp(x, 0, 1), 3);
 
 const bgImg = document.querySelector('#bg img');
+const movers = [...document.querySelectorAll('.mv')];
 const bars = [...document.querySelectorAll('#bars i b')];
 const items = [...document.querySelectorAll('.anim')];
 
@@ -93,6 +144,11 @@ window.seek = (t) => {
 
   // الخلفية تكبر ببطء طوال المشهد
   if (bgImg) bgImg.style.transform = `scale(${(1.06 + 0.10 * p).toFixed(4)})`;
+  // عناصر الخلفية التصميمية: إزاحة وتكبير بنسبة تقدّم المشهد
+  movers.forEach((m) => {
+    const dx = parseFloat(m.dataset.dx || '0'), dy = parseFloat(m.dataset.dy || '0'), ds = parseFloat(m.dataset.ds || '0');
+    m.style.transform = `translate(${(dx * p).toFixed(2)}px, ${(dy * p).toFixed(2)}px) scale(${(1 + ds * p).toFixed(4)})`;
+  });
 
   // شريط التقدّم: ما قبل المشهد ممتلئ، والحالي يمتلئ مع الزمن
   bars.forEach((b, i) => {

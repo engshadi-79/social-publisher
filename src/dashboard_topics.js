@@ -199,7 +199,6 @@ $("pAdd").onclick = async () => {
   const err = mErr ? mErr : (!isCar && !v("pTitle")) ? "اكتب عنوان الصورة." : !v("pText") ? "اكتب نص المنشور." : !plats.length ? "اختر منصة واحدة على الأقل." :
     !when ? "اختر موعد النشر." :
     (isCar ? false : $("pTemplate").value === "infographic" && (v("pPoints").split("\n").filter((x) => x.trim()).length < 2)) ? "الإنفوجرافك يحتاج نقطتين على الأقل (كل نقطة في سطر)." :
-    (!isCar && $("pTemplate").value !== "infographic" && !(v("pQuery") || v("pVP"))) ? "اكتب كلمات إنجليزية للصورة (مثل: engineer construction site)." :
     ($("pTopic") && !v("pTopic")) ? "اختر الموضوع." :
     (plats.includes("threads") && v("pText").length > 500) ? "نص ثريدز يجب ألا يتجاوز 500 حرف." :
     (plats.includes("linkedin") && v("pText").length > 3000) ? "نص لينكدإن يجب ألا يتجاوز 3000 حرف." :

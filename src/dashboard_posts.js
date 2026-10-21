@@ -41,6 +41,18 @@ async function deleteBg(id) {
   await gh("contents/" + path, { method: "DELETE", body: JSON.stringify({ message: "media: regenerate " + id, sha }) });
 }
 
+// صور الشرائح/المشاهد المحفوظة تُستعمل ولو تغيّرت كلمات البحث، فنحذف ما تغيّر ليُجلب من جديد
+async function deleteChangedPhotos(id, oldList, newList, oldBase, newBase) {
+  const n = Math.max((oldList || []).length, (newList || []).length);
+  for (let i = 1; i <= n; i++) {
+    const o = (oldList || [])[i - 1] || {}, w = (newList || [])[i - 1] || {};
+    if ((o.photo_query || oldBase || "") === (w.photo_query || newBase || "")) continue;
+    const path = "content/media/" + id + "-s" + String(i).padStart(2, "0") + ".jpg";
+    let sha; try { sha = (await gh("contents/" + path)).sha; } catch (e) { continue; }
+    await gh("contents/" + path, { method: "DELETE", body: JSON.stringify({ message: "media: new photo " + id + " #" + i, sha }) });
+  }
+}
+
 // ---------- نافذة التعديل ----------
 const PLATS = ["facebook", "instagram", "threads", "linkedin", "telegram"];
 let editId = null;
@@ -65,7 +77,6 @@ $("eSave").onclick = async () => {
   const tpl = $("eTemplate").value, eSlides = tpl === "carousel" ? parseSlides($("eSlides").value) : tpl === "reel" ? parseScenes($("eSlides").value) : [], points = v("ePoints").split("\n").map((x) => x.trim()).filter(Boolean);
   const multi = tpl === "carousel" || tpl === "reel", err = (tpl === "carousel" && slidesError(eSlides)) ? slidesError(eSlides) : (tpl === "reel" && scenesError(eSlides)) ? scenesError(eSlides) : (!multi && !v("eTitle")) ? "العنوان مطلوب." : !Object.keys(platforms).length ? "اختر منصة واحدة على الأقل بنص غير فارغ." :
     !v("eWhen") ? "اختر الموعد." : (tpl === "infographic" && (points.length < 2 || points.length > 6)) ? "الإنفوجرافك يحتاج من 2 إلى 6 نقاط." :
-    (tpl !== "infographic" && !multi && !(v("eQuery") || v("eVP"))) ? "اكتب كلمات إنجليزية للصورة." :
     (platforms.threads && platforms.threads.length > 500) ? "نص ثريدز أطول من 500 حرف." :
     (platforms.instagram && platforms.instagram.length > 2200) ? "نص إنستغرام أطول من 2200 حرف." :
     (platforms.linkedin && platforms.linkedin.length > 3000) ? "نص لينكدإن أطول من 3000 حرف." :
@@ -83,6 +94,7 @@ $("eSave").onclick = async () => {
     say(m, "جارٍ الحفظ…", true);
     await edit((x) => replacePost(x, editId, Object.assign({}, nu, { approved: liveApproved(x, editId) })), "queue: edit " + editId, QFILE);
     if (imageChanged) await deleteBg(editId);
+    if (tpl === "reel" || tpl === "carousel") await deleteChangedPhotos(editId, oi.scenes || oi.slides, img.scenes || img.slides, oi.photo_query || "", img.photo_query || "");
     POSTS[editId] = Object.assign({}, POSTS[editId], nu, { approved: POSTS[editId].approved, group: POSTS[editId].group });
     const card = document.querySelector('.post [data-id="' + editId + '"]');
     if (card) { const post = card.closest(".post"); const t = post.querySelector(".title"), ln = post.querySelector(".line");

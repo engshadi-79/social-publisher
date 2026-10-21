@@ -184,6 +184,11 @@ def make_entries(items: list[dict], req: dict, topic: dict, existing_ids: set[st
             img["photo_query"] = str(it.get("photo_query", "")).strip()
             if str(it.get("visual_prompt", "")).strip():
                 img["visual_prompt"] = str(it["visual_prompt"]).strip()
+        # التصاميم بلا صور فوتوغرافية (قرار المالك): تُحذف كل كلمات البحث ولو كتبها النموذج
+        img.pop("photo_query", None)
+        img.pop("visual_prompt", None)
+        for part in (img.get("slides") or []) + (img.get("scenes") or []):
+            part.pop("photo_query", None)
         img["seed"] = 1 + (i * 7) % 90
         entry["image"] = img
         entry["platforms"] = {p: clip(texts[p], 480) if p == "threads" else texts[p]
@@ -202,6 +207,8 @@ def main() -> int:
         print("لا يوجد طلب توليد")
         return 0
     req = yaml.safe_load(REQUEST.read_text(encoding="utf-8")) or {}
+    if req.get("style") not in ("carousel", "reel", "infographic"):
+        req["style"] = "infographic"          # لا منشورات بصور فوتوغرافية بعد الآن
     rid = str(req.get("id", ""))
     try:
         count = max(1, min(int(req.get("count", 1)), 7))
