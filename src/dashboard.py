@@ -157,7 +157,8 @@ def main() -> int:
             bg = imagegen.post_bg_path(post)
             if post["template"] == "reel":      # لقطة غلاف بدل بناء الفيديو كاملاً
                 import video
-                pngs = [video.render_poster(r, post, OUT_DIR / "_tmp" / f"{post['id']}-poster.png")]
+                n_sc = len((post.get("image") or {}).get("scenes") or [])    # كل مشهد بلقطته ليراجعها صاحبها
+                pngs = [video.render_poster(r, post, OUT_DIR / "_tmp" / f"{post['id']}-poster{k}.png", k) for k in range(1, n_sc + 1)]
             else:
                 pngs = r.render_post(post, OUT_DIR / "_tmp", bg if bg.exists() else None)
             fulls = []

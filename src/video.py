@@ -65,7 +65,7 @@ def duration_of(post: dict) -> float:
     return sum(s["duration"] for s in scene_specs(post))
 
 
-def render_poster(renderer, post: dict, out_png: Path) -> Path:
+def render_poster(renderer, post: dict, out_png: Path, scene: int = 1) -> Path:
     """لقطة غلاف من المشهد الأول عند لحظة اكتمال النصّ.
 
     اللوحة تعرض هذه بدل بناء الفيديو كاملاً: ثانية واحدة بدل دقيقتين.
@@ -83,19 +83,20 @@ def render_poster(renderer, post: dict, out_png: Path) -> Path:
     photos, _ = imagegen.ensure_slide_photos(post, key="scenes")
     env = Environment(loader=FileSystemLoader(str(TEMPLATES_DIR)), autoescape=True)
     w, h = TEMPLATES["reel"]
-    photo = photos.get(1)
+    spec = specs[scene - 1]
+    photo = photos.get(scene)
     html = env.get_template("reel/scene.html").render(
         brand=load_brand(), w=w, h=h, fonts=_fonts(),
-        photo=photo.as_uri() if photo else None, **specs[0])
+        photo=photo.as_uri() if photo else None, **spec)
     tmp = OUT_DIR / "_tmp"
     tmp.mkdir(parents=True, exist_ok=True)
-    page_file = tmp / f"{post['id']}-poster.html"
+    page_file = tmp / f"{post['id']}-poster{scene}.html"
     page_file.write_text(html, encoding="utf-8")
     page = renderer._browser.new_page(viewport={"width": w, "height": h}, device_scale_factor=1)
     try:
         page.goto(page_file.as_uri())
         page.wait_for_function("window.__ready === true", timeout=30000)
-        page.evaluate("t => window.seek(t)", min(1.6, specs[0]["duration"] - 0.6))
+        page.evaluate("t => window.seek(t)", min(1.6, spec["duration"] - 0.6))
         out_png.parent.mkdir(parents=True, exist_ok=True)
         page.screenshot(path=str(out_png), clip={"x": 0, "y": 0, "width": w, "height": h})
     finally:
