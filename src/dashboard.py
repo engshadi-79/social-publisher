@@ -172,6 +172,7 @@ def main() -> int:
                     th.save(img_dir / f"thumb-{it['id']}.jpg", quality=82)
             it["slides_json"] = json.dumps(fulls) if len(fulls) > 1 else ""
             it["slide_count"] = len(fulls)
+            it["reel_scenes"] = len((post.get("image") or {}).get("scenes") or []) if post["template"] == "reel" else 0
 
     acc_json = json.dumps([{"id": a.id, "platform": a.platform, "label": a.label, "default": a.default}
                            for a in acc.load_accounts().values()], ensure_ascii=False).replace("</", "<\\/")

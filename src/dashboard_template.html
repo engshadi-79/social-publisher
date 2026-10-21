@@ -247,7 +247,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
 <div class="list" id="grid">
 {% for p in posts %}
 <article class="post" data-s="{{ p.group }}">
-  <div class="imgwrap"><img loading="lazy" src="images/thumb-{{ p.id }}.jpg" data-full="images/full-{{ p.id }}{% if p.slide_count > 1 %}-s1{% endif %}.jpg"{% if p.slides_json %} data-slides='{{ p.slides_json }}'{% endif %} alt="{{ p.title }}" title="اضغط لعرض الصورة كاملة">{% if p.slide_count > 1 %}<span class="scount">{{ p.slide_count }} شرائح ▤</span>{% endif %}</div>
+  <div class="imgwrap"><img loading="lazy" src="images/thumb-{{ p.id }}.jpg" data-full="images/full-{{ p.id }}{% if p.slide_count > 1 %}-s1{% endif %}.jpg"{% if p.slides_json %} data-slides='{{ p.slides_json }}'{% endif %} alt="{{ p.title }}" title="اضغط لعرض الصورة كاملة">{% if p.slide_count > 1 %}<span class="scount">{{ p.slide_count }} شرائح ▤</span>{% endif %}{% if p.reel_scenes %}<span class="scount">▶ فيديو · {{ p.reel_scenes }} مشاهد (لقطة الغلاف)</span>{% endif %}</div>
   <div class="body">
     <span class="badge b-{{ p.badge }}">{{ p.badge_txt }}</span>
     <div class="title">{{ p.title }}</div>
