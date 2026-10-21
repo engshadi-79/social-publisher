@@ -158,7 +158,7 @@
       "published_at": "2026-10-21T05:34:07+00:00"
     },
     "threads": {
-      "attempts": 1,
+      "attempts": 2,
       "error": "PublishError: threads publish: HTTP 400 The requested resource does not exist",
       "status": "retry"
     },
@@ -169,6 +169,32 @@
       "error": null,
       "account": "لينكدإن — المهندس شادي",
       "published_at": "2026-10-21T05:34:24+00:00"
+    }
+  },
+  "2026-10-21-reel1": {
+    "facebook": {
+      "attempts": 0,
+      "status": "published",
+      "platform_post_id": "1868809447864735",
+      "error": null,
+      "account": "فيسبوك — الوان",
+      "published_at": "2026-10-21T05:39:28+00:00"
+    },
+    "instagram": {
+      "attempts": 0,
+      "status": "published",
+      "platform_post_id": "18114550196032985",
+      "error": null,
+      "account": "إنستغرام — engshadi2011",
+      "published_at": "2026-10-21T05:40:10+00:00"
+    },
+    "threads": {
+      "attempts": 0,
+      "status": "published",
+      "platform_post_id": "18036069941851071",
+      "error": null,
+      "account": "ثريدز — engshadi2011",
+      "published_at": "2026-10-21T05:40:49+00:00"
     }
   }
 }
