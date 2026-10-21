@@ -74,7 +74,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
   <select id="eTemplate"><option value="carousel">كاروسيل</option><option value="reel">ريل (فيديو عمودي)</option><option value="infographic">إنفوجرافك</option><option value="split">صورة + لوحة نص</option><option value="photo">صورة كاملة</option><option value="tip">نصيحة</option><option value="quote">اقتباس</option><option value="announcement">إعلان</option><option value="story">ستوري</option></select>
   <label>العنوان على الصورة *</label><input id="eTitle">
   <label>النص الصغير</label><input id="eBody">
-  <label>شرائح الكاروسيل (انظر التنسيق في نموذج الإضافة)</label><textarea id="eSlides" rows="10"></textarea>
+  <label>شرائح الكاروسيل أو مشاهد الريل (انظر التنسيق في نموذج الإضافة)</label><textarea id="eSlides" rows="10"></textarea>
   <label>نقاط الإنفوجرافك (سطر لكل نقطة)</label><textarea id="ePoints" rows="4"></textarea>
   <label>كلمات إنجليزية للصورة <span class="hint">(تغييرها يعيد توليد الصورة)</span></label><input id="eQuery" dir="ltr">
   <label>وصف بديل للصورة (إنجليزي)</label><textarea id="eVP" dir="ltr" rows="2"></textarea>
@@ -130,7 +130,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
 <div id="lb"><button id="lbPrev" aria-label="السابق">›</button><img alt=""><button id="lbNext" aria-label="التالي">‹</button><span id="lbCtr"></span></div>
 <div class="wrap">
 <h1>لوحة النشر</h1>
-<div class="upd">آخر تحديث: <bdi dir="ltr">2026-10-21 03:56</bdi></div>
+<div class="upd">آخر تحديث: <bdi dir="ltr">2026-10-21 07:54</bdi></div>
 
 <div class="summary">يوجد 1 منشور مجدول، وأقربها يوم الأربعاء 21 أكتوبر الساعة 8:32 صباحاً. تم نشر 5 منشور حتى الآن.</div>
 
@@ -340,9 +340,9 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
     <select id="gTopic"><option value="tmvet3asy">الذكاء الصناعي</option><option value="tmvgcv3kj">تطبيقات الذكاء الاصطناعي في تطوير الويب والأنظمة (Technical &amp; How-To)</option><option value="tmvgcvmh5">نصائح للمطورين والمبتدئين (Mindset &amp; Career)</option><option value="tmvgcw0d5">دراسات حالة وأتمتة الأعمال (Business &amp; Automation)</option><option value="tmvgcw9c3">اقتباسات سريعة وتفاعل خفيف (Quotes &amp; Engagement)</option><option value="tmvgczjo2">منهجيات إدارة المشاريع (Agile vs Waterfall)</option><option value="tmvgczrg1">إدارة الفرق والقيادة (Leadership &amp; Team Dynamics)</option><option value="tmvgczzq9">أدوات وتقنيات رفع الإنتاجية (Tools &amp; Frameworks)</option><option value="tmvgd08zd">إدارة المخاطر والأزمات (Risk &amp; Crisis Management)</option></select>
     
     <label>شكل الصورة</label>
-    <select id="gStyle"><option value="carousel">كاروسيل: عدة شرائح بأسلوب دراسة حالة (مقترح)</option><option value="infographic">إنفوجرافك: نقاط مرقّمة تلخّص الفكرة (مقترح)</option><option value="photo">صورة حقيقية تمثّل الفكرة</option></select>
-    <label>عدد الشرائح (للكاروسيل)</label>
-    <select id="gSlides"><option>5</option><option selected>7</option><option>8</option><option>10</option></select>
+    <select id="gStyle"><option value="carousel">كاروسيل: عدة شرائح بأسلوب دراسة حالة (مقترح)</option><option value="infographic">إنفوجرافك: نقاط مرقّمة تلخّص الفكرة (مقترح)</option><option value="reel">ريل: فيديو عمودي بمشاهد وصور حقيقية (يُبنى عند النشر)</option><option value="photo">صورة حقيقية تمثّل الفكرة</option></select>
+    <label>عدد الشرائح أو المشاهد (للكاروسيل والريل)</label>
+    <select id="gSlides"><option>3</option><option>4</option><option>5</option><option selected>7</option><option>8</option><option>10</option></select>
     <label>عدد المنشورات</label>
     <select id="gCount"><option>1</option><option>2</option><option selected>3</option><option>5</option><option>7</option></select>
     <label>موعد أول منشور (ثم واحد كل يوم في نفس الوقت)</label><input id="gWhen" type="datetime-local">
@@ -360,6 +360,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
     <label>شكل الصورة</label>
     <select id="pTemplate">
       <option value="carousel">كاروسيل (عدة شرائح، أسلوب دراسة حالة)</option>
+      <option value="reel">ريل — فيديو عمودي (مشاهد بصور حقيقية)</option>
       <option value="infographic">إنفوجرافك (نقاط مرقّمة)</option>
       <option value="split">صورة في الأعلى ولوحة نص أسفلها (الأنسب للصور الحقيقية)</option>
       <option value="photo">صورة كاملة والنص أسفلها (تحتاج صورة عالية الدقة)</option>
@@ -370,9 +371,10 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
     </select>
     <label>العنوان الذي يظهر على الصورة *</label><input id="pTitle" placeholder="جملة قصيرة وواضحة">
     <label>نص صغير تحت العنوان (اختياري)</label><input id="pBody">
-    <label>شرائح الكاروسيل <span class="hint">— لقالب الكاروسيل فقط</span></label>
+    <label>شرائح الكاروسيل أو مشاهد الريل <span class="hint">— للكاروسيل والريل فقط</span></label>
     <textarea id="pSlides" rows="9" placeholder="# عنوان الغلاف&#10;@ دراسة حالة&#10;جملة تحت العنوان&#10;- نقطة&#10;---&#10;# عنوان الشريحة الثانية&#10;شرح قصير"></textarea>
     <div class="hint">كل شريحة تبدأ بسطر «# العنوان»؛ «@ ...» للسطر الصغير فوق العنوان؛ «- ...» للنقاط؛ وبقية الأسطر شرحٌ. وتفصل بين الشرائح بسطر «---». من 3 إلى 10 شرائح.</div>
+    <div class="hint">للريل: نفس الصيغة لكل مشهد (من 3 إلى 8)، وأضف «~ 3.5» لمدّة المشهد بالثواني و«? kind of photo» لكلمات صورته الإنجليزية (وإلا استُعملت الكلمات العامة أدناه). الفيديو يُبنى عند النشر ويستغرق دقائق، وتظهر في اللوحة لقطة الغلاف فقط.</div>
     <label>نقاط الإنفوجرافك (كل نقطة في سطر، من 2 إلى 6) <span class="hint">— لقالب الإنفوجرافك فقط</span></label><textarea id="pPoints" rows="4"></textarea>
     <label>كلمات إنجليزية للصورة الحقيقية <span class="hint">(2 إلى 4 كلمات، لغير الإنفوجرافك)</span></label><input id="pQuery" dir="ltr" placeholder="civil engineer construction site">
     <label>وصف بديل للصورة بالإنجليزية (اختياري)</label><textarea id="pVP" dir="ltr" rows="2"></textarea>
@@ -742,6 +744,29 @@ function slidesYaml(slides) {
   return "    slides:\n" + slides.map((s) => "      - kicker: " + q(s.kicker || "") + "\n        title: " + q(s.title) + "\n        body: " + q(s.body || "") +
     (s.points && s.points.length ? "\n        points:\n" + s.points.map((x) => "          - " + q(x)).join("\n") : "")).join("\n") + "\n";
 }
+// مشاهد الريل: نفس صيغة الشرائح مع سطرين إضافيين: «~ 3.5» للثواني و«? كلمات» للصورة
+function parseScenes(text) {
+  return text.split(/^\s*---\s*$/m).map((blk) => {
+    const sc = { kicker: "", title: "", body: "", seconds: 3.4, photo_query: "" }, body = [];
+    blk.split("\n").map((l) => l.trim()).filter(Boolean).forEach((l) => {
+      if (l.startsWith("# ")) sc.title = l.slice(2).trim();
+      else if (l.startsWith("@ ")) sc.kicker = l.slice(2).trim();
+      else if (l.startsWith("~ ")) sc.seconds = parseFloat(l.slice(2)) || 3.4;
+      else if (l.startsWith("? ")) sc.photo_query = l.slice(2).trim();
+      else body.push(l);
+    });
+    sc.body = body.join(" "); return sc;
+  }).filter((s) => s.title || s.body);
+}
+function scenesToText(scenes) {
+  return (scenes || []).map((s) => [s.title ? "# " + s.title : "", s.kicker ? "@ " + s.kicker : "", s.body || "",
+    s.seconds ? "~ " + s.seconds : "", s.photo_query ? "? " + s.photo_query : ""].filter(Boolean).join("\n")).join("\n---\n");
+}
+function scenesYaml(scenes) {
+  return "    scenes:\n" + scenes.map((s) => "      - kicker: " + q(s.kicker || "") + "\n        title: " + q(s.title) + "\n        body: " + q(s.body || "") +
+    "\n        seconds: " + (Math.min(8, Math.max(1.5, s.seconds || 3.4))) + (s.photo_query ? "\n        photo_query: " + q(s.photo_query) : "")).join("\n") + "\n";
+}
+const scenesError = (sc) => (sc.length < 3 || sc.length > 8) ? "الريل يحتاج من 3 إلى 8 مشاهد." : (sc.some((s) => !s.title) ? "لكل مشهد عنوان («# العنوان»)." : (sc.some((s) => s.title.length > 70) ? "عنوان المشهد أطول من 70 حرفاً." : (sc.some((s) => s.body.length > 150) ? "نص المشهد أطول من 150 حرفاً." : "")));
 const slidesError = (sl) => (sl.length < 3 || sl.length > 10) ? "الكاروسيل يحتاج من 3 إلى 10 شرائح." : (sl.some((s) => !s.title) ? "لكل شريحة عنوان («# العنوان»)." : "");
 
 
@@ -817,7 +842,7 @@ function addPost(text, p) {
   if (p.topic) b += "  topic: " + q(p.topic) + "\n";
   b += "  image:\n    title: " + q(p.title) + "\n    body: " + q(p.body) + "\n";
   if (p.points && p.points.length) b += "    points:\n" + p.points.map((x) => "      - " + q(x)).join("\n") + "\n";
-  if (p.slides && p.slides.length) b += slidesYaml(p.slides);
+  if (p.slides && p.slides.length) b += p.template === "reel" ? scenesYaml(p.slides) : slidesYaml(p.slides);
   if (p.query) b += "    photo_query: " + q(p.query) + "\n";
   if (p.vp) b += "    visual_prompt: " + q(p.vp) + "\n";
   b += "    seed: " + p.seed + "\n  platforms:\n";
@@ -885,8 +910,9 @@ $("pAdd").onclick = async () => {
   const m = $("pMsg"), v = (i) => $(i).value.trim();
   const plats = ["facebook", "instagram", "threads", "linkedin", "telegram"].filter((k) => $("pl_" + k).checked);
   const when = v("pWhen").replace("T", " ");
-  const isCar = $("pTemplate").value === "carousel", slides = isCar ? parseSlides($("pSlides").value) : [];
-  const err = isCar && slidesError(slides) ? slidesError(slides) : (!isCar && !v("pTitle")) ? "اكتب عنوان الصورة." : !v("pText") ? "اكتب نص المنشور." : !plats.length ? "اختر منصة واحدة على الأقل." :
+  const tplv = $("pTemplate").value, isCar = tplv === "carousel" || tplv === "reel", slides = tplv === "reel" ? parseScenes($("pSlides").value) : isCar ? parseSlides($("pSlides").value) : [];
+  const mErr = tplv === "reel" ? scenesError(slides) : isCar ? slidesError(slides) : "";
+  const err = mErr ? mErr : (!isCar && !v("pTitle")) ? "اكتب عنوان الصورة." : !v("pText") ? "اكتب نص المنشور." : !plats.length ? "اختر منصة واحدة على الأقل." :
     !when ? "اختر موعد النشر." :
     (isCar ? false : $("pTemplate").value === "infographic" && (v("pPoints").split("\n").filter((x) => x.trim()).length < 2)) ? "الإنفوجرافك يحتاج نقطتين على الأقل (كل نقطة في سطر)." :
     (!isCar && $("pTemplate").value !== "infographic" && !(v("pQuery") || v("pVP"))) ? "اكتب كلمات إنجليزية للصورة (مثل: engineer construction site)." :
@@ -961,6 +987,7 @@ function serializePost(p) {
   b += "  image:\n    title: " + q(im.title || "") + "\n    body: " + q(im.body || "") + "\n";
   if (im.points && im.points.length) b += "    points:\n" + im.points.map((x) => "      - " + q(x)).join("\n") + "\n";
   if (im.slides && im.slides.length) b += slidesYaml(im.slides);
+  if (im.scenes && im.scenes.length) b += scenesYaml(im.scenes);
   if (im.photo_query) b += "    photo_query: " + q(im.photo_query) + "\n";
   if (im.bg_from) b += "    bg_from: " + q(im.bg_from) + "\n";
   if (im.visual_prompt) b += "    visual_prompt: " + q(im.visual_prompt) + "\n";
@@ -997,7 +1024,7 @@ let editId = null;
 function openEdit(id) {
   const p = POSTS[id]; if (!p) return;
   editId = id; const im = p.image || {};
-  $("eTitle").value = im.title || ""; $("eBody").value = im.body || ""; $("ePoints").value = (im.points || []).join("\n"); $("eSlides").value = slidesToText(im.slides);
+  $("eTitle").value = im.title || ""; $("eBody").value = im.body || ""; $("ePoints").value = (im.points || []).join("\n"); $("eSlides").value = p.template === "reel" ? scenesToText(im.scenes) : slidesToText(im.slides);
   $("eQuery").value = im.photo_query || ""; $("eVP").value = im.visual_prompt || "";
   $("eTemplate").value = p.template; $("eWhen").value = (p.publish_at || "").replace(" ", "T");
   if ($("eTopic")) $("eTopic").value = p.topic || "";
@@ -1012,18 +1039,18 @@ $("eSave").onclick = async () => {
   const m = $("eMsg"), v = (i) => $(i).value.trim(), old = POSTS[editId];
   const platforms = {};
   PLATS.forEach((k) => { if ($("ep_" + k).checked && v("et_" + k)) platforms[k] = v("et_" + k); });
-  const tpl = $("eTemplate").value, eSlides = tpl === "carousel" ? parseSlides($("eSlides").value) : [], points = v("ePoints").split("\n").map((x) => x.trim()).filter(Boolean);
-  const err = (tpl === "carousel" && slidesError(eSlides)) ? slidesError(eSlides) : (tpl !== "carousel" && !v("eTitle")) ? "العنوان مطلوب." : !Object.keys(platforms).length ? "اختر منصة واحدة على الأقل بنص غير فارغ." :
+  const tpl = $("eTemplate").value, eSlides = tpl === "carousel" ? parseSlides($("eSlides").value) : tpl === "reel" ? parseScenes($("eSlides").value) : [], points = v("ePoints").split("\n").map((x) => x.trim()).filter(Boolean);
+  const multi = tpl === "carousel" || tpl === "reel", err = (tpl === "carousel" && slidesError(eSlides)) ? slidesError(eSlides) : (tpl === "reel" && scenesError(eSlides)) ? scenesError(eSlides) : (!multi && !v("eTitle")) ? "العنوان مطلوب." : !Object.keys(platforms).length ? "اختر منصة واحدة على الأقل بنص غير فارغ." :
     !v("eWhen") ? "اختر الموعد." : (tpl === "infographic" && (points.length < 2 || points.length > 6)) ? "الإنفوجرافك يحتاج من 2 إلى 6 نقاط." :
-    (tpl !== "infographic" && tpl !== "carousel" && !(v("eQuery") || v("eVP"))) ? "اكتب كلمات إنجليزية للصورة." :
+    (tpl !== "infographic" && !multi && !(v("eQuery") || v("eVP"))) ? "اكتب كلمات إنجليزية للصورة." :
     (platforms.threads && platforms.threads.length > 500) ? "نص ثريدز أطول من 500 حرف." :
     (platforms.instagram && platforms.instagram.length > 2200) ? "نص إنستغرام أطول من 2200 حرف." :
     (platforms.linkedin && platforms.linkedin.length > 3000) ? "نص لينكدإن أطول من 3000 حرف." :
     ($("eTopic") && !v("eTopic")) ? "اختر الموضوع." : "";
   if (err) { say(m, err, false); return; }
   const oi = old.image || {};
-  const img = { title: tpl === "carousel" ? eSlides[0].title : v("eTitle"), body: tpl === "carousel" ? "" : v("eBody"), seed: oi.seed != null ? oi.seed : 1 };
-  if (tpl === "carousel") img.slides = eSlides; else if (tpl === "infographic") img.points = points; else { img.photo_query = v("eQuery"); if (v("eVP")) img.visual_prompt = v("eVP"); }
+  const img = { title: multi ? eSlides[0].title : v("eTitle"), body: multi ? "" : v("eBody"), seed: oi.seed != null ? oi.seed : 1 };
+  if (tpl === "carousel") img.slides = eSlides; else if (tpl === "reel") { img.scenes = eSlides; if (v("eQuery")) img.photo_query = v("eQuery"); } else if (tpl === "infographic") img.points = points; else { img.photo_query = v("eQuery"); if (v("eVP")) img.visual_prompt = v("eVP"); }
   let targets;
   try { targets = readTargets("eAcc", Object.keys(platforms)); } catch (e4) { say(m, e4.message, false); return; }
   const nu = { id: editId, approved: old.approved, targets, publish_at: v("eWhen").replace("T", " "), template: tpl,
