@@ -1,8 +1,8 @@
 {
-  "id": "gmvgw8a1t",
+  "id": "gmvi0ni4m",
   "ok": true,
-  "count": 1,
-  "topic": "دراسات حالة وأتمتة الأعمال (Business & Automation)",
-  "method": "Gemini gemini-3.8-flash | ترند Google: 47 عنصر",
-  "message": "وُلِّدت 1 مسودات عن «دراسات حالة وأتمتة الأعمال (Business & Automation)»"
+  "count": 3,
+  "topic": "إدارة المخاطر والأزمات (Risk & Crisis Management)",
+  "method": "Gemini gemini-3.8-flash (generateContent) — تعذّر سابقاً: Gemini gemini-3.8-flash: gemini-3.8-flash (interactions) HTTP 503: gemini-3.8-flash is currently experiencing high demand, spikes in demand are usually temporary. Please  | ترند Google: 48 عنصر",
+  "message": "وُلِّدت 3 مسودات عن «إدارة المخاطر والأزمات (Risk & Crisis Management)»"
 }
