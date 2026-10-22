@@ -68,6 +68,7 @@ jobs:
         env:
           GITHUB_REPOSITORY: ${{ github.repository }}
           DASHBOARD_PASSWORD: ${{ secrets.DASHBOARD_PASSWORD }}
+          DASHBOARD_URL: https://social-dashboard-cyan-mu.vercel.app/
         run: python dashboard.py --publish
       - name: Deploy dashboard to Vercel (server-side login)
         working-directory: src

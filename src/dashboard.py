@@ -240,11 +240,16 @@ def main() -> int:
         print("اللوحة مشفّرة بكلمة المرور")
     else:
         print("اللوحة بلا تشفير (محمية على الخادم)" if args.vercel else "تنبيه: DASHBOARD_PASSWORD غير مضبوط، اللوحة مفتوحة لكل من معه الرابط")
+    redirect = os.environ.get("DASHBOARD_URL", "")
+    if args.publish and redirect:           # اللوحة صارت على Vercel: صفحة GitHub القديمة تحوّل إليها ولا تحمل أي محتوى
+        html = ('<!doctype html><html dir="rtl" lang="ar"><head><meta charset="utf-8"><meta name="robots" content="noindex">'
+                f'<meta http-equiv="refresh" content="0;url={redirect}"><title>لوحة التحكم</title></head>'
+                f'<body style="font-family:sans-serif;text-align:center;padding:40px"><a href="{redirect}">انتقل إلى لوحة التحكم</a></body></html>')
     (args.out / "index.html").write_text(html, encoding="utf-8")
     print(f"لوحة: {args.out / 'index.html'}  ({len(items)} منشور)")
     if args.publish:
         import hosting
-        print("نُشرت على:", hosting.upload_site(args.out))
+        print("نُشرت على:", hosting.upload_site(args.out, with_images=not redirect))
     return 0
 
 

@@ -61,13 +61,13 @@ def upload(files: list[Path]) -> dict[str, str]:
     return urls
 
 
-def upload_site(src: Path) -> str:
+def upload_site(src: Path, with_images: bool = True) -> str:
     """ينسخ محتويات مجلد (index.html و images/) إلى جذر gh-pages دون حذف صور المنشورات."""
     def copy(root: Path):
         shutil.copy2(src / "index.html", root / "index.html")
         for stale in list((root / "images").glob("full-*")) + list((root / "images").glob("thumb-*")):
             stale.unlink()                      # معاينات اللوحة تُبنى من جديد كل مرة، فلا تبقى قديمة أو بأسماء مكشوفة
-        for f in (src / "images").glob("*"):
+        for f in (src / "images").glob("*") if with_images else []:
             shutil.copy2(f, root / "images" / f.name)
 
     _push_to_pages(copy, "dashboard [skip ci]")
