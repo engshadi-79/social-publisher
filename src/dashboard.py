@@ -215,7 +215,7 @@ def main() -> int:
         e["group"] = group_of.get(p["id"], "draft")
         raw[p["id"]] = e
     ins_f = ROOT / "content" / "insights.json"
-    insights_json = (ins_f.read_text(encoding="utf-8") if ins_f.exists() else "{}").replace("</", "<\/")
+    insights_json = (ins_f.read_text(encoding="utf-8") if ins_f.exists() else "{}").replace("</", "<\\/")
     posts_json = json.dumps(raw, ensure_ascii=False).replace("</", "<\\/")
 
     env = Environment(loader=FileSystemLoader(str(Path(__file__).parent)), autoescape=True)
