@@ -300,14 +300,20 @@ def daily(target: str | None = None) -> int:
     def make(t, day, slot, style, slides, extra=None):
         req = {"id": f"daily-{day}-{t['id']}", "count": 1, "topic_id": t["id"], "style": style,
                "slides": slides, "start": f"{day} {slot}", **(extra or {})}
-        try:
-            entries, topic, method = build_entries(req, load_queue())
-            append_entries(entries)
-            done.append(f"{topic['name']} ({style})")
-            print(f"✓ {topic['name']} → {entries[0]['id']} [{style}] {slot}")
-        except Exception as e:  # noqa: BLE001
-            failed.append(f"{t.get('name', t['id'])}: {str(e)[:120]}")
-            print(f"✗ {t.get('name', t['id'])}: {e}")
+        for attempt in range(3):              # Gemini المجاني يزدحم (503/429): نعيد بتأخير متزايد
+            try:
+                entries, topic, method = build_entries(req, load_queue())
+                append_entries(entries)
+                done.append(f"{topic['name']} ({style})")
+                print(f"✓ {topic['name']} → {entries[0]['id']} [{style}] {slot}")
+                break
+            except Exception as e:  # noqa: BLE001
+                if attempt == 2:
+                    failed.append(f"{t.get('name', t['id'])}: {str(e)[:120]}")
+                    print(f"✗ {t.get('name', t['id'])}: {e}")
+                else:
+                    print(f"… إعادة المحاولة {attempt + 2}/3 بعد خطأ: {str(e)[:80]}")
+                    time.sleep(45 * (attempt + 1))
         time.sleep(8)                         # حدّ معدّل الطبقة المجانية
 
     start = (now_local() + timedelta(days=1)).date()
