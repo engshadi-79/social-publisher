@@ -246,36 +246,57 @@ def append_entries(entries: list[dict]) -> None:
 
 
 DAILY_STYLES = ["infographic", "carousel", "infographic", "reel"]     # الريل بنسبة ربع المنشورات: بناؤه أثقل
-DAILY_HOUR = "08:00"
+# أوقات الذروة لجمهور عربي (بتوقيت الجهة): صباح قبل العمل، استراحة الظهيرة، وذروة المساء
+SLOTS = ["08:00", "13:00", "21:00"]
+PER_DAY = len(SLOTS)
+
+
+def free_slots(queue: list[dict], day: str) -> list[str]:
+    taken = {str(p["publish_at"])[11:16] for p in queue if str(p["publish_at"])[:10] == day}
+    return [s for s in SLOTS if s not in taken]
 
 
 def daily(target: str | None = None) -> int:
-    """منشور واحد لكل موضوع في topics.yaml، مجدول الساعة 8 صباحاً من اليوم المستهدف (افتراضياً: غداً بتوقيت الجهة).
+    """ثلاثة منشورات يومياً (8:00 و13:00 و21:00) من المواضيع الأقدم نشراً، مسودات تنتظر الموافقة.
 
-    مسودات فقط (approved:false) تنتظر موافقة المالك. لا تكرّر موضوعاً له منشور في ذلك اليوم،
-    فيمكن تشغيله أكثر من مرة بأمان.
+    اليوم المستهدف: أول يوم من الغد فصاعداً فيه مواعيد شاغرة، فيتنظّم المخزون ذاتياً ولا يتراكم.
+    آمن عند التكرار: لا يملأ إلا الأوقات الشاغرة.
     """
     import time
     from datetime import datetime
     from queue_io import now_local
 
-    day = target or (now_local() + timedelta(days=1)).strftime("%Y-%m-%d")
     topics = yaml.safe_load(TOPICS_PATH.read_text(encoding="utf-8")).get("topics") if TOPICS_PATH.exists() else []
     topics = [t for t in (topics or []) if isinstance(t, dict) and t.get("id")]
+    if not topics:
+        print("لا مواضيع")
+        return 0
+    queue = load_queue()
+    day = target
+    if not day:
+        d = (now_local() + timedelta(days=1)).date()
+        while not free_slots(queue, d.strftime("%Y-%m-%d")):
+            d += timedelta(days=1)
+        day = d.strftime("%Y-%m-%d")
+    slots = free_slots(queue, day)
+    # الموضوع الأقدم نشراً أولاً (من لم يُنشر له شيء قط يتقدّم)
+    last = {t["id"]: "" for t in topics}
+    for p in queue:
+        if p.get("topic") in last:
+            last[p["topic"]] = max(last[p["topic"]], str(p["publish_at"]))
+    order = sorted(topics, key=lambda t: (last[t["id"]], topics.index(t)))
     ordinal = datetime.strptime(day, "%Y-%m-%d").toordinal()
     done, failed = [], []
-    for i, t in enumerate(topics):
+    for i, (t, slot) in enumerate(zip(order, slots)):
         queue = load_queue()
-        if any(p.get("topic") == t["id"] and str(p["publish_at"])[:10] == day for p in queue):
-            continue
         style = DAILY_STYLES[(ordinal + i) % len(DAILY_STYLES)]
         req = {"id": f"daily-{day}-{t['id']}", "count": 1, "topic_id": t["id"], "style": style,
-               "slides": 6 if style == "carousel" else 5, "start": f"{day} {DAILY_HOUR}"}
+               "slides": 6 if style == "carousel" else 5, "start": f"{day} {slot}"}
         try:
             entries, topic, method = build_entries(req, queue)
             append_entries(entries)
             done.append(f"{topic['name']} ({style})")
-            print(f"✓ {topic['name']} → {entries[0]['id']} [{style}]")
+            print(f"✓ {topic['name']} → {entries[0]['id']} [{style}] {slot}")
         except Exception as e:  # noqa: BLE001
             failed.append(f"{t.get('name', t['id'])}: {str(e)[:120]}")
             print(f"✗ {t.get('name', t['id'])}: {e}")

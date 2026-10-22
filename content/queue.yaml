@@ -278,7 +278,7 @@
     threads: "كم ساعة تضيعها أسبوعياً في مهام تتكرر بنفس الخطوات؟ ⏱️\n\n#الذكاء_الاصطناعي #أتمتة"
 - id: 2026-10-22-reel2
   approved: true
-  publish_at: 2026-10-22 20:00
+  publish_at: "2026-10-22 13:00"
   template: reel
   topic: tmvet3asy
   image:
@@ -348,7 +348,7 @@
       #أتمتة #إنتاجية'
 - id: 2026-10-23-g1
   approved: true
-  publish_at: 2026-10-23 17:15
+  publish_at: "2026-10-22 21:00"
   template: infographic
   topic: tmvgd08zd
   image:
@@ -431,7 +431,7 @@
       #إدارة_المخاطر #إدارة_المشاريع #تطوير_الأعمال #ريادة_الأعمال #نمو'
 - id: 2026-10-24-g1
   approved: false
-  publish_at: 2026-10-24 17:15
+  publish_at: "2026-10-25 21:00"
   template: infographic
   topic: tmvgd08zd
   image:
@@ -598,7 +598,7 @@
       #مبدأ_باريتو #إدارة_المشاريع #تطوير_المنتجات #فائدة #نمو'
 - id: 2026-10-23-g2
   approved: false
-  publish_at: 2026-10-23 08:00
+  publish_at: "2026-10-23 08:00"
   template: infographic
   topic: tmvet3asy
   image:
@@ -667,7 +667,7 @@
       #ذكاء_اصطناعي #برمجة_مواقع #تطوير_الويب #تقنية'
 - id: 2026-10-23-g3
   approved: false
-  publish_at: 2026-10-23 08:00
+  publish_at: "2026-10-23 13:00"
   template: carousel
   topic: tmvgcv3kj
   image:
@@ -785,7 +785,7 @@
       #تطوير_الويب #ذكاء_اصطناعي #برمجة #قواعد_بيانات'
 - id: 2026-10-23-g4
   approved: false
-  publish_at: 2026-10-23 08:00
+  publish_at: "2026-10-23 21:00"
   template: infographic
   topic: tmvgcvmh5
   image:
@@ -869,7 +869,7 @@
       #برمجة #تطوير_برمجيات #ذكاء_اصطناعي #نصائح_برمجية'
 - id: 2026-10-23-g5
   approved: false
-  publish_at: 2026-10-23 08:00
+  publish_at: "2026-10-24 08:00"
   template: reel
   topic: tmvgcw0d5
   image:
@@ -977,7 +977,7 @@
       #أتمتة_الأعمال #ذكاء_اصطناعي #تطوير_برمجيات #ريادة_الأعمال'
 - id: "2026-10-23-g6"
   approved: false
-  publish_at: "2026-10-23 20:00"
+  publish_at: "2026-10-25 13:00"
   template: infographic
   topic: "tmvgcw9c3"
   image:
@@ -998,7 +998,7 @@
     linkedin: "الذكاء الاصطناعي اليوم صار مثل محرك نفاث بين يديك؛ يكتب، ينسّق، ويقترح حلولاً في ثوانٍ معدودة. لكن تذكّر دائماً: المحرك القوي بلا ربّان ماهر لن يوصل السفينة لوجهتها! 💡\n\nالأدوات الذكية خُلقت لتسرّع إنجازك وتوفر مجهودك، بينما عقلك، تحليلك للمنطق، وفهمك العميق لاحتياجات النظام هو ما يحدد نجاح المشروع من فشله. الأداة لا تصنع الرؤية، بل تترجمها فقط.\n\nسؤال سريع لأصدقائي المطورين وصنّاع التقنية:\nما هي أكثر مهمة روتينية مملة في مشروعك الحالي تتمنى لو يؤديها عنك الذكاء الاصطناعي بالكامل لترتاح منها؟ شاركونا تجاربكم وآراءكم في التعليقات! 👇\n\n#تطوير_البرمجيات #الذكاء_الاصطناعي #برمجة #نصائح_تقنية"
 - id: 2026-10-23-g7
   approved: false
-  publish_at: 2026-10-23 08:00
+  publish_at: "2026-10-24 13:00"
   template: carousel
   topic: tmvgczjo2
   image:
@@ -1101,7 +1101,7 @@
       #إدارة_المشاريع #Agile #Waterfall #المهندس_شادي #تطوير_المنتجات'
 - id: 2026-10-23-g8
   approved: false
-  publish_at: 2026-10-23 08:00
+  publish_at: "2026-10-24 21:00"
   template: infographic
   topic: tmvgczrg1
   image:
@@ -1185,7 +1185,7 @@
       #teams #القيادة_التقنية #إدارة_الفرق #بيئة_العمل #تطوير_البرمجيات'
 - id: 2026-10-23-g9
   approved: false
-  publish_at: 2026-10-23 08:00
+  publish_at: "2026-10-25 08:00"
   template: reel
   topic: tmvgczzq9
   image:
