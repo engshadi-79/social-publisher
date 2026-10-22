@@ -1,0 +1,7 @@
+public/
+node_modules/
+.vercel/*
+!.vercel/project.json
+
+.vercel
+.env*

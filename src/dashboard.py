@@ -171,7 +171,16 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", type=Path, default=SITE)
     ap.add_argument("--publish", action="store_true", help="ارفع اللوحة إلى gh-pages (داخل Actions)")
+    ap.add_argument("--vercel", action="store_true", help="ابنِ اللوحة لـ Vercel (vercel-site/public)، بلا تشفير: الحماية على الخادم")
     args = ap.parse_args()
+    global PASSWORD
+    if args.vercel:
+        PASSWORD = ""                      # الحماية في middleware الخادم، فلا تشفير ولا أسماء صور مموّهة
+        args.out = ROOT / "vercel-site" / "public"
+        args.publish = False
+        if args.out.exists():
+            import shutil
+            shutil.rmtree(args.out)
 
     posts, state, now = load_queue(), load_state(), now_local()
     items, counts, nxt = build(posts, state, now)
@@ -222,7 +231,7 @@ def main() -> int:
     html = env.get_template("dashboard_template.html").render(
         topics_js=((Path(__file__).parent / "dashboard_topics.js").read_text(encoding="utf-8") + "\n" +
                    (Path(__file__).parent / "dashboard_posts.js").read_text(encoding="utf-8")).replace("__REPO__", os.environ.get("GITHUB_REPOSITORY", "engshadi-79/social-publisher")),
-        gen_log=load_gen_log(), health=load_health(), posts_json=posts_json, acc_json=acc_json, insights_json=insights_json,
+        gen_log=load_gen_log(), health=load_health(), posts_json=posts_json, acc_json=acc_json, pages_base="https://" + os.environ.get("GITHUB_REPOSITORY", "engshadi-79/social-publisher").replace("/", ".github.io/", 1) + "/", insights_json=insights_json,
         topics=load_topics(), repo=os.environ.get("GITHUB_REPOSITORY", "engshadi-79/social-publisher"),
         posts=items, counts=counts, next_post=nxt, tz=TIMEZONE,
         updated=now.strftime("%Y-%m-%d %H:%M"))
@@ -230,7 +239,7 @@ def main() -> int:
         html = encrypt_page(html)
         print("اللوحة مشفّرة بكلمة المرور")
     else:
-        print("تنبيه: DASHBOARD_PASSWORD غير مضبوط، اللوحة مفتوحة لكل من معه الرابط")
+        print("اللوحة بلا تشفير (محمية على الخادم)" if args.vercel else "تنبيه: DASHBOARD_PASSWORD غير مضبوط، اللوحة مفتوحة لكل من معه الرابط")
     (args.out / "index.html").write_text(html, encoding="utf-8")
     print(f"لوحة: {args.out / 'index.html'}  ({len(items)} منشور)")
     if args.publish:

@@ -69,3 +69,16 @@ jobs:
           GITHUB_REPOSITORY: ${{ github.repository }}
           DASHBOARD_PASSWORD: ${{ secrets.DASHBOARD_PASSWORD }}
         run: python dashboard.py --publish
+      - name: Deploy dashboard to Vercel (server-side login)
+        working-directory: src
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: team_bFtRd96jCIi9unglHTAXfR0l
+          VERCEL_PROJECT_ID: prj_qS8UuX5J4gm1DJhgpHZWoWkRYtV8
+        run: |
+          if [ -z "$VERCEL_TOKEN" ]; then echo "VERCEL_TOKEN غير مضبوط: تخطّي النشر على Vercel"; exit 0; fi
+          python dashboard.py --vercel
+          cd ../vercel-site
+          npm install --silent
+          npx --yes vercel@latest deploy --prod --yes --token "$VERCEL_TOKEN"
