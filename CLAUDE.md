@@ -85,7 +85,7 @@ Extra secrets: `CF_ACCOUNT_ID`, `CF_API_TOKEN` (token with Workers AI permission
 │   ├── announcement/ (1080x1350)
 │   ├── split/      (1080x1350)  photo on top, solid text panel below
 │   ├── photo/      (1080x1350)  full photo, light gradient, text at the bottom
-│   ├── infographic/ (1080x1350) numbered key points (image.points)
+│   ├── infographic/ (1080x1350) numbered key points (image.points); six styles in infographic/styles/ (cards|bento|timeline|bold|glass|steps), image.style or derived from id; the generator rotates them
 │   ├── carousel/   (1080x1350)  multi-slide album: image.slides (3-10); six visual styles in carousel/styles/
 │   ├── reel/       (1080x1920)  vertical VIDEO: image.scenes (3-8), built by src/video.py
 │   ├── tip/        (1080x1350)

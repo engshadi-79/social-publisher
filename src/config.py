@@ -42,3 +42,6 @@ CAROUSEL_STYLES = CAROUSEL_STYLES_FLAT + CAROUSEL_STYLES_PHOTO
 PLATFORMS = ("facebook", "instagram", "threads", "linkedin", "telegram")
 LIMITS = {"threads": 500, "instagram": 2200, "facebook": 63000, "telegram": 4096,
           "linkedin": 3000}
+
+# أنماط الإنفوجرافك (بلا صور): cards بطاقات · bento بلاطات · timeline خط زمني · bold جريء · glass زجاجي · steps درج
+INFOGRAPHIC_STYLES = ("cards", "bento", "timeline", "bold", "glass", "steps")

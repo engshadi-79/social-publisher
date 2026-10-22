@@ -5,7 +5,7 @@ from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 
 import imagegen
-from config import (CAROUSEL_STYLES, CAROUSEL_STYLES_FLAT, CAROUSEL_STYLES_PHOTO, OUT_DIR,
+from config import (INFOGRAPHIC_STYLES, CAROUSEL_STYLES, CAROUSEL_STYLES_FLAT, CAROUSEL_STYLES_PHOTO, OUT_DIR,
                     ROOT, TEMPLATES, TEMPLATES_DIR)
 from queue_io import load_brand
 
@@ -58,7 +58,9 @@ class Renderer:
         brand = load_brand()
         w, h = TEMPLATES[post["template"]]
         logo = ROOT / brand.get("logo", "")
-        html = _env.get_template(f"{post['template']}/template.html").render(
+        tpl_name = (f"infographic/styles/{infographic_style(post)}.html" if post["template"] == "infographic"
+                    else f"{post['template']}/template.html")
+        html = _env.get_template(tpl_name).render(
             brand=brand, w=w, h=h, fonts=_fonts(),
             title=post["image"]["title"], body=post["image"].get("body", ""),
             points=[str(x) for x in (post["image"].get("points") or [])],
@@ -94,6 +96,15 @@ class Renderer:
             import video
             return [video.render_reel(self, post, out_dir)]
         return [self.render(post, out_dir / f"{post['id']}.png", bg)]
+
+
+def infographic_style(post: dict) -> str:
+    """نمط الإنفوجرافك: `image.style` إن حُدّد، وإلا يُشتق من معرّف المنشور (ثابت لنفس المعرّف)."""
+    name = str(post.get("image", {}).get("style") or "").strip().lower()
+    if name in INFOGRAPHIC_STYLES:
+        return name
+    digest = hashlib.sha1(("info:" + str(post.get("id", ""))).encode("utf-8")).digest()
+    return INFOGRAPHIC_STYLES[digest[0] % len(INFOGRAPHIC_STYLES)]
 
 
 def flat_style(post: dict) -> str:

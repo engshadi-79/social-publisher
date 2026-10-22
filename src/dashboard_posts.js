@@ -12,6 +12,7 @@ function serializePost(p) {
   if (im.slides && im.slides.length) b += slidesYaml(im.slides);
   if (im.scenes && im.scenes.length) b += scenesYaml(im.scenes);
   if (im.photo_query) b += "    photo_query: " + q(im.photo_query) + "\n";
+  if (im.style) b += "    style: " + q(im.style) + "\n";
   if (im.bg_from) b += "    bg_from: " + q(im.bg_from) + "\n";
   if (im.visual_prompt) b += "    visual_prompt: " + q(im.visual_prompt) + "\n";
   if (im.seed != null) b += "    seed: " + im.seed + "\n";
@@ -83,7 +84,7 @@ $("eSave").onclick = async () => {
     ($("eTopic") && !v("eTopic")) ? "اختر الموضوع." : "";
   if (err) { say(m, err, false); return; }
   const oi = old.image || {};
-  const img = { title: multi ? eSlides[0].title : v("eTitle"), body: multi ? "" : v("eBody"), seed: oi.seed != null ? oi.seed : 1 };
+  const img = { style: tpl === old.template ? oi.style : undefined, title: multi ? eSlides[0].title : v("eTitle"), body: multi ? "" : v("eBody"), seed: oi.seed != null ? oi.seed : 1 };
   if (tpl === "carousel") img.slides = eSlides; else if (tpl === "reel") { img.scenes = eSlides; if (v("eQuery")) img.photo_query = v("eQuery"); } else if (tpl === "infographic") img.points = points; else { img.photo_query = v("eQuery"); if (v("eVP")) img.visual_prompt = v("eVP"); }
   let targets;
   try { targets = readTargets("eAcc", Object.keys(platforms)); } catch (e4) { say(m, e4.message, false); return; }

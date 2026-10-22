@@ -1,0 +1,31 @@
+{% extends "_base.html" %}
+{# «درج»: كل نقطة تتقدّم عن سابقتها كدرجات سلّم على خلفية بيضاء نظيفة. #}
+{% block style %}
+.canvas { background: #FBFAF7; color: #0B1F3A; }
+.overlay { display: none; }
+.frame { padding: 80px 72px 60px; }
+.text { --base: 46px; --m: 0 0 auto; }
+.chip { display: inline-block; background: #0B1F3A; color: var(--accent); font-weight: 800; font-size: .5em; padding: .35em 1em; border-radius: 99px; margin-bottom: .8em; }
+.title { font-size: 1.85em; line-height: 1.28; }
+.body { opacity: .65; font-size: .84em; }
+.st { list-style: none; margin: 1.2em 0 0; padding: 0; }
+.st li { display: flex; align-items: center; gap: .7em; margin-bottom: 14px; font-size: .82em; line-height: 1.45; font-weight: 700;
+         background: #fff; border-radius: 22px; padding: .7em .9em; box-shadow: 0 10px 30px rgba(11,31,58,.10); border-right: 12px solid var(--teal); }
+.st li:nth-child(1) { margin-right: 0; }
+.st li:nth-child(2) { margin-right: 36px; border-color: var(--accent); }
+.st li:nth-child(3) { margin-right: 72px; border-color: #C8452B; }
+.st li:nth-child(4) { margin-right: 108px; border-color: #0B1F3A; }
+.st li:nth-child(5) { margin-right: 144px; border-color: var(--teal); }
+.st li:nth-child(6) { margin-right: 180px; border-color: var(--accent); }
+.st .n { flex: 0 0 auto; width: 1.8em; height: 1.8em; border-radius: 12px; background: #0B1F3A; color: #fff; display: grid; place-items: center; font-weight: 800; }
+.footer { border-top: 3px solid rgba(11,31,58,.14); }
+.handle { color: #C8452B; }
+{% endblock %}
+{% block content %}
+<div class="text"><div class="inner">
+  <div class="chip">خطوة بخطوة</div>
+  <div class="title">{{ title }}</div>
+  {% if body %}<div class="body">{{ body }}</div>{% endif %}
+  <ol class="st">{% for p in points %}<li><span class="n">{{ loop.index }}</span><span>{{ p }}</span></li>{% endfor %}</ol>
+</div></div>
+{% endblock %}

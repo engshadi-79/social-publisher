@@ -7,7 +7,7 @@ from zoneinfo import ZoneInfo
 import yaml
 
 import accounts as _acc
-from config import (BRAND_PATH, CAROUSEL_STYLES, TOPICS_PATH, LIMITS, PLATFORMS, QUEUE_PATH,
+from config import (BRAND_PATH, CAROUSEL_STYLES, INFOGRAPHIC_STYLES, TOPICS_PATH, LIMITS, PLATFORMS, QUEUE_PATH,
                     STATE_PATH, TEMPLATES, TIMEZONE)
 
 TZ = ZoneInfo(TIMEZONE)
@@ -85,6 +85,8 @@ def validate(queue: list[dict]) -> list[str]:
         img = p.get("image")
         if not isinstance(img, dict) or not img.get("title"):
             errors.append(f"{tag} image.title مطلوب")
+        elif p.get("template") == "infographic" and str(img.get("style", "") or "").strip() and str(img["style"]).strip().lower() not in INFOGRAPHIC_STYLES:
+            errors.append(f"{tag} نمط إنفوجرافك غير معروف: {img['style']} (المتاح: {', '.join(INFOGRAPHIC_STYLES)})")
         elif p.get("template") == "carousel":
             sl = img.get("slides")
             style = str(img.get("style", "") or "").strip()

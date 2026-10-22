@@ -1,0 +1,30 @@
+{% extends "_base.html" %}
+{# «خط زمني»: خط عمودي بعُقد مضيئة، وكل نقطة خطوة. #}
+{% block style %}
+.canvas { background: radial-gradient(700px 500px at 100% 0%, rgba(20,184,166,.28), transparent 60%), linear-gradient(170deg, #0B1F3A, #0a1830); }
+.overlay { display: none; }
+.frame { padding: 84px 78px 60px; }
+.text { --base: 46px; --m: 0 0 auto; }
+.eyebrow { display: inline-block; font-size: .5em; font-weight: 800; color: var(--accent); letter-spacing: .12em; margin-bottom: .6em; }
+.title { font-size: 1.9em; line-height: 1.28; }
+.body { opacity: .8; font-size: .86em; }
+.tl { list-style: none; margin: 1.3em 0 0; padding: 0; position: relative; }
+.tl::before { content: ""; position: absolute; right: 33px; top: 20px; bottom: 20px; width: 6px; border-radius: 3px;
+              background: linear-gradient(180deg, var(--accent), var(--teal)); opacity: .75; }
+.tl li { position: relative; padding: 0 100px 0 0; margin-bottom: .75em; font-size: .86em; line-height: 1.5; font-weight: 600; min-height: 72px;
+         display: flex; align-items: center; }
+.tl li:last-child { margin-bottom: 0; }
+.tl .n { position: absolute; right: 0; top: 50%; transform: translateY(-50%); width: 72px; height: 72px; border-radius: 50%;
+         background: #0B1F3A; border: 6px solid var(--accent); color: var(--accent); display: grid; place-items: center;
+         font-weight: 800; font-size: .95em; box-shadow: 0 0 0 10px rgba(244,185,66,.14), 0 10px 30px rgba(0,0,0,.4); }
+.tl li:nth-child(even) .n { border-color: var(--teal); color: var(--teal); box-shadow: 0 0 0 10px rgba(20,184,166,.14), 0 10px 30px rgba(0,0,0,.4); }
+.footer { border-top: 3px solid rgba(255,255,255,.16); }
+{% endblock %}
+{% block content %}
+<div class="text"><div class="inner">
+  <div class="eyebrow">{{ points|length }} خطوات</div>
+  <div class="title">{{ title }}</div>
+  {% if body %}<div class="body">{{ body }}</div>{% endif %}
+  <ol class="tl">{% for p in points %}<li><span class="n">{{ loop.index }}</span><span>{{ p }}</span></li>{% endfor %}</ol>
+</div></div>
+{% endblock %}

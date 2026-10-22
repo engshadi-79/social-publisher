@@ -1,0 +1,28 @@
+{% extends "_base.html" %}
+{# «زجاجي»: شبكة ألوان متدرّجة وبطاقات شبه شفافة بحواف مضيئة. #}
+{% block style %}
+.canvas { background:
+  radial-gradient(600px 520px at 12% 8%, rgba(200,69,43,.55), transparent 62%),
+  radial-gradient(700px 600px at 95% 40%, rgba(20,184,166,.55), transparent 62%),
+  radial-gradient(640px 560px at 20% 98%, rgba(244,185,66,.42), transparent 62%),
+  #0B1530; }
+.overlay { display: none; }
+.frame { padding: 82px 74px 60px; }
+.text { --base: 46px; --m: 0 0 auto; }
+.title { font-size: 1.9em; line-height: 1.28; text-shadow: 0 4px 30px rgba(0,0,0,.35); }
+.body { opacity: .85; font-size: .86em; }
+.gl { list-style: none; margin: 1.2em 0 0; padding: 0; display: flex; flex-direction: column; gap: 16px; }
+.gl li { display: flex; align-items: center; gap: .8em; padding: .75em .95em; border-radius: 26px; font-size: .84em; line-height: 1.5; font-weight: 700;
+         background: linear-gradient(135deg, rgba(255,255,255,.20), rgba(255,255,255,.06));
+         border: 2px solid rgba(255,255,255,.30); box-shadow: 0 14px 40px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.35); }
+.gl .n { flex: 0 0 auto; width: 1.9em; height: 1.9em; border-radius: 14px; display: grid; place-items: center; font-weight: 800;
+         background: linear-gradient(135deg, var(--accent), #ff9a62); color: #20140A; }
+.footer { border-top: 2px solid rgba(255,255,255,.25); }
+{% endblock %}
+{% block content %}
+<div class="text"><div class="inner">
+  <div class="title">{{ title }}</div>
+  {% if body %}<div class="body">{{ body }}</div>{% endif %}
+  <ol class="gl">{% for p in points %}<li><span class="n">{{ loop.index }}</span><span>{{ p }}</span></li>{% endfor %}</ol>
+</div></div>
+{% endblock %}

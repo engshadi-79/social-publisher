@@ -1,0 +1,25 @@
+{% extends "_base.html" %}
+{# «جريء»: لون العلامة الأصفر الطاغي، عنوان ضخم، وأرقام مفرّغة كبيرة. #}
+{% block style %}
+.canvas { background: var(--accent); color: #14100A; }
+.overlay { display: none; }
+.frame { padding: 76px 72px 58px; }
+.text { --base: 46px; --m: 0 0 auto; }
+.title { font-size: 2.35em; line-height: 1.16; font-weight: 800; letter-spacing: -.01em; }
+.body { opacity: .75; font-size: .82em; font-weight: 600; margin-top: .5em; }
+.rows { list-style: none; margin: 1.1em 0 0; padding: 0; border-top: 5px solid #14100A; }
+.rows li { display: flex; align-items: center; gap: .7em; padding: .55em 0; border-bottom: 3px solid rgba(20,16,10,.85);
+           font-size: .84em; line-height: 1.45; font-weight: 700; }
+.rows .n { flex: 0 0 auto; min-width: 1.5em; font-size: 2.1em; font-weight: 800; line-height: 1; direction: ltr;
+           color: transparent; -webkit-text-stroke: 2.5px #14100A; }
+.footer { border-top: 0; }
+.handle { color: #14100A; }
+.brand { color: #14100A; }
+{% endblock %}
+{% block content %}
+<div class="text"><div class="inner">
+  <div class="title">{{ title }}</div>
+  {% if body %}<div class="body">{{ body }}</div>{% endif %}
+  <ol class="rows">{% for p in points %}<li><span class="n">{{ '%02d' % loop.index }}</span><span>{{ p }}</span></li>{% endfor %}</ol>
+</div></div>
+{% endblock %}
