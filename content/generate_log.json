@@ -1,8 +1,8 @@
 {
   "id": "daily-2026-10-26",
-  "ok": false,
-  "count": 0,
+  "ok": true,
+  "count": 1,
   "topic": "كل المواضيع",
   "method": "daily",
-  "message": "يومي 2026-10-26: وُلِّد 0 مسودة، وفشل 6. رسالة أمل لكل قلب متعب: Gemini gemini-3.8-flash: gemini-3.8-flash (interactions) HTTP 503: gemini-3.8-flash is currently experiencing high deman | رسالة أمل لكل قلب متعب: Gemini gemini-3.8-flash: HTTPSConnectionPool(host='generativelanguage.googleapis.com', port=443): Read timed out. (read  | رسالة"
+  "message": "يومي 2026-10-26: وُلِّد 1 مسودة، وفشل 5. رسالة أمل لكل قلب متعب: Gemini gemini-3.8-flash: HTTPSConnectionPool(host='generativelanguage.googleapis.com', port=443): Read timed out. (read  | رسالة أمل لكل قلب متعب: Gemini gemini-3.8-flash: gemini-3.8-flash (interactions) HTTP 503: gemini-3.8-flash is currently experiencing high deman | رسالة"
 }
