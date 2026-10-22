@@ -46,7 +46,9 @@ body { font-family: "BrandFont", "Cairo", "Segoe UI", Tahoma, sans-serif; color:
 (async () => {
   await document.fonts.ready;
   const box = document.querySelector('.text'), inner = document.querySelector('.inner');
-  let k = 1;
+  // نبدأ أكبر من المعتاد ثم نصغّر حتى يتّسع: المنشور القليل النقاط يملأ الصورة بدل أن يترك فراغاً في أسفلها
+  let k = document.querySelector('.pts, .tl, .rows, .gl, .st, .nn, .sheet, .lst, .bp, .pl, .cl, .grid') ? 1.32 : 1;
+  box.style.setProperty('--k', k.toFixed(2));
   while (inner.offsetHeight > box.clientHeight && k > 0.35) { k -= 0.03; box.style.setProperty('--k', k.toFixed(2)); }
   window.__ready = true;
 })();

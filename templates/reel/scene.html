@@ -60,6 +60,8 @@ body{ font-family:"BrandFont","Cairo","Segoe UI",Tahoma,sans-serif; color:#FFF8E
 .v0 .bg{ background:linear-gradient(160deg, #0B1F3A, #11314a 60%, #0f4c5c) }
 .v1 .bg{ background:linear-gradient(200deg, #1b1f4b, #0B1F3A 55%, #0b3a45) }
 .v2 .bg{ background:linear-gradient(140deg, #0B1F3A, #14304f 50%, #6b2f2a) }
+.v4 .bg{ background:linear-gradient(190deg, #1a1d3a, #0B1F3A 55%, #3a1f2a) }
+.v5 .bg{ background:linear-gradient(150deg, #0a2f3a, #0B1F3A 60%, #1f3a2a) }
 .v3 .bg{ background:linear-gradient(180deg, #0f2a3d, #0B1F3A 60%, #123a3a) }
 .accentline{ position:absolute; z-index:3; inset-inline:70px; bottom:170px; height:6px; border-radius:99px;
              background:var(--accent); transform-origin:right center; opacity:.9 }
@@ -70,11 +72,11 @@ body{ font-family:"BrandFont","Cairo","Segoe UI",Tahoma,sans-serif; color:#FFF8E
 </style>
 </head>
 <body>
-<div class="stage {% if not photo %}nophoto v{{ (index - 1) % 4 }}{% endif %}">
+<div class="stage {% if not photo %}nophoto v{{ (index - 1) % 6 }}{% endif %}">
   <div class="bg" id="bg">{% if photo %}<img src="{{ photo }}" alt="">{% endif %}</div>
   {% if not photo %}
   <div class="art">
-    {% set v = (index - 1) % 4 %}
+    {% set v = (index - 1) % 6 %}
     {% if v == 0 %}
     <svg viewBox="0 0 1080 1920" preserveAspectRatio="none">
       <g class="mv" data-dy="90" stroke="#5fd0c4" stroke-opacity=".16" stroke-width="2">
@@ -96,6 +98,18 @@ body{ font-family:"BrandFont","Cairo","Segoe UI",Tahoma,sans-serif; color:#FFF8E
       <g transform="rotate(-18 540 335)"><rect class="mv" data-dx="-160" x="-200" y="260" width="1500" height="150" fill="#F4B942" fill-opacity=".16"/></g>
       <g transform="rotate(-18 540 690)"><rect class="mv" data-dx="140" x="-260" y="560" width="1500" height="260" fill="#14B8A6" fill-opacity=".13"/></g>
       <g transform="rotate(-18 540 1035)"><rect class="mv" data-dx="-120" x="-200" y="980" width="1500" height="110" fill="#C8452B" fill-opacity=".22"/></g>
+    </svg>
+    {% elif v == 4 %}
+    <svg viewBox="0 0 1080 1920" preserveAspectRatio="none">
+      {% for i in range(7) %}
+      <path class="mv" data-dy="{{ 70 + i * 14 }}" d="M-40 {{ 300 + i * 120 }} L540 {{ 150 + i * 120 }} L1120 {{ 300 + i * 120 }}" fill="none" stroke="{{ ['#F4B942','#14B8A6','#C8452B'][i % 3] }}" stroke-opacity="{{ 0.42 - i * 0.04 }}" stroke-width="10" stroke-linecap="round"/>
+      {% endfor %}
+    </svg>
+    {% elif v == 5 %}
+    <svg viewBox="0 0 1080 1920" preserveAspectRatio="none">
+      {% for i in range(6) %}
+      <path class="mv" data-dx="{{ -90 if i % 2 else 90 }}" d="M-100 {{ 380 + i * 150 }} C 200 {{ 260 + i * 150 }}, 380 {{ 500 + i * 150 }}, 640 {{ 380 + i * 150 }} S 1000 {{ 280 + i * 150 }}, 1200 {{ 400 + i * 150 }}" fill="none" stroke="{{ ['#14B8A6','#F4B942'][i % 2] }}" stroke-opacity="{{ 0.5 - i * 0.05 }}" stroke-width="8"/>
+      {% endfor %}
     </svg>
     {% else %}
     <svg viewBox="0 0 1080 1920" preserveAspectRatio="none">
@@ -162,7 +176,10 @@ window.seek = (t) => {
     const inAt = parseFloat(el.dataset.in || '0');
     const a = ease((t - inAt) / 0.55);
     el.style.opacity = (a * (1 - out)).toFixed(3);
-    el.style.transform = `translateY(${((1 - a) * 46 + out * -26).toFixed(2)}px)`;
+    const mode = [0, 1, 2, 0, 3, 2][(INDEX - 1) % 6];     // دخول متنوّع: صعود، من اليمين، تكبير، من اليسار
+    const off = (1 - a) * 46 + out * -26;
+    el.style.transform = mode === 1 ? `translateX(${(off * 1.6).toFixed(2)}px)` : mode === 3 ? `translateX(${(-off * 1.6).toFixed(2)}px)`
+      : mode === 2 ? `scale(${(0.88 + 0.12 * a - out * 0.06).toFixed(3)})` : `translateY(${off.toFixed(2)}px)`;
   });
 };
 
