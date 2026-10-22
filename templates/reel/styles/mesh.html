@@ -1,0 +1,15 @@
+{% extends "reel/styles/_base.html" %}
+{# «شبكة ألوان»: تدرّجات ناعمة وبطاقة زجاجية بحواف مضيئة. #}
+{% block style %}
+.stage{ color:#fff; background:#0B1530 }
+.blob{ position:absolute; border-radius:50%; filter:blur(10px) }
+.wrap{ inset-inline:56px; bottom:230px; padding:56px 52px; border-radius:56px; background:linear-gradient(135deg,rgba(255,255,255,.22),rgba(255,255,255,.06)); border:3px solid rgba(255,255,255,.35); box-shadow:0 30px 80px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.4) }
+.kicker{ background:rgba(255,255,255,.2); color:#fff }
+.title{ font-size:82px; text-shadow:0 4px 30px rgba(0,0,0,.3) }
+{% endblock %}
+{% block art %}
+<div class="blob mv" data-dy="90" data-dx="-60" style="width:900px; height:900px; left:-300px; top:-200px; background:radial-gradient(circle,{{ ['#C8452B','#6d5bd0','#0f766e'][(index-1) % 3] }},transparent 68%)"></div>
+<div class="blob mv" data-dy="-80" data-dx="70" style="width:1000px; height:1000px; right:-380px; top:600px; background:radial-gradient(circle,#14B8A6,transparent 68%)"></div>
+<div class="blob mv" data-dy="60" style="width:800px; height:800px; left:-200px; bottom:-300px; background:radial-gradient(circle,#F4B942,transparent 68%); opacity:.75"></div>
+{% endblock %}
+{% block modes %}[0, 2, 4, 1]{% endblock %}

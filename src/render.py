@@ -5,7 +5,7 @@ from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 
 import imagegen
-from config import (HUES, INFOGRAPHIC_STYLES, CAROUSEL_STYLES, CAROUSEL_STYLES_FLAT, CAROUSEL_STYLES_PHOTO, OUT_DIR,
+from config import (REEL_STYLES, HUES, INFOGRAPHIC_STYLES, CAROUSEL_STYLES, CAROUSEL_STYLES_FLAT, CAROUSEL_STYLES_PHOTO, OUT_DIR,
                     ROOT, TEMPLATES, TEMPLATES_DIR)
 from queue_io import load_brand
 
@@ -107,6 +107,20 @@ def post_hue(post: dict) -> int:
         return 0
     digest = hashlib.sha1(("hue:" + str(post.get("id", ""))).encode("utf-8")).digest()
     return HUES[digest[0] % len(HUES)]
+
+
+def reel_style(post: dict) -> str:
+    """نمط الريل: `image.style` إن حُدّد، وإلا يُشتق من المعرّف (ثابت لنفس المنشور)."""
+    name = str(post.get("image", {}).get("style") or "").strip().lower()
+    if name in REEL_STYLES:
+        return name
+    digest = hashlib.sha1(("reel:" + str(post.get("id", ""))).encode("utf-8")).digest()
+    return REEL_STYLES[digest[0] % len(REEL_STYLES)]
+
+
+def reel_template(post: dict) -> str:
+    st = reel_style(post)
+    return "reel/scene.html" if st == "geo" else f"reel/styles/{st}.html"
 
 
 def infographic_style(post: dict) -> str:

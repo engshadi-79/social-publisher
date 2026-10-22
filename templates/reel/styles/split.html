@@ -1,0 +1,18 @@
+{% extends "reel/styles/_base.html" %}
+{# «شقّان»: لوحان مائلان بلونين، رقم كبير في الأعلى، والنص على اللوح الداكن. #}
+{% block style %}
+.stage{ background:#0B1F3A; color:#FFF8EE }
+.panel{ position:absolute; left:-10%; right:-10%; top:0; height:58%; background:{{ ['#F4B942','#14B8A6','#E8604C'][(index-1) % 3] }}; transform:skewY(-9deg); transform-origin:top left }
+.big{ position:absolute; top:190px; inset-inline-start:70px; font-size:560px; font-weight:800; line-height:.9; direction:ltr; color:#0B1F3A; opacity:.9 }
+.wrap{ bottom:220px }
+.kicker{ background:#F4B942; color:#0B1F3A }
+.title{ font-size:88px }
+.stripe{ position:absolute; height:14px; border-radius:99px; background:#FFF8EE; opacity:.9 }
+{% endblock %}
+{% block art %}
+<div class="panel"></div>
+<div class="big">{{ '%02d' % index }}</div>
+<div class="stripe mv" data-dx="-160" style="left:60%; top:1010px; width:300px"></div>
+<div class="stripe mv" data-dx="120" style="left:20%; top:1060px; width:180px; opacity:.5"></div>
+{% endblock %}
+{% block modes %}[1, 3, 0, 2]{% endblock %}

@@ -1,0 +1,22 @@
+{% extends "reel/styles/_base.html" %}
+{# «بطاقة»: خلفية متدرّجة ناعمة وبطاقة بيضاء عائمة يظهر فيها النص بنظافة. #}
+{% block style %}
+.stage{ background:linear-gradient(160deg,{{ ['#6d5bd0','#0f766e','#c8452b','#1d4ed8'][(index-1) % 4] }},#0B1F3A); color:#fff }
+.wrap{ inset-inline:60px; bottom:auto; top:50%; transform:translateY(-50%); background:#fff; color:#0E1A2B; border-radius:56px; padding:70px 62px 64px; box-shadow:0 40px 90px rgba(0,0,0,.4) }
+.kicker{ background:#0E1A2B; color:#fff; font-size:32px }
+.title{ font-size:78px; color:#0E1A2B }
+.body{ color:#445066; font-size:38px }
+.dot{ position:absolute; border-radius:50%; background:rgba(255,255,255,.16) }
+.chip{ position:absolute; top:-40px; inset-inline-end:46px; width:110px; height:110px; border-radius:50%; background:#F4B942; color:#0E1A2B; display:grid; place-items:center; font-size:44px; font-weight:800; direction:ltr }
+{% endblock %}
+{% block art %}
+<div class="dot mv" data-dy="-60" data-ds=".15" style="width:620px; height:620px; right:-200px; top:-120px"></div>
+<div class="dot mv" data-dy="50" style="width:380px; height:380px; left:-120px; bottom:200px; background:rgba(255,255,255,.1)"></div>
+{% endblock %}
+{% block layout %}
+<div class="chip anim" data-in="0.1">{{ '%02d' % index }}</div>
+{% if kicker %}<div class="kicker anim" data-in="0.2">{{ kicker }}</div>{% endif %}
+<div class="title anim" data-in="0.4">{{ title }}</div>
+{% if body %}<div class="body anim" data-in="0.8">{{ body }}</div>{% endif %}
+{% endblock %}
+{% block modes %}[2, 0, 4, 2]{% endblock %}

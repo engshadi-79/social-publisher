@@ -7,7 +7,7 @@ from zoneinfo import ZoneInfo
 import yaml
 
 import accounts as _acc
-from config import (BRAND_PATH, CAROUSEL_STYLES, INFOGRAPHIC_STYLES, TOPICS_PATH, LIMITS, PLATFORMS, QUEUE_PATH,
+from config import (BRAND_PATH, CAROUSEL_STYLES, INFOGRAPHIC_STYLES, REEL_STYLES, TOPICS_PATH, LIMITS, PLATFORMS, QUEUE_PATH,
                     STATE_PATH, TEMPLATES, TIMEZONE)
 
 TZ = ZoneInfo(TIMEZONE)
@@ -104,6 +104,8 @@ def validate(queue: list[dict]) -> list[str]:
                         errors.append(f"{tag} الشريحة {n}: العنوان أو النص أطول من المسموح")
                     elif len(s_.get("points") or []) > 5:
                         errors.append(f"{tag} الشريحة {n}: أكثر من 5 نقاط")
+        elif p.get("template") == "reel" and str(img.get("style", "") or "").strip() and str(img["style"]).strip().lower() not in REEL_STYLES:
+            errors.append(f"{tag} نمط ريل غير معروف: {img['style']} (المتاح: {', '.join(REEL_STYLES)})")
         elif p.get("template") == "reel":
             sc = img.get("scenes")
             if not (isinstance(sc, list) and 3 <= len(sc) <= 8):

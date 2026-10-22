@@ -1,0 +1,19 @@
+{% extends "reel/styles/_base.html" %}
+{# «جريء»: لون العلامة الأصفر الطاغي، عنوان ضخم وسط الشاشة، كتل لونية. #}
+{% block style %}
+.stage{ background:{{ ['#F4B942','#14B8A6','#C8452B','#F5F1E8'][(index-1) % 4] }}; color:#0E1A2B }
+.stage:nth-of-type(n){ }
+.kicker{ background:#0E1A2B; color:#fff }
+.wrap{ bottom:auto; top:50%; transform:translateY(-50%); text-align:start }
+.title{ font-size:104px; line-height:1.12; letter-spacing:-.01em }
+.body{ font-size:42px; font-weight:700; opacity:.85 }
+.blk{ position:absolute; background:#0E1A2B; opacity:.9 }
+.num{ position:absolute; top:150px; left:50px; font-size:230px; font-weight:800; line-height:1; direction:ltr; color:transparent; -webkit-text-stroke:5px #0E1A2B }
+{% endblock %}
+{% block art %}
+<div class="blk mv" data-dx="-120" style="left:-60px; bottom:-60px; width:520px; height:520px; border-radius:50%; background:rgba(14,26,43,.14)"></div>
+<div class="blk mv" data-dx="90" style="right:-80px; top:620px; width:260px; height:26px; border-radius:99px"></div>
+<div class="blk mv" data-dy="70" style="right:90px; bottom:420px; width:26px; height:260px; border-radius:99px; opacity:.5"></div>
+<div class="num">{{ '%02d' % index }}</div>
+{% endblock %}
+{% block modes %}[2, 1, 0, 3]{% endblock %}

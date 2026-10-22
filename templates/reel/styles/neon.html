@@ -1,0 +1,19 @@
+{% extends "reel/styles/_base.html" %}
+{# «نيون»: أسود بشبكة خافتة، حدود مضيئة وعناوين متوهّجة. #}
+{% block style %}
+.stage{ color:#f2f6ff; background:
+  linear-gradient(rgba(255,255,255,.05) 2px,transparent 2px) 0 0/72px 72px,
+  linear-gradient(90deg,rgba(255,255,255,.05) 2px,transparent 2px) 0 0/72px 72px,
+  radial-gradient(900px 700px at 80% 15%,rgba(20,184,166,.32),transparent 70%), #05070f }
+.frame{ position:absolute; inset:34px; border:4px solid #14B8A6; border-radius:44px; box-shadow:0 0 40px rgba(20,184,166,.7), inset 0 0 40px rgba(20,184,166,.25) }
+.kicker{ background:transparent; color:#F4B942; border:3px solid #F4B942; border-radius:99px; text-shadow:0 0 16px #F4B942; box-shadow:0 0 20px rgba(244,185,66,.55) }
+.title{ text-shadow:0 0 40px rgba(20,184,166,.9), 0 0 8px rgba(20,184,166,.8) }
+.body{ color:#c5d3ee }
+.ring{ position:absolute; border-radius:50%; border:6px solid #F4B942; box-shadow:0 0 36px rgba(244,185,66,.7) }
+{% endblock %}
+{% block art %}
+<div class="frame"></div>
+<div class="ring mv" data-ds=".25" data-dr="40" style="width:420px; height:420px; right:-120px; top:300px; opacity:.7"></div>
+<div class="ring mv" data-ds="-.2" style="width:200px; height:200px; left:90px; top:900px; border-color:#14B8A6; box-shadow:0 0 30px #14B8A6; opacity:.7"></div>
+{% endblock %}
+{% block modes %}[2, 4, 0, 1]{% endblock %}

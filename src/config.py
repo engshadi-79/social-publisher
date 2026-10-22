@@ -48,3 +48,5 @@ INFOGRAPHIC_STYLES = ("cards", "bento", "timeline", "bold", "glass", "steps",
                       "neon", "checklist", "bignum", "blueprint", "pills", "columns")
 # إزاحات لونية (hue-rotate بالدرجات): كل نمط × كل إزاحة = تصميم مختلف المظهر
 HUES = (0, 35, 70, 140, 190, 250, 290, 325)
+# أنماط الريل: geo أشكال هندسية · bold جريء · split شقّان · card بطاقة · terminal طرفية · neon نيون · paper ورقي · mesh شبكة ألوان
+REEL_STYLES = ("geo", "bold", "split", "card", "terminal", "neon", "paper", "mesh")

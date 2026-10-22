@@ -1,0 +1,26 @@
+{% extends "reel/styles/_base.html" %}
+{# «طرفية»: نافذة كود، والعنوان يُكتب حرفاً حرفاً، مؤشر وامض. للمحتوى التقني. #}
+{% block style %}
+.stage{ background:#0a0f1a; color:#d7e3f4 }
+.win{ position:absolute; inset:150px 50px 190px 50px; border-radius:36px; background:#0f1626; border:3px solid #223049; box-shadow:0 30px 80px rgba(0,0,0,.5); overflow:hidden }
+.bar{ height:84px; background:#162036; display:flex; align-items:center; gap:14px; padding:0 34px; direction:ltr }
+.bar i{ width:24px; height:24px; border-radius:50%; background:#ff5f57 }.bar i:nth-child(2){ background:#febc2e }.bar i:nth-child(3){ background:#28c840 }
+.bar span{ margin-inline-start:20px; font-size:26px; color:#7d8ca6; font-family:Consolas,monospace }
+.wrap{ inset-inline:100px; bottom:auto; top:420px }
+.kicker{ background:transparent; color:#2dd4bf; padding:0; font-family:Consolas,monospace; font-size:34px }
+.kicker::before{ content:"// " }
+.title{ color:#fff; font-size:80px }
+.body{ color:#9fb0c8; font-size:38px }
+.cur{ display:inline-block; width:18px; height:70px; background:#2dd4bf; vertical-align:-10px; margin-inline-start:10px }
+.ln{ position:absolute; inset-inline-start:30px; top:130px; font-family:Consolas,monospace; font-size:28px; line-height:2.1; color:#3a4a66; direction:ltr; text-align:right }
+{% endblock %}
+{% block art %}
+<div class="win"><div class="bar"><i></i><i></i><i></i><span>scene-{{ '%02d' % index }}.md</span></div>
+<div class="ln">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8</div></div>
+{% endblock %}
+{% block layout %}
+{% if kicker %}<div class="kicker anim" data-in="0.1">{{ kicker }}</div>{% endif %}
+<div class="title anim" data-in="0.2"><span class="type" data-in="0.3">{{ title }}</span><span class="cur"></span></div>
+{% if body %}<div class="body anim" data-in="1.6">{{ body }}</div>{% endif %}
+{% endblock %}
+{% block modes %}[0, 1, 0, 3]{% endblock %}

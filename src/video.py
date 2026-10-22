@@ -75,7 +75,7 @@ def render_poster(renderer, post: dict, out_png: Path, scene: int = 1) -> Path:
 
     from config import TEMPLATES_DIR
     from queue_io import load_brand
-    from render import _fonts, post_hue
+    from render import _fonts, post_hue, reel_template
 
     specs = scene_specs(post)
     if not specs:
@@ -85,7 +85,7 @@ def render_poster(renderer, post: dict, out_png: Path, scene: int = 1) -> Path:
     w, h = TEMPLATES["reel"]
     spec = specs[scene - 1]
     photo = photos.get(scene)
-    html = env.get_template("reel/scene.html").render(
+    html = env.get_template(reel_template(post)).render(
         brand=load_brand(), w=w, h=h, fonts=_fonts(),
         photo=photo.as_uri() if photo else None, hue=post_hue(post), **spec)
     tmp = OUT_DIR / "_tmp"
@@ -111,7 +111,7 @@ def render_reel(renderer, post: dict, out_dir: Path, photos: dict[int, Path] | N
 
     from config import TEMPLATES_DIR
     from queue_io import load_brand
-    from render import _fonts, post_hue
+    from render import _fonts, post_hue, reel_template
 
     if photos is None:                    # يجلبها بنفسه كما يفعل الكاروسيل
         photos, warns = imagegen.ensure_slide_photos(post, key="scenes")
@@ -119,7 +119,7 @@ def render_reel(renderer, post: dict, out_dir: Path, photos: dict[int, Path] | N
             print("⚠️", w_)
 
     env = Environment(loader=FileSystemLoader(str(TEMPLATES_DIR)), autoescape=True)
-    tpl = env.get_template("reel/scene.html")
+    tpl = env.get_template(reel_template(post))
     brand = load_brand()
     w, h = TEMPLATES["reel"]
     specs = scene_specs(post)
