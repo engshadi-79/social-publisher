@@ -313,3 +313,39 @@ function renderStats() {
     table("حسب الموضوع", groupBy((p) => p.topic || null), topicName);
 }
 renderStats();
+
+// ---------- الشريط العلوي والجانبي (تصميم v4) ----------
+function toast(msg, ok) {
+  let t = document.getElementById("toast");
+  if (!t) { t = document.createElement("div"); t.id = "toast"; t.setAttribute("role", "status"); document.body.appendChild(t); }
+  t.textContent = msg; t.className = "toast show " + (ok === false ? "no" : "ok");
+  clearTimeout(t._h); t._h = setTimeout(() => (t.className = "toast"), 5000);
+}
+async function dispatchWf(file) { await gh("actions/workflows/" + file + "/dispatches", { method: "POST", body: JSON.stringify({ ref: "main" }) }); }
+$("tbRefresh").onclick = () => location.reload();
+$("tbAdd").onclick = () => show("addpost");
+$("tbPublish").onclick = async () => {
+  if (!confirm("سأشغّل النشر الآن لكل منشور معتمد حان موعده. متابعة؟")) return;
+  try { await dispatchWf("publish.yml"); toast("بدأ تشغيل النشر ✓ تظهر النتيجة بعد دقائق.", true); } catch (e) { toast(e.message, false); }
+};
+if ($("btnHealth")) $("btnHealth").onclick = async () => { try { await dispatchWf("health.yml"); toast("بدأ فحص الصحة ✓ تتحدّث البطاقات بعد دقائق.", true); } catch (e) { toast(e.message, false); } };
+if ($("btnDaily")) $("btnDaily").onclick = async () => { if (!confirm("أولّد مسودات اليوم الآن؟ (تستغرق دقائق)")) return; try { await dispatchWf("daily.yml"); toast("بدأ توليد المسودات ✓ تصلك في الطابور بعد دقائق.", true); } catch (e) { toast(e.message, false); } };
+(function sideAccounts() {
+  const col = { facebook: ["#1877F2", "f", "#fff"], instagram: ["#E1306C", "ig", "#fff"], threads: ["#ffffff", "@", "#000"], linkedin: ["#0A66C2", "in", "#fff"], telegram: ["#229ED9", "tg", "#fff"] };
+  const box = $("sideAcc"); if (!box) return;
+  [...new Set(ACC.map((a) => a.platform))].forEach((p) => { const c = col[p]; if (!c) return; const i = document.createElement("i"); i.textContent = c[1]; i.style.background = c[0]; i.style.color = c[2]; i.title = PLAT_NAME[p] || p; box.appendChild(i); });
+})();
+
+// ---------- مؤشرات وأعمدة إضافية في «الأداء» ----------
+(function statsExtra() {
+  const body = $("statsBody"); if (!body || !body.innerHTML.trim()) return;
+  const sum = { likes: 0, comments: 0, shares: 0, reach: 0 };
+  Object.values(INS).forEach((per) => Object.values(per).forEach((m) => { if (!m || m.error) return; sum.likes += m.likes || 0; sum.comments += m.comments || 0; sum.shares += m.shares || 0; sum.reach += (m.reach || m.views || 0); }));
+  const pub = Object.values(POSTS).filter((p) => p.group === "published").length;
+  const f = (n) => n >= 1000 ? (n / 1000).toFixed(1) + "K" : String(n);
+  let html = '<div class="skpis"><div class="sk"><span>منشورات منشورة</span><b>' + pub + '</b></div><div class="sk"><span>إعجابات</span><b>' + f(sum.likes) + '</b></div><div class="sk"><span>تعليقات</span><b>' + f(sum.comments) + '</b></div><div class="sk"><span>وصول / مشاهدات</span><b>' + f(sum.reach) + "</b></div></div>";
+  const byHour = {}; Object.values(POSTS).forEach((p) => { const sc = postScore(p.id); if (sc == null) return; const h = (p.publish_at || "").slice(11, 13) + ":00"; (byHour[h] = byHour[h] || []).push(sc); });
+  const hrs = Object.entries(byHour).map(([h, v]) => [h, v.reduce((a, b) => a + b, 0) / v.length]).sort();
+  if (hrs.length) { const mx = Math.max(...hrs.map((x) => x[1])) || 1; html += '<h3>متوسط التفاعل بحسب ساعة النشر</h3><div class="bars2">' + hrs.map(([h, v]) => '<div class="bar2"><span dir="ltr">' + h + '</span><i><b style="width:' + Math.round(v / mx * 100) + '%"></b></i><span>' + v.toFixed(1) + "</span></div>").join("") + "</div>"; }
+  body.insertAdjacentHTML("afterbegin", html);
+})();
