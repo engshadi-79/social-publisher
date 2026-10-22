@@ -84,7 +84,7 @@ class Renderer:
         for spec in slide_specs(post):
             photo = photos.get(spec["index"])
             html = tpl.render(brand=brand, w=w, h=h, fonts=_fonts(),
-                              photo=photo.as_uri() if photo else None, **spec)
+                              photo=photo.as_uri() if photo else None, hue=post_hue(post), **spec)
             outs.append(self._shoot(html, f"{post['id']}-s{spec['index']}", w, h, out_dir / f"{post['id']}-s{spec['index']}.png"))
         return outs
 
@@ -103,7 +103,7 @@ def post_hue(post: dict) -> int:
     h = (post.get("image") or {}).get("hue")
     if isinstance(h, int) and not isinstance(h, bool) and 0 <= h < 360:
         return h
-    if post.get("template") not in ("infographic", "reel"):
+    if post.get("template") not in ("infographic", "reel", "carousel"):
         return 0
     digest = hashlib.sha1(("hue:" + str(post.get("id", ""))).encode("utf-8")).digest()
     return HUES[digest[0] % len(HUES)]

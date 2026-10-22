@@ -20,6 +20,9 @@ h1{font-size:1.7rem;margin-bottom:4px}
 .tabs button[aria-pressed=true]{background:var(--teal);color:#06201d;border-color:var(--teal);font-weight:700}
 .list{display:flex;flex-direction:column;gap:14px}
 [hidden]{display:none!important}
+.hues{display:flex;gap:8px;flex-wrap:wrap}.hues button{width:34px;height:34px;border-radius:50%;border:3px solid var(--line);cursor:pointer;padding:0}.hues button.on{border-color:#fff;box-shadow:0 0 0 2px var(--teal)}.hues .auto{width:auto;border-radius:99px;padding:0 12px;background:var(--card);color:var(--ink);font:inherit;font-size:.85rem}
+.st{width:100%;border-collapse:collapse;margin:6px 0 18px}.st td{padding:8px 10px;border-bottom:1px solid var(--line)}.st td:nth-child(2){font-weight:800;color:var(--teal);width:70px}.st td:nth-child(3){color:var(--mute);width:90px}
+.tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:0 0 14px}.tools input,.tools select{background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:9px 12px;font:inherit;min-width:140px}.tools input{flex:1;min-width:200px}
 .post{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;gap:0}
 .post img{width:250px;min-width:250px;height:auto;align-self:flex-start;object-fit:contain;background:var(--chip);display:block;cursor:zoom-in}
 .body{padding:14px 16px;display:flex;flex-direction:column;gap:8px;flex:1;min-width:0}
@@ -73,6 +76,8 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
   {% if topics %}<label>الموضوع</label><select id="eTopic"><option value="">— اختر —</option>{% for t in topics %}<option value="{{ t.id }}">{{ t.name }}</option>{% endfor %}</select>{% endif %}
   <label>شكل الصورة</label>
   <select id="eTemplate"><option value="carousel">كاروسيل</option><option value="reel">ريل (فيديو عمودي)</option><option value="infographic">إنفوجرافك</option><option value="split">صورة + لوحة نص</option><option value="photo">صورة كاملة</option><option value="tip">نصيحة</option><option value="quote">اقتباس</option><option value="announcement">إعلان</option><option value="story">ستوري</option></select>
+  <div id="eLook"><label>نمط التصميم <span class="hint">(تلقائي = يُشتق من المنشور)</span></label><select id="eStyle"></select>
+  <label>لون التصميم</label><div id="eHueBox" class="hues"></div></div>
   <label>العنوان على الصورة *</label><input id="eTitle">
   <label>النص الصغير</label><input id="eBody">
   <label>شرائح الكاروسيل أو مشاهد الريل (انظر التنسيق في نموذج الإضافة)</label><textarea id="eSlides" rows="10"></textarea>
@@ -129,7 +134,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
 </div>
 
 <div class="tabs" id="tabs">
-  {% for key,label in [("all","الكل"),("upcoming","سيُنشر"),("published","تم نشره"),("draft","بانتظار موافقتك"),("failed","فيه مشكلة"),("topics","المواضيع"),("addpost","إضافة منشور"),("calendar","التقويم")] %}
+  {% for key,label in [("all","الكل"),("upcoming","سيُنشر"),("published","تم نشره"),("draft","بانتظار موافقتك"),("failed","فيه مشكلة"),("topics","المواضيع"),("addpost","إضافة منشور"),("calendar","التقويم"),("stats","الأداء")] %}
   <button data-f="{{ key }}" aria-pressed="{{ 'true' if key=='all' else 'false' }}">{{ label }}</button>
   {% endfor %}
 </div>
@@ -161,6 +166,11 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
 
 </section>
 
+<section id="statsPanel" class="panel" hidden>
+  <h2>أداء المنشورات</h2>
+  <p class="hint" id="statsNote"></p>
+  <div id="statsBody"></div>
+</section>
 <section id="calPanel" hidden>
   <div class="panel">
     <h2>التقويم الأسبوعي</h2>
@@ -243,9 +253,16 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
   </div>
 </section>
 
+<div class="tools" id="tools">
+  <input id="qSearch" type="search" placeholder="🔎 ابحث في العناوين…">
+  <select id="qTopic"><option value="">كل المواضيع</option>{% for t in topics %}<option value="{{ t.id }}">{{ t.name }}</option>{% endfor %}</select>
+  <select id="qTpl"><option value="">كل القوالب</option><option value="infographic">إنفوجرافك</option><option value="carousel">كاروسيل</option><option value="reel">ريل</option><option value="split">صورة</option><option value="tip">نصيحة</option><option value="quote">اقتباس</option></select>
+  <button class="act" id="bulkApprove" hidden>✅ وافق على كل المسودات (<span id="bulkN">0</span>)</button>
+  <div class="msg" id="bulkMsg"></div>
+</div>
 <div class="list" id="grid">
 {% for p in posts %}
-<article class="post" data-s="{{ p.group }}">
+<article class="post" data-s="{{ p.group }}" data-tpl="{{ p.template }}" data-topic="{{ p.topic }}" data-q="{{ p.title }}">
   <div class="imgwrap"><img loading="lazy" src="images/thumb-{{ p.id }}.jpg" {% if p.reel_scenes and p.group == "published" %}data-video="images/{{ p.id }}.mp4" {% endif %}data-full="images/full-{{ p.id }}{% if p.slide_count > 1 %}-s1{% endif %}.jpg"{% if p.slides_json %} data-slides='{{ p.slides_json }}'{% endif %} alt="{{ p.title }}" title="اضغط لعرض الصورة كاملة">{% if p.slide_count > 1 and not p.reel_scenes %}<span class="scount">{{ p.slide_count }} شرائح ▤</span>{% endif %}{% if p.reel_scenes %}<span class="scount">▶ فيديو · {{ p.reel_scenes }} مشاهد {% if p.group == "published" %}— اضغط للتشغيل{% else %}— اضغط لتصفّح المشاهد{% endif %}</span>{% endif %}</div>
   <div class="body">
     <span class="badge b-{{ p.badge }}">{{ p.badge_txt }}</span>
@@ -295,10 +312,13 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
 
 </div>
 <script type="application/json" id="accdata">{{ acc_json|safe }}</script>
+<script type="application/json" id="insdata">{{ insights_json|safe }}</script>
 <script type="application/json" id="postdata">{{ posts_json|safe }}</script>
 <script>
 const tabs=document.querySelectorAll('#tabs button'),posts=document.querySelectorAll('.post'),empty=document.getElementById('empty');
-function show(f){const PN={topics:'topicsPanel',addpost:'postPanel',calendar:'calPanel'};const tp=f in PN;Object.entries(PN).forEach(([k,id])=>document.getElementById(id).hidden=f!==k);document.getElementById('grid').hidden=tp;let n=0;posts.forEach(p=>{const ok=!tp&&(f==='all'||p.dataset.s===f);p.hidden=!ok;if(ok)n++});empty.hidden=tp||n>0;tabs.forEach(b=>b.setAttribute('aria-pressed',b.dataset.f===f))}
+let curF='upcoming';function matchTools(p){const q=(document.getElementById('qSearch').value||'').trim().toLowerCase(),tp=document.getElementById('qTopic').value,tl=document.getElementById('qTpl').value;return(!q||(p.dataset.q||'').toLowerCase().includes(q))&&(!tp||p.dataset.topic===tp)&&(!tl||p.dataset.tpl===tl)}
+function show(f){curF=f;const PN={topics:'topicsPanel',addpost:'postPanel',calendar:'calPanel',stats:'statsPanel'};const tp=f in PN;Object.entries(PN).forEach(([k,id])=>document.getElementById(id).hidden=f!==k);document.getElementById('grid').hidden=tp;let n=0;posts.forEach(p=>{const ok=!tp&&(f==='all'||p.dataset.s===f)&&matchTools(p);p.hidden=!ok;if(ok)n++});empty.hidden=tp||n>0;tabs.forEach(b=>b.setAttribute('aria-pressed',b.dataset.f===f));document.getElementById('tools').hidden=tp;const dn=[...posts].filter(p=>p.dataset.s==='draft'&&!p.hidden).length;document.getElementById('bulkApprove').hidden=!(f==='draft'&&dn>0);document.getElementById('bulkN').textContent=dn}
+['qSearch','qTopic','qTpl'].forEach(i=>{const el=document.getElementById(i);el.oninput=el.onchange=()=>show(curF)});
 tabs.forEach(b=>b.onclick=()=>show(b.dataset.f));
 const lb=document.getElementById('lb'),lbImg=lb.querySelector('img'),lbVid=document.getElementById('lbVid');let lbList=[],lbI=0;
 function lbShow(){lbImg.src=lbList[lbI];document.getElementById('lbCtr').textContent=lbList.length>1?(lbI+1)+' / '+lbList.length:'';lb.classList.toggle('multi',lbList.length>1)}

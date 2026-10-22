@@ -56,6 +56,26 @@ async function deleteChangedPhotos(id, oldList, newList, oldBase, newBase) {
 }
 
 // ---------- نافذة التعديل ----------
+// ---------- نمط التصميم ولونه ----------
+const STYLES = {
+  infographic: { cards: "بطاقات", bento: "بنتو", timeline: "خط زمني", bold: "جريء", glass: "زجاجي", steps: "درج", neon: "نيون", checklist: "قائمة تحقق", bignum: "الرقم الكبير", blueprint: "مخطط", pills: "كبسولات", columns: "شريط جانبي" },
+  carousel: { blueprint: "مخطط", editorial: "مجلة", terminal: "طرفية", poster: "ملصق", sticky: "ورقة ملصقة", duo: "لوحان", neon: "نيون", paper: "ورقي", gradient: "تدرج" },
+};
+const HUES = [0, 35, 70, 140, 190, 250, 290, 325];
+let eHue = null;
+function fillLook(tpl, style, hue) {
+  const box = $("eLook"), opts = STYLES[tpl];
+  box.hidden = !(tpl === "infographic" || tpl === "carousel" || tpl === "reel");
+  const sel = $("eStyle");
+  sel.parentElement.querySelector("label").hidden = sel.hidden = !opts;
+  sel.innerHTML = '<option value="">تلقائي</option>' + Object.entries(opts || {}).map(([k, n]) => '<option value="' + k + '">' + n + "</option>").join("");
+  sel.value = opts && opts[style] ? style : "";
+  eHue = hue != null ? hue : null;
+  const hb = $("eHueBox");
+  hb.innerHTML = '<button type="button" class="auto' + (eHue == null ? " on" : "") + '" data-h="">تلقائي</button>' +
+    HUES.map((h) => '<button type="button" data-h="' + h + '" class="' + (eHue === h ? "on" : "") + '" style="background:hsl(' + ((215 + h) % 360) + ',58%,38%)" title="لون ' + (HUES.indexOf(h) + 1) + '"></button>').join("");
+  hb.querySelectorAll("button").forEach((b) => (b.onclick = () => { eHue = b.dataset.h === "" ? null : parseInt(b.dataset.h, 10); hb.querySelectorAll("button").forEach((x) => x.classList.toggle("on", x === b)); }));
+}
 const PLATS = ["facebook", "instagram", "threads", "linkedin", "telegram"];
 let editId = null;
 function openEdit(id) {
@@ -63,7 +83,7 @@ function openEdit(id) {
   editId = id; const im = p.image || {};
   $("eTitle").value = im.title || ""; $("eBody").value = im.body || ""; $("ePoints").value = (im.points || []).join("\n"); $("eSlides").value = p.template === "reel" ? scenesToText(im.scenes) : slidesToText(im.slides);
   $("eQuery").value = im.photo_query || ""; $("eVP").value = im.visual_prompt || "";
-  $("eTemplate").value = p.template; $("eWhen").value = (p.publish_at || "").replace(" ", "T");
+  $("eTemplate").value = p.template; fillLook(p.template, im.style, im.hue); $("eWhen").value = (p.publish_at || "").replace(" ", "T");
   if ($("eTopic")) $("eTopic").value = p.topic || "";
   PLATS.forEach((k) => { $("ep_" + k).checked = !!(p.platforms && p.platforms[k]); $("et_" + k).value = (p.platforms && p.platforms[k]) || ""; });
   accPicker("eAcc", p.targets || null);
@@ -71,6 +91,7 @@ function openEdit(id) {
   $("eNote").textContent = p.approved ? "هذا المنشور معتمد: سيُنشر بالنص الجديد في موعده." : "";
   say($("eMsg"), "", true); $("editBox").classList.add("on");
 }
+$("eTemplate").onchange = () => fillLook($("eTemplate").value, "", null);
 $("eCancel").onclick = () => $("editBox").classList.remove("on");
 $("eSave").onclick = async () => {
   const m = $("eMsg"), v = (i) => $(i).value.trim(), old = POSTS[editId];
@@ -85,7 +106,7 @@ $("eSave").onclick = async () => {
     ($("eTopic") && !v("eTopic")) ? "اختر الموضوع." : "";
   if (err) { say(m, err, false); return; }
   const oi = old.image || {};
-  const img = { style: tpl === old.template ? oi.style : undefined, hue: oi.hue, title: multi ? eSlides[0].title : v("eTitle"), body: multi ? "" : v("eBody"), seed: oi.seed != null ? oi.seed : 1 };
+  const img = { style: $("eStyle").value || undefined, hue: eHue != null && (tpl === "infographic" || tpl === "reel" || tpl === "carousel") ? eHue : undefined, title: multi ? eSlides[0].title : v("eTitle"), body: multi ? "" : v("eBody"), seed: oi.seed != null ? oi.seed : 1 };
   if (tpl === "carousel") img.slides = eSlides; else if (tpl === "reel") { img.scenes = eSlides; if (v("eQuery")) img.photo_query = v("eQuery"); } else if (tpl === "infographic") img.points = points; else { img.photo_query = v("eQuery"); if (v("eVP")) img.visual_prompt = v("eVP"); }
   let targets;
   try { targets = readTargets("eAcc", Object.keys(platforms)); } catch (e4) { say(m, e4.message, false); return; }
@@ -224,3 +245,68 @@ $("rGo").onclick = async () => {
   } catch (e) { say(m, e.message, false); }
 };
 document.addEventListener("click", (e) => { const b = e.target.closest('[data-act="repub"]'); if (b) openRepub(b.dataset.id); });
+
+// ---------- موافقة بالجملة على المسودات الظاهرة ----------
+$("bulkApprove").onclick = async () => {
+  const ids = [...document.querySelectorAll('.post[data-s="draft"]')].filter((p) => !p.hidden)
+    .map((p) => (p.querySelector('[data-act="approve"]') || {}).dataset).filter(Boolean).map((d) => d.id);
+  const m = $("bulkMsg");
+  if (!ids.length) { say(m, "لا مسودات ظاهرة.", false); return; }
+  if (!confirm("سأوافق على " + ids.length + " منشور وتُنشر في مواعيدها. متابعة؟")) return;
+  try {
+    say(m, "جارٍ الحفظ…", true);
+    await edit((x) => ids.reduce((t, id) => setApproved(t, id, "true"), x), "queue: approve " + ids.length + " drafts", QFILE);
+    say(m, "تمت الموافقة على " + ids.length + " منشور ✅ تظهر في «سيُنشر» بعد دقائق.", true);
+    ids.forEach((id) => { const a = document.querySelector('[data-act="approve"][data-id="' + id + '"]'); if (a) a.parentElement.querySelectorAll("button").forEach((x) => (x.disabled = true)); });
+    $("bulkApprove").hidden = true;
+  } catch (e) { say(m, e.message, false); }
+};
+
+// ---------- الأداء: أرقام على البطاقات + لوحة تجميع ----------
+const INS = JSON.parse(document.getElementById("insdata").textContent || "{}");
+const PLAT_NAME = { facebook: "فيسبوك", instagram: "إنستغرام", threads: "ثريدز", linkedin: "لينكدإن", telegram: "تيليجرام" };
+const score = (m) => (m.likes || 0) + 2 * (m.comments || 0) + 3 * (m.shares || 0) + 2 * (m.saved || 0);
+function postScore(id) {
+  const per = INS[id] || {}; let s = 0, any = false;
+  Object.values(per).forEach((m) => { if (m && !m.error) { any = true; s += score(m); } });
+  return any ? s : null;
+}
+function metricsLine(id) {
+  const per = INS[id]; if (!per) return "";
+  return Object.entries(per).map(([k, m]) => {
+    const nm = PLAT_NAME[k.split(":")[0]] || k;
+    if (!m || m.error) return nm + ": —";
+    const bits = [];
+    if (m.views != null) bits.push("👁 " + m.views); if (m.reach != null) bits.push("👁 " + m.reach);
+    bits.push("❤ " + (m.likes || 0), "💬 " + (m.comments || 0));
+    if (m.shares) bits.push("↗ " + m.shares); if (m.saved) bits.push("🔖 " + m.saved);
+    return nm + ": " + bits.join(" ");
+  }).join(" · ");
+}
+document.querySelectorAll(".post").forEach((p) => {
+  const b = p.querySelector("[data-id]"); if (!b) return;
+  const t = metricsLine(b.dataset.id); if (!t) return;
+  const ln = p.querySelector(".line"); if (!ln) return;
+  const d = document.createElement("div"); d.className = "hint"; d.textContent = "📊 " + t; ln.after(d);
+});
+function renderStats() {
+  const rows = Object.values(POSTS).map((p) => ({ p, s: postScore(p.id) })).filter((r) => r.s != null);
+  const body = $("statsBody"), note = $("statsNote");
+  if (!rows.length) {
+    note.textContent = "لا أرقام بعد. تُسحب إحصاءات المنشورات مع الفحص اليومي (الساعة 8 صباحاً تقريباً)، وقد ترفض المنصة بعضها إن كانت صلاحية القراءة غير ممنوحة للتوكن.";
+    body.innerHTML = ""; return;
+  }
+  note.textContent = "التقييم = إعجابات + ٢×تعليقات + ٣×مشاركات + ٢×حفظ. المتوسط لكل منشور، وكلما زاد العدد كان الرقم أدق.";
+  const topicName = (id) => { const o = [...$("qTopic").options].find((x) => x.value === id); return o ? o.textContent : (id || "—"); };
+  const groupBy = (keyFn) => { const g = {}; rows.forEach((r) => { const k = keyFn(r.p); if (k == null) return; (g[k] = g[k] || []).push(r.s); }); return Object.entries(g).map(([k, v]) => [k, v.reduce((a, b) => a + b, 0) / v.length, v.length]).sort((a, b) => b[1] - a[1]); };
+  const TPL = { infographic: "إنفوجرافك", carousel: "كاروسيل", reel: "ريل", split: "صورة", photo: "صورة", tip: "نصيحة", quote: "اقتباس" };
+  const table = (title, data, label) => "<h3>" + title + "</h3><table class=\"st\">" + data.map(([k, avg, n]) => "<tr><td>" + label(k) + "</td><td>" + avg.toFixed(1) + "</td><td>" + n + " منشور</td></tr>").join("") + "</table>";
+  const top = rows.slice().sort((a, b) => b.s - a.s).slice(0, 5);
+  body.innerHTML =
+    "<h3>الأفضل أداءً</h3><table class=\"st\">" + top.map((r) => "<tr><td>" + (r.p.image && r.p.image.title || r.p.id) + "</td><td>" + r.s + "</td></tr>").join("") + "</table>" +
+    table("حسب القالب", groupBy((p) => p.template), (k) => TPL[k] || k) +
+    table("حسب النمط", groupBy((p) => (p.image && p.image.style) || null), (k) => k) +
+    table("حسب وقت النشر", groupBy((p) => (p.publish_at || "").slice(11, 13) + ":00"), (k) => k) +
+    table("حسب الموضوع", groupBy((p) => p.topic || null), topicName);
+}
+renderStats();

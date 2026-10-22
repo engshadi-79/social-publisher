@@ -89,7 +89,7 @@ def build(posts, state, now):
                          else f"سيُنشر {when_ar(when)} على: {pl}."),
         }[group]
         items.append({"line": line, "when_ar": when_ar(when),
-            "id": p["id"], "template": p["template"], "title": p["image"]["title"],
+            "id": p["id"], "template": p["template"], "topic": p.get("topic", ""), "title": p["image"]["title"],
             "when": when, "when_txt": when.strftime("%Y-%m-%d %H:%M"), "chips": chips,
             "group": group, "badge": badge, "badge_txt": badge_txt,
             "platforms_txt": "، ".join(LABELS[n] for n in p["platforms"]),
@@ -184,13 +184,15 @@ def main() -> int:
         e["publish_at"] = parse_when(p["publish_at"]).strftime("%Y-%m-%d %H:%M")
         e["group"] = group_of.get(p["id"], "draft")
         raw[p["id"]] = e
+    ins_f = ROOT / "content" / "insights.json"
+    insights_json = (ins_f.read_text(encoding="utf-8") if ins_f.exists() else "{}").replace("</", "<\/")
     posts_json = json.dumps(raw, ensure_ascii=False).replace("</", "<\\/")
 
     env = Environment(loader=FileSystemLoader(str(Path(__file__).parent)), autoescape=True)
     html = env.get_template("dashboard_template.html").render(
         topics_js=((Path(__file__).parent / "dashboard_topics.js").read_text(encoding="utf-8") + "\n" +
                    (Path(__file__).parent / "dashboard_posts.js").read_text(encoding="utf-8")).replace("__REPO__", os.environ.get("GITHUB_REPOSITORY", "engshadi-79/social-publisher")),
-        gen_log=load_gen_log(), health=load_health(), posts_json=posts_json, acc_json=acc_json,
+        gen_log=load_gen_log(), health=load_health(), posts_json=posts_json, acc_json=acc_json, insights_json=insights_json,
         topics=load_topics(), repo=os.environ.get("GITHUB_REPOSITORY", "engshadi-79/social-publisher"),
         posts=items, counts=counts, next_post=nxt, tz=TIMEZONE,
         updated=now.strftime("%Y-%m-%d %H:%M"))

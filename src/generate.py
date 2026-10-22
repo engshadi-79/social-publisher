@@ -198,7 +198,7 @@ def make_entries(items: list[dict], req: dict, topic: dict, existing_ids: set[st
             pick = max(pool, key=lambda st: (used[::-1].index(st) if st in used else 99, -pool.index(st)))
             img["style"] = pick
             used.append(pick)
-        if entry["template"] in ("infographic", "reel"):
+        if entry["template"] in ("infographic", "reel", "carousel"):
             hue = max(HUES, key=lambda h: (used_h[::-1].index(h) if h in used_h else 99, -HUES.index(h)))
             img["hue"] = hue
             used_h.append(hue)

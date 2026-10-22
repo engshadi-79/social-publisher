@@ -44,14 +44,16 @@ jobs:
           PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
           GITHUB_TOKEN: ${{ github.token }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-        run: python health.py
+        run: |
+          python health.py
+          python insights.py || true
       - name: Commit result and refresh dashboard
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           git config user.name "publisher-bot"
           git config user.email "publisher-bot@users.noreply.github.com"
-          git add content/health.json
+          git add content/health.json content/insights.json
           if ! git diff --cached --quiet; then
             git commit -m "bot: health check [skip ci]"
             git pull --rebase origin "${GITHUB_REF_NAME}"

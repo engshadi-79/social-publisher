@@ -1,0 +1,34 @@
+{% extends "carousel/base.html" %}
+{# نمط «نيون»: أسود بشبكة خافتة وإطار مضيء، عناوين بتوهّج. يناسب: التقنية، المحتوى الجريء. #}
+{% block style %}
+.slide{ padding:70px 66px 60px; color:#F4F7FF;
+        background:linear-gradient(rgba(255,255,255,.05) 2px, transparent 2px) 0 0/54px 54px,
+                   linear-gradient(90deg, rgba(255,255,255,.05) 2px, transparent 2px) 0 0/54px 54px,
+                   radial-gradient(800px 600px at 80% 0%, rgba(20,184,166,.28), transparent 70%), #070B16 }
+.slide.cta{ background:radial-gradient(900px 700px at 50% 100%, rgba(200,69,43,.45), transparent 70%), #0A0D1A }
+.frame{ position:absolute; inset:30px; border:3px solid var(--teal); border-radius:30px; box-shadow:0 0 28px rgba(20,184,166,.6), inset 0 0 24px rgba(20,184,166,.2); pointer-events:none }
+.slide.cta .frame{ border-color:var(--accent); box-shadow:0 0 28px rgba(244,185,66,.55), inset 0 0 24px rgba(244,185,66,.18) }
+.top{ position:relative; display:flex; justify-content:space-between; font-size:26px; font-weight:700; direction:ltr; opacity:.8 }
+.top .name{ direction:rtl }
+.kicker{ display:inline-block; color:var(--accent); border:2.5px solid var(--accent); border-radius:99px; padding:.25em .9em; font-size:.5em; font-weight:800; margin-bottom:.9em; text-shadow:0 0 12px var(--accent) }
+.title{ font-weight:800; line-height:1.24; font-size:2em; text-shadow:0 0 30px rgba(20,184,166,.75) }
+.cover .title{ font-size:2.35em }
+.sub{ margin-top:.8em; line-height:1.7; font-size:.62em; font-weight:600; opacity:.88 }
+.pts{ margin-top:1.2em; display:flex; flex-direction:column; gap:.55em }
+.pts li{ font-size:.58em; font-weight:700; line-height:1.5; padding:.5em .9em; border-radius:16px; border:2.5px solid rgba(20,184,166,.7); box-shadow:0 0 16px rgba(20,184,166,.35); background:rgba(7,11,22,.6) }
+.foot{ position:relative; display:flex; justify-content:space-between; align-items:center; font-size:26px; font-weight:700; direction:ltr; opacity:.9 }
+.foot .pill{ direction:rtl; color:var(--teal); text-shadow:0 0 12px var(--teal) }
+{% endblock %}
+{% block slide %}
+<div class="slide {{ theme }} {{ kind }}">
+  <div class="frame"></div>
+  <div class="top"><span>{{ '%02d' % index }}/{{ '%02d' % total }}</span><span class="name">{{ brand.name }}</span></div>
+  <div class="body-area" id="area"><div class="inner" id="inner">
+    {% if kicker %}<div class="kicker">{{ kicker }}</div>{% endif %}
+    <div class="title">{{ title }}</div>
+    {% if body %}<div class="sub">{{ body }}</div>{% endif %}
+    {% if points %}<ul class="pts">{% for p in points %}<li>{{ p }}</li>{% endfor %}</ul>{% endif %}
+  </div></div>
+  <div class="foot"><span>{{ brand.handle }}</span><span class="pill">{% if index < total %}اسحب ←{% else %}احفظ ✓{% endif %}</span></div>
+</div>
+{% endblock %}

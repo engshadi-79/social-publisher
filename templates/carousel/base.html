@@ -26,6 +26,7 @@ body{ font-family:"BrandFont","Cairo","Segoe UI",Tahoma,sans-serif; }
 .inner{ margin:var(--m, auto 0); width:100% }
 ul{ list-style:none }
 {% block style %}{% endblock %}
+{% if hue %}.slide{ filter:hue-rotate({{ hue }}deg) }{% endif %}
 </style>
 </head>
 <body>

@@ -1,0 +1,35 @@
+{% extends "carousel/base.html" %}
+{# نمط «ورقي»: خلفية كريمية دافئة، رقم كبير مفرّغ، وخطوط رفيعة كصفحة كتاب. يناسب: المقالات والأفكار الهادئة. #}
+{% block style %}
+.slide{ padding:78px 80px 64px; background:#F5F0E6; color:#1B2433 }
+.slide.dark{ background:#EBE3D3 }
+.slide.cta{ background:#1B2433; color:#F5F0E6 }
+.num{ position:absolute; top:40px; left:50px; font-size:420px; font-weight:800; line-height:1; direction:ltr; color:transparent; -webkit-text-stroke:3px rgba(27,36,51,.16) }
+.slide.cta .num{ -webkit-text-stroke-color:rgba(245,240,230,.2) }
+.top{ position:relative; display:flex; justify-content:space-between; font-size:26px; font-weight:700; direction:ltr; opacity:.65 }
+.top .name{ direction:rtl }
+.rule{ position:relative; height:4px; background:currentColor; opacity:.85; margin:26px 0 0; width:120px }
+.kicker{ font-size:.5em; font-weight:800; color:var(--kick); margin-bottom:.8em; letter-spacing:.04em }
+.slide.cta .kicker{ color:var(--accent) }
+.title{ font-weight:800; line-height:1.28; font-size:1.9em }
+.cover .title{ font-size:2.2em }
+.sub{ margin-top:.9em; line-height:1.85; font-size:.62em; font-weight:500; opacity:.82; border-right:6px solid var(--accent); padding-right:.8em }
+.pts{ margin-top:1.2em; display:flex; flex-direction:column }
+.pts li{ font-size:.6em; font-weight:700; line-height:1.55; padding:.55em 0; border-bottom:2.5px solid rgba(27,36,51,.18) }
+.slide.cta .pts li{ border-color:rgba(245,240,230,.25) }
+.foot{ position:relative; display:flex; justify-content:space-between; align-items:center; font-size:26px; font-weight:700; direction:ltr; opacity:.8 }
+{% endblock %}
+{% block slide %}
+<div class="slide {{ theme }} {{ kind }}">
+  <div class="num">{{ '%02d' % index }}</div>
+  <div class="top"><span>{{ '%02d' % index }} / {{ '%02d' % total }}</span><span class="name">{{ brand.name }}</span></div>
+  <div class="rule"></div>
+  <div class="body-area" id="area"><div class="inner" id="inner">
+    {% if kicker %}<div class="kicker">{{ kicker }}</div>{% endif %}
+    <div class="title">{{ title }}</div>
+    {% if body %}<div class="sub">{{ body }}</div>{% endif %}
+    {% if points %}<ul class="pts">{% for p in points %}<li>{{ p }}</li>{% endfor %}</ul>{% endif %}
+  </div></div>
+  <div class="foot"><span>{{ brand.handle }}</span><span>{% if index < total %}اسحب ←{% else %}احفظ ✓{% endif %}</span></div>
+</div>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends "carousel/base.html" %}
+{# نمط «تدرّج»: شبكة ألوان ناعمة وبطاقة زجاجية للنص. يناسب: التحفيز والمحتوى العاطفي. #}
+{% block style %}
+.slide{ padding:64px 58px 58px; color:#fff;
+        background:radial-gradient(620px 560px at 10% 5%, rgba(200,69,43,.65), transparent 62%),
+                   radial-gradient(700px 640px at 95% 45%, rgba(20,184,166,.6), transparent 62%),
+                   radial-gradient(640px 560px at 15% 100%, rgba(244,185,66,.5), transparent 62%), #0B1530 }
+.slide.dark{ background:radial-gradient(640px 560px at 90% 0%, rgba(244,185,66,.55), transparent 62%),
+                   radial-gradient(700px 640px at 0% 55%, rgba(20,184,166,.55), transparent 62%),
+                   radial-gradient(640px 560px at 85% 100%, rgba(200,69,43,.55), transparent 62%), #0B1530 }
+.top{ position:relative; display:flex; justify-content:space-between; font-size:26px; font-weight:700; direction:ltr; opacity:.9; margin-bottom:28px }
+.top .name{ direction:rtl }
+.card{ position:relative; flex:1; min-height:0; display:flex; flex-direction:column; border-radius:44px; padding:56px 52px 44px;
+       background:linear-gradient(135deg, rgba(255,255,255,.22), rgba(255,255,255,.07));
+       border:2.5px solid rgba(255,255,255,.35); box-shadow:0 30px 70px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.4) }
+.kicker{ display:inline-block; background:rgba(255,255,255,.2); border-radius:99px; padding:.3em .9em; font-size:.48em; font-weight:800; margin-bottom:.9em }
+.title{ font-weight:800; line-height:1.25; font-size:1.95em; text-shadow:0 4px 26px rgba(0,0,0,.3) }
+.cover .title{ font-size:2.25em }
+.sub{ margin-top:.8em; line-height:1.75; font-size:.62em; font-weight:600; opacity:.92 }
+.pts{ margin-top:1.1em; display:flex; flex-direction:column; gap:.5em }
+.pts li{ font-size:.58em; font-weight:700; line-height:1.5; padding:.5em .9em; border-radius:18px; background:rgba(11,21,48,.45); border:2px solid rgba(255,255,255,.2) }
+.foot{ position:relative; display:flex; justify-content:space-between; align-items:center; font-size:26px; font-weight:700; direction:ltr; margin-top:26px }
+.foot .pill{ direction:rtl; border:2.5px solid currentColor; border-radius:99px; padding:.3em 1em }
+{% endblock %}
+{% block slide %}
+<div class="slide {{ theme }} {{ kind }}">
+  <div class="top"><span>{{ '%02d' % index }} / {{ '%02d' % total }}</span><span class="name">{{ brand.name }}</span></div>
+  <div class="card">
+    <div class="body-area" id="area"><div class="inner" id="inner">
+      {% if kicker %}<div class="kicker">{{ kicker }}</div>{% endif %}
+      <div class="title">{{ title }}</div>
+      {% if body %}<div class="sub">{{ body }}</div>{% endif %}
+      {% if points %}<ul class="pts">{% for p in points %}<li>{{ p }}</li>{% endfor %}</ul>{% endif %}
+    </div></div>
+    <div class="foot"><span>{{ brand.handle }}</span><span class="pill">{% if index < total %}اسحب ←{% else %}احفظ ✓{% endif %}</span></div>
+  </div>
+</div>
+{% endblock %}

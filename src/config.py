@@ -33,7 +33,7 @@ TEMPLATES = {
 # أنماط الكاروسيل: لكلٍّ لغة بصرية مختلفة بنيوياً لا لوناً فقط.
 # بلا صور: blueprint مخطط هندسي · editorial مجلّة · terminal نافذة كود
 #          poster ملصق لوني · sticky ورقة ملصقة · duo لوحان بشريط جانبي
-CAROUSEL_STYLES_FLAT = ("blueprint", "editorial", "terminal", "poster", "sticky", "duo")
+CAROUSEL_STYLES_FLAT = ("blueprint", "editorial", "terminal", "poster", "sticky", "duo", "neon", "paper", "gradient")
 # بصور حقيقية: magazine غلاف مجلّة · polaroid صورة فورية · collage قصاصات
 #              duotone صورة بلونين · window بطاقة بنافذة · filmstrip شريط فيلم
 CAROUSEL_STYLES_PHOTO = ("magazine", "polaroid", "collage", "duotone", "window", "filmstrip")

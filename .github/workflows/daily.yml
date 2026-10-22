@@ -13,6 +13,7 @@ on:
 permissions:
   contents: write
   actions: write
+  issues: write
 
 concurrency:
   group: publish
@@ -50,3 +51,16 @@ jobs:
             git push
           fi
           gh workflow run dashboard.yml
+      - name: Notify owner (GitHub issue -> email / GitHub app)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        working-directory: src
+        run: |
+          N=$(python daily_report.py ../report.md)
+          if [ "$N" != "0" ]; then
+            gh label create daily-drafts --color 0E8A16 --description "مسودات بانتظار الموافقة" --force || true
+            for n in $(gh issue list --label daily-drafts --state open --json number -q '.[].number'); do
+              gh issue close "$n" --comment "حلّ محلّه إشعار أحدث." || true
+            done
+            gh issue create --label daily-drafts --title "📬 $N منشور بانتظار موافقتك — $(date -u +%Y-%m-%d)" --body-file ../report.md
+          fi
