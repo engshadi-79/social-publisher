@@ -1,0 +1,23 @@
+{% extends "_base.html" %}
+{# «الرقم الكبير»: عدد النقاط كبطل التصميم، ثم قائمة مرتّبة. #}
+{% block style %}
+.canvas { background: linear-gradient(180deg, #0B1F3A 0, #0B1F3A 520px, #F3EFE6 520px); color: #0B1F3A; }
+.overlay { display: none; }
+.frame { padding: 0 0 56px; }
+.top { padding: 70px 76px 0; height: 520px; color: #FFF7EC; position: relative; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 54px; }
+.big { position: absolute; top: 40px; left: 60px; font-size: 440px; font-weight: 800; line-height: 1; color: var(--accent); direction: ltr; opacity: .95; }
+.t { font-size: 62px; font-weight: 800; line-height: 1.25; position: relative; max-width: 78%; }
+.sub { font-size: 34px; opacity: .8; margin-top: 12px; position: relative; max-width: 78%; line-height: 1.5; }
+.text { --base: 44px; --m: 0 0 auto; padding: 38px 76px 0; }
+.lst { list-style: none; margin: 0; padding: 0; }
+.lst li { display: flex; align-items: baseline; gap: .6em; padding: .5em 0; font-size: .86em; line-height: 1.45; font-weight: 700; border-bottom: 3px solid rgba(11,31,58,.14); }
+.lst .n { flex: 0 0 auto; color: #C8452B; font-weight: 800; font-size: 1.1em; direction: ltr; min-width: 1.3em; }
+.footer { margin: 0 76px; border-top: 3px solid rgba(11,31,58,.16); }
+.handle { color: #C8452B; }
+{% endblock %}
+{% block content %}
+<div class="top"><div class="big">{{ points|length }}</div><div class="t">{{ title }}</div>{% if body %}<div class="sub">{{ body }}</div>{% endif %}</div>
+<div class="text"><div class="inner">
+  <ol class="lst">{% for p in points %}<li><span class="n">{{ loop.index }}.</span><span>{{ p }}</span></li>{% endfor %}</ol>
+</div></div>
+{% endblock %}

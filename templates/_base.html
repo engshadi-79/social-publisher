@@ -27,6 +27,7 @@ body { font-family: "BrandFont", "Cairo", "Segoe UI", Tahoma, sans-serif; color:
 .badge { align-self: flex-start; background: var(--teal); color: var(--navy); font-weight: 800;
   padding: 8px 30px; border-radius: 999px; font-size: 34px; margin-bottom: 28px; }
 {% block style %}{% endblock %}
+{% if hue %}.canvas { filter: hue-rotate({{ hue }}deg); }{% endif %}
 </style>
 </head>
 <body>

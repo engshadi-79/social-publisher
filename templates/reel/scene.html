@@ -64,6 +64,7 @@ body{ font-family:"BrandFont","Cairo","Segoe UI",Tahoma,sans-serif; color:#FFF8E
 .accentline{ position:absolute; z-index:3; inset-inline:70px; bottom:170px; height:6px; border-radius:99px;
              background:var(--accent); transform-origin:right center; opacity:.9 }
 
+{% if hue %}.bg, .art { filter: hue-rotate({{ hue }}deg); }{% endif %}
 /* العناصر المتحرّكة تبدأ مخفية: seek(t) هو ما يُظهرها */
 .anim{ opacity:0 }
 </style>

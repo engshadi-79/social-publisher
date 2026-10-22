@@ -83,6 +83,8 @@ def validate(queue: list[dict]) -> list[str]:
         if p.get("template") not in TEMPLATES:
             errors.append(f"{tag} قالب غير صالح: {p.get('template')} (المتاح: {', '.join(TEMPLATES)})")
         img = p.get("image")
+        if isinstance(img, dict) and img.get("hue") is not None and not (isinstance(img["hue"], int) and 0 <= img["hue"] < 360):
+            errors.append(f"{tag} image.hue يجب أن يكون عدداً بين 0 و359")
         if not isinstance(img, dict) or not img.get("title"):
             errors.append(f"{tag} image.title مطلوب")
         elif p.get("template") == "infographic" and str(img.get("style", "") or "").strip() and str(img["style"]).strip().lower() not in INFOGRAPHIC_STYLES:

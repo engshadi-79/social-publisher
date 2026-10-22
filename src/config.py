@@ -44,4 +44,7 @@ LIMITS = {"threads": 500, "instagram": 2200, "facebook": 63000, "telegram": 4096
           "linkedin": 3000}
 
 # أنماط الإنفوجرافك (بلا صور): cards بطاقات · bento بلاطات · timeline خط زمني · bold جريء · glass زجاجي · steps درج
-INFOGRAPHIC_STYLES = ("cards", "bento", "timeline", "bold", "glass", "steps")
+INFOGRAPHIC_STYLES = ("cards", "bento", "timeline", "bold", "glass", "steps",
+                      "neon", "checklist", "bignum", "blueprint", "pills", "columns")
+# إزاحات لونية (hue-rotate بالدرجات): كل نمط × كل إزاحة = تصميم مختلف المظهر
+HUES = (0, 35, 70, 140, 190, 250, 290, 325)

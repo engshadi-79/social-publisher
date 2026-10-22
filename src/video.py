@@ -75,7 +75,7 @@ def render_poster(renderer, post: dict, out_png: Path, scene: int = 1) -> Path:
 
     from config import TEMPLATES_DIR
     from queue_io import load_brand
-    from render import _fonts
+    from render import _fonts, post_hue
 
     specs = scene_specs(post)
     if not specs:
@@ -87,7 +87,7 @@ def render_poster(renderer, post: dict, out_png: Path, scene: int = 1) -> Path:
     photo = photos.get(scene)
     html = env.get_template("reel/scene.html").render(
         brand=load_brand(), w=w, h=h, fonts=_fonts(),
-        photo=photo.as_uri() if photo else None, **spec)
+        photo=photo.as_uri() if photo else None, hue=post_hue(post), **spec)
     tmp = OUT_DIR / "_tmp"
     tmp.mkdir(parents=True, exist_ok=True)
     page_file = tmp / f"{post['id']}-poster{scene}.html"
@@ -111,7 +111,7 @@ def render_reel(renderer, post: dict, out_dir: Path, photos: dict[int, Path] | N
 
     from config import TEMPLATES_DIR
     from queue_io import load_brand
-    from render import _fonts
+    from render import _fonts, post_hue
 
     if photos is None:                    # يجلبها بنفسه كما يفعل الكاروسيل
         photos, warns = imagegen.ensure_slide_photos(post, key="scenes")
@@ -137,7 +137,7 @@ def render_reel(renderer, post: dict, out_dir: Path, photos: dict[int, Path] | N
     for spec in specs:
         photo = (photos or {}).get(spec["index"])
         html = tpl.render(brand=brand, w=w, h=h, fonts=_fonts(),
-                          photo=photo.as_uri() if photo else None, **spec)
+                          photo=photo.as_uri() if photo else None, hue=post_hue(post), **spec)
         page_file = tmp / f"{post['id']}-reel-{spec['index']}.html"
         page_file.write_text(html, encoding="utf-8")
         page = renderer._browser.new_page(viewport={"width": w, "height": h}, device_scale_factor=1)

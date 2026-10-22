@@ -1,0 +1,26 @@
+{% extends "_base.html" %}
+{# «قائمة تحقّق»: ورقة بيضاء مائلة قليلاً بعلامات صح على خلفية ملوّنة. #}
+{% block style %}
+.canvas { background: var(--teal); color: #0B1F3A; }
+.canvas::before { content: ""; position: absolute; inset: 0; background: radial-gradient(500px 500px at 100% 0%, rgba(255,255,255,.28), transparent 65%); }
+.overlay { display: none; }
+.frame { padding: 70px 66px 56px; }
+.text { --base: 44px; --m: 0 0 auto; }
+.title { font-size: 1.85em; line-height: 1.24; color: #07202c; }
+.body { opacity: .75; font-size: .84em; font-weight: 600; }
+.sheet { margin-top: 1em; background: #fffdf6; border-radius: 28px; padding: .6em 1em; transform: rotate(-1.4deg);
+         box-shadow: 0 24px 60px rgba(7,32,44,.35); border-top: 16px solid var(--accent); }
+.sheet li { list-style: none; display: flex; align-items: center; gap: .7em; padding: .62em 0; font-size: .82em; line-height: 1.45; font-weight: 700;
+            border-bottom: 3px dashed rgba(11,31,58,.18); }
+.sheet li:last-child { border-bottom: 0; }
+.sheet .ck { flex: 0 0 auto; width: 1.6em; height: 1.6em; border-radius: 9px; background: #0B1F3A; color: var(--accent); display: grid; place-items: center; font-weight: 800; }
+.footer { border-top: 3px solid rgba(7,32,44,.25); }
+.handle { color: #07202c; }
+{% endblock %}
+{% block content %}
+<div class="text"><div class="inner">
+  <div class="title">{{ title }}</div>
+  {% if body %}<div class="body">{{ body }}</div>{% endif %}
+  <ol class="sheet">{% for p in points %}<li><span class="ck">✓</span><span>{{ p }}</span></li>{% endfor %}</ol>
+</div></div>
+{% endblock %}

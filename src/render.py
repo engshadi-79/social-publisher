@@ -5,7 +5,7 @@ from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 
 import imagegen
-from config import (INFOGRAPHIC_STYLES, CAROUSEL_STYLES, CAROUSEL_STYLES_FLAT, CAROUSEL_STYLES_PHOTO, OUT_DIR,
+from config import (HUES, INFOGRAPHIC_STYLES, CAROUSEL_STYLES, CAROUSEL_STYLES_FLAT, CAROUSEL_STYLES_PHOTO, OUT_DIR,
                     ROOT, TEMPLATES, TEMPLATES_DIR)
 from queue_io import load_brand
 
@@ -64,7 +64,7 @@ class Renderer:
             brand=brand, w=w, h=h, fonts=_fonts(),
             title=post["image"]["title"], body=post["image"].get("body", ""),
             points=[str(x) for x in (post["image"].get("points") or [])],
-            bg=bg.as_uri() if bg and bg.exists() else None,
+            bg=bg.as_uri() if bg and bg.exists() else None, hue=post_hue(post),
             logo=logo.as_uri() if brand.get("logo") and logo.is_file() else None,
         )
         return self._shoot(html, post["id"], w, h, out_png)
@@ -96,6 +96,17 @@ class Renderer:
             import video
             return [video.render_reel(self, post, out_dir)]
         return [self.render(post, out_dir / f"{post['id']}.png", bg)]
+
+
+def post_hue(post: dict) -> int:
+    """إزاحة اللون: `image.hue` إن حُدّدت (0-359)، وإلا تُشتق من المعرّف. القوالب القديمة لا تستعملها."""
+    h = (post.get("image") or {}).get("hue")
+    if isinstance(h, int) and not isinstance(h, bool) and 0 <= h < 360:
+        return h
+    if post.get("template") not in ("infographic", "reel"):
+        return 0
+    digest = hashlib.sha1(("hue:" + str(post.get("id", ""))).encode("utf-8")).digest()
+    return HUES[digest[0] % len(HUES)]
 
 
 def infographic_style(post: dict) -> str:

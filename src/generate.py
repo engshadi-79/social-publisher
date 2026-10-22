@@ -17,7 +17,7 @@ import yaml
 import generator
 from config import ROOT, QUEUE_PATH
 from queue_io import fatal, load_queue, load_brand, parse_when, validate
-from config import TOPICS_PATH, INFOGRAPHIC_STYLES, CAROUSEL_STYLES_FLAT
+from config import TOPICS_PATH, INFOGRAPHIC_STYLES, CAROUSEL_STYLES_FLAT, HUES
 
 REQUEST = ROOT / "content" / "generate_request.yaml"
 LOG = ROOT / "content" / "generate_log.json"
@@ -123,11 +123,12 @@ def clip(text: str, limit: int) -> str:
     return (cut[:space] if space > limit * 0.6 else cut).rstrip(" ،.") + "…"
 
 
-def make_entries(items: list[dict], req: dict, topic: dict, existing_ids: set[str], used_styles: list[str] | None = None) -> list[dict]:
+def make_entries(items: list[dict], req: dict, topic: dict, existing_ids: set[str], used_styles: list[str] | None = None, used_hues: list[int] | None = None) -> list[dict]:
     start = parse_when(req["start"])
     platforms = req.get("platforms") or DEFAULT_PLATFORMS
     out = []
     used = list(used_styles or [])
+    used_h = list(used_hues or [])
     for i, it in enumerate(items):
         when = start + timedelta(days=i)
         pid, n = f"{when:%Y-%m-%d}-g1", 1
@@ -196,6 +197,10 @@ def make_entries(items: list[dict], req: dict, topic: dict, existing_ids: set[st
             pick = max(pool, key=lambda st: (used[::-1].index(st) if st in used else 99, -pool.index(st)))
             img["style"] = pick
             used.append(pick)
+        if entry["template"] in ("infographic", "reel"):
+            hue = max(HUES, key=lambda h: (used_h[::-1].index(h) if h in used_h else 99, -HUES.index(h)))
+            img["hue"] = hue
+            used_h.append(hue)
         img["seed"] = 1 + (i * 7) % 90
         entry["image"] = img
         entry["platforms"] = {p: clip(texts[p], 480) if p == "threads" else texts[p]
@@ -229,7 +234,8 @@ def main() -> int:
         if not isinstance(items, list) or not items:
             raise generator.GeneratorError("قائمة المنشورات فارغة")
         recent_styles = [str((p.get("image") or {}).get("style")) for p in queue if isinstance(p.get("image"), dict) and (p.get("image") or {}).get("style")]
-        entries = make_entries(items[:count], req, topic, {p["id"] for p in queue}, recent_styles)
+        recent_hues = [(p.get("image") or {}).get("hue") for p in queue if isinstance(p.get("image"), dict) and isinstance((p.get("image") or {}).get("hue"), int)]
+        entries = make_entries(items[:count], req, topic, {p["id"] for p in queue}, recent_styles, recent_hues)
         entries = [e for e in entries if e["image"]["title"] and e["platforms"] and (e["template"] != "infographic" or len(e["image"].get("points", [])) >= 2) and (e["template"] != "carousel" or len(e["image"].get("slides", [])) >= 3) and (e["template"] != "reel" or len(e["image"].get("scenes", [])) >= 3)]
         if not entries:
             raise generator.GeneratorError("لم يصلح أي منشور مولَّد")

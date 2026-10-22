@@ -1,0 +1,30 @@
+{% extends "_base.html" %}
+{# «مخطط»: ورق شبكي أزرق بحواف تقنية ومربعات متقطعة. #}
+{% block style %}
+.canvas { background:
+  linear-gradient(rgba(255,255,255,.09) 2px, transparent 2px) 0 0 / 45px 45px,
+  linear-gradient(90deg, rgba(255,255,255,.09) 2px, transparent 2px) 0 0 / 45px 45px,
+  linear-gradient(160deg, #0d3b66, #0a2a4a); }
+.overlay { display: none; }
+.frame { padding: 84px 76px 60px; }
+.frame::before, .frame::after { content: ""; position: absolute; width: 70px; height: 70px; border: 4px solid var(--accent); }
+.frame::before { top: 36px; right: 36px; border-left: 0; border-bottom: 0; }
+.frame::after { bottom: 36px; left: 36px; border-right: 0; border-top: 0; }
+.text { --base: 46px; --m: 0 0 auto; }
+.tag { display: inline-block; font-size: .46em; font-weight: 800; color: var(--accent); border: 2px dashed var(--accent); padding: .2em .8em; margin-bottom: .7em; direction: ltr; }
+.title { font-size: 1.85em; line-height: 1.28; }
+.body { opacity: .78; font-size: .84em; }
+.bp { list-style: none; margin: 1.2em 0 0; padding: 0; display: flex; flex-direction: column; gap: 16px; }
+.bp li { display: flex; align-items: center; gap: .8em; padding: .7em .9em; font-size: .82em; line-height: 1.5; font-weight: 600;
+         border: 3px dashed rgba(255,255,255,.55); background: rgba(10,42,74,.6); }
+.bp .n { flex: 0 0 auto; width: 1.7em; height: 1.7em; border: 3px solid var(--accent); color: var(--accent); display: grid; place-items: center; font-weight: 800; direction: ltr; }
+.footer { border-top: 3px dashed rgba(255,255,255,.4); }
+{% endblock %}
+{% block content %}
+<div class="text"><div class="inner">
+  <div class="tag">FIG. {{ '%02d' % (points|length) }}</div>
+  <div class="title">{{ title }}</div>
+  {% if body %}<div class="body">{{ body }}</div>{% endif %}
+  <ol class="bp">{% for p in points %}<li><span class="n">{{ loop.index }}</span><span>{{ p }}</span></li>{% endfor %}</ol>
+</div></div>
+{% endblock %}

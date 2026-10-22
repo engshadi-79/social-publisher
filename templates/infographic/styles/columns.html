@@ -1,0 +1,28 @@
+{% extends "_base.html" %}
+{# «شريط جانبي»: شريط ملوّن عمودي برقم كل نقطة، ونص ضخم مقروء على فاتح. #}
+{% block style %}
+.canvas { background: #F6F2EA; color: #0B1F3A; }
+.overlay { display: none; }
+.frame { padding: 80px 70px 58px 70px; }
+.text { --base: 46px; --m: 0 0 auto; }
+.kick { display: inline-block; background: #C8452B; color: #FFF2EE; font-weight: 800; font-size: .48em; padding: .3em .9em; border-radius: 8px; margin-bottom: .7em; }
+.title { font-size: 1.9em; line-height: 1.24; }
+.body { opacity: .65; font-size: .84em; }
+.cl { list-style: none; margin: 1.1em 0 0; padding: 0; }
+.cl li { display: flex; align-items: stretch; margin-bottom: 14px; background: #fff; border-radius: 18px; overflow: hidden; box-shadow: 0 8px 24px rgba(11,31,58,.09);
+         font-size: .8em; line-height: 1.5; font-weight: 700; }
+.cl .n { flex: 0 0 auto; width: 1.9em; display: grid; place-items: center; background: #0B1F3A; color: var(--accent); font-weight: 800; font-size: 1.3em; }
+.cl li:nth-child(even) .n { background: var(--teal); color: #04211E; }
+.cl li:nth-child(3n) .n { background: #C8452B; color: #FFF2EE; }
+.cl .t { padding: .7em .9em; }
+.footer { border-top: 3px solid rgba(11,31,58,.14); }
+.handle { color: #C8452B; }
+{% endblock %}
+{% block content %}
+<div class="text"><div class="inner">
+  <div class="kick">{{ points|length }} نقاط</div>
+  <div class="title">{{ title }}</div>
+  {% if body %}<div class="body">{{ body }}</div>{% endif %}
+  <ol class="cl">{% for p in points %}<li><span class="n">{{ loop.index }}</span><span class="t">{{ p }}</span></li>{% endfor %}</ol>
+</div></div>
+{% endblock %}

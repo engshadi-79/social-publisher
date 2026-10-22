@@ -1,0 +1,27 @@
+{% extends "_base.html" %}
+{# «نيون»: خلفية سوداء بشبكة خافتة وبطاقات بحواف مضيئة. #}
+{% block style %}
+.canvas { background:
+  linear-gradient(rgba(255,255,255,.045) 2px, transparent 2px) 0 0 / 54px 54px,
+  linear-gradient(90deg, rgba(255,255,255,.045) 2px, transparent 2px) 0 0 / 54px 54px,
+  radial-gradient(700px 500px at 50% 0%, rgba(20,184,166,.22), transparent 70%), #070B16; }
+.overlay { display: none; }
+.frame { padding: 84px 76px 60px; }
+.text { --base: 46px; --m: 0 0 auto; }
+.title { font-size: 1.9em; line-height: 1.26; color: #fff; text-shadow: 0 0 28px rgba(20,184,166,.7); }
+.body { opacity: .75; font-size: .86em; }
+.nn { list-style: none; margin: 1.2em 0 0; padding: 0; display: flex; flex-direction: column; gap: 18px; }
+.nn li { display: flex; align-items: center; gap: .8em; padding: .7em .95em; border-radius: 18px; font-size: .84em; line-height: 1.5; font-weight: 700;
+         border: 3px solid var(--teal); box-shadow: 0 0 22px rgba(20,184,166,.55), inset 0 0 18px rgba(20,184,166,.18); background: rgba(7,11,22,.7); }
+.nn li:nth-child(even) { border-color: var(--accent); box-shadow: 0 0 22px rgba(244,185,66,.5), inset 0 0 18px rgba(244,185,66,.15); }
+.nn .n { flex: 0 0 auto; font-size: 1.5em; font-weight: 800; color: var(--accent); text-shadow: 0 0 14px var(--accent); direction: ltr; }
+.nn li:nth-child(odd) .n { color: var(--teal); text-shadow: 0 0 14px var(--teal); }
+.footer { border-top: 2px solid rgba(255,255,255,.18); }
+{% endblock %}
+{% block content %}
+<div class="text"><div class="inner">
+  <div class="title">{{ title }}</div>
+  {% if body %}<div class="body">{{ body }}</div>{% endif %}
+  <ol class="nn">{% for p in points %}<li><span class="n">{{ '%02d' % loop.index }}</span><span>{{ p }}</span></li>{% endfor %}</ol>
+</div></div>
+{% endblock %}
