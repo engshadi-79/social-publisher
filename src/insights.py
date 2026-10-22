@@ -39,11 +39,20 @@ def metrics_of(d: dict) -> dict:
 
 def facebook(pid, c):
     tok = c["token"]
-    d = get(f"{G}/{pid}", fields="reactions.summary(true).limit(0),comments.summary(true).limit(0),shares", access_token=tok)
-    out = {"likes": d.get("reactions", {}).get("summary", {}).get("total_count"),
-           "comments": d.get("comments", {}).get("summary", {}).get("total_count"),
-           "shares": (d.get("shares") or {}).get("count", 0)}
-    try:                                   # الوصول يحتاج read_insights؛ اختياري
+    try:
+        d = get(f"{G}/{pid}", fields="reactions.summary(true).limit(0),comments.summary(true).limit(0),shares", access_token=tok)
+        out = {"likes": d.get("reactions", {}).get("summary", {}).get("total_count"),
+               "comments": d.get("comments", {}).get("summary", {}).get("total_count"),
+               "shares": (d.get("shares") or {}).get("count", 0)}
+    except Exception as first:  # noqa: BLE001
+        # بديل: واجهة insights (تحتاج read_insights بدل pages_read_user_content)
+        try:
+            m = metrics_of(get(f"{G}/{pid}/insights", metric="post_impressions_unique,post_reactions_by_type_total", access_token=tok))
+        except Exception:  # noqa: BLE001
+            raise first
+        rt = m.get("post_reactions_by_type_total")
+        return {"reach": m.get("post_impressions_unique"), "likes": sum(rt.values()) if isinstance(rt, dict) else None}
+    try:
         out["reach"] = metrics_of(get(f"{G}/{pid}/insights", metric="post_impressions_unique", access_token=tok)).get("post_impressions_unique")
     except Exception:  # noqa: BLE001
         pass
