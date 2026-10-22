@@ -60,7 +60,7 @@ def fetch_trends() -> list[str]:
     return out[:60]
 
 
-def build_prompt(topic: dict, count: int, brand: dict, recent: list[str], trends: list[str], style: str = "photo", slides_n: int = 7) -> str:
+def build_prompt(topic: dict, count: int, brand: dict, recent: list[str], trends: list[str], style: str = "photo", slides_n: int = 7, when_txt: str = "") -> str:
     fixed = " ".join(topic.get("hashtags_fixed") or []) or "(لا يوجد)"
     avoid = "، ".join(recent[-15:]) or "(لا يوجد)"
     trend_txt = "، ".join(trends) if trends else "(غير متاح الآن)"
@@ -103,7 +103,8 @@ def build_prompt(topic: dict, count: int, brand: dict, recent: list[str], trends
 - العربية الفصحى المبسّطة. معلومات صحيحة ومفيدة، بلا ادعاءات طبية أو مالية أو سياسية ولا أرقام مختلقة.
 - ترند Google الحالي (مواضيع يبحث عنها الناس الآن): {trend_txt}
   استعمل منها كهاشتاج فقط ما يرتبط فعلاً بموضوع المنشور (قد لا يوجد شيء مناسب، وهذا مقبول ولا تُقحم ترنداً لا علاقة له).
-  ثم أضف 3 إلى 4 هاشتاجات عربية متخصصة بالموضوع، مع الهاشتاجات الثابتة.
+  موعد النشر: {when_txt or "غير محدد"}. اختر هاشتاجاً رائجاً مناسباً لهذا اليوم والموضوع (مثل جمعة_مباركة يوم الجمعة، وصباح_الخير في منشورات الصباح، أو مناسبة قائمة) إن وُجد، فهذا ما يجعل الهاشتاج جديداً كل يوم.
+  ثم أضف 3 إلى 4 هاشتاجات عربية متخصصة بالموضوع، مع الهاشتاجات الثابتة (قد لا توجد).
 - لكل منشور هذه الحقول بالضبط:
   "title": عنوان قصير يظهر على الصورة (حتى 60 حرفاً)،
   "body": سطر صغير تحت العنوان (حتى 80 حرفاً، أو فارغ)،
@@ -213,13 +214,23 @@ def write_log(**kw):
     LOG.write_text(json.dumps(kw, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
+def when_ar(start) -> str:
+    """«يوم الجمعة 23 أكتوبر 2026 الساعة 08:00» لإرشاد النموذج في اختيار الهاشتاج."""
+    try:
+        d = parse_when(str(start))
+    except Exception:  # noqa: BLE001
+        return ""
+    days = ["الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت", "الأحد"]
+    return f"يوم {days[d.weekday()]} {d:%Y-%m-%d} الساعة {d:%H:%M}"
+
+
 def build_entries(req: dict, queue: list[dict]) -> tuple[list[dict], dict, str]:
     """يولّد مسودات طلب واحد ويتحقق منها (دون كتابتها). يرجع (المسودات، الموضوع، وصف الطريقة)."""
     count = max(1, min(int(req.get("count", 1)), 7))
     topic = load_topic(req)
     recent = [p["image"]["title"] for p in queue if isinstance(p.get("image"), dict) and p["image"].get("title")]
     trends = fetch_trends()
-    text, method = generator.generate_text(build_prompt(topic, count, load_brand(), recent, trends, req.get("style") or "photo", int(req.get("slides") or 7)))
+    text, method = generator.generate_text(build_prompt(topic, count, load_brand(), recent, trends, req.get("style") or "photo", int(req.get("slides") or 7), when_ar(req.get("start"))))
     method += f" | ترند Google: {len(trends)} عنصر" if trends else " | ترند Google غير متاح"
     items = generator.extract_json(text)
     if not isinstance(items, list) or not items:
@@ -285,9 +296,16 @@ def daily(target: str | None = None) -> int:
         if p.get("topic") in last:
             last[p["topic"]] = max(last[p["topic"]], str(p["publish_at"]))
     order = sorted(topics, key=lambda t: (last[t["id"]], topics.index(t)))
+    morning = [t for t in order if t.get("time") == "morning"]       # مواضيع الصباح: دائماً في موعد 8:00
+    others = [t for t in order if t.get("time") != "morning"]
+    pairs = []
+    for slot in slots:
+        pool = morning if slot == SLOTS[0] and morning else others or morning
+        if pool:
+            pairs.append((pool.pop(0), slot))
     ordinal = datetime.strptime(day, "%Y-%m-%d").toordinal()
     done, failed = [], []
-    for i, (t, slot) in enumerate(zip(order, slots)):
+    for i, (t, slot) in enumerate(pairs):
         queue = load_queue()
         style = DAILY_STYLES[(ordinal + i) % len(DAILY_STYLES)]
         req = {"id": f"daily-{day}-{t['id']}", "count": 1, "topic_id": t["id"], "style": style,
