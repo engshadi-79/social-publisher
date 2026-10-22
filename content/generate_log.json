@@ -1,8 +1,8 @@
 {
-  "id": "gmvi0ni4m",
+  "id": "daily-2026-10-23",
   "ok": true,
-  "count": 3,
-  "topic": "إدارة المخاطر والأزمات (Risk & Crisis Management)",
-  "method": "Gemini gemini-3.8-flash (generateContent) — تعذّر سابقاً: Gemini gemini-3.8-flash: gemini-3.8-flash (interactions) HTTP 503: gemini-3.8-flash is currently experiencing high demand, spikes in demand are usually temporary. Please  | ترند Google: 48 عنصر",
-  "message": "وُلِّدت 3 مسودات عن «إدارة المخاطر والأزمات (Risk & Crisis Management)»"
+  "count": 8,
+  "topic": "كل المواضيع",
+  "method": "daily",
+  "message": "يومي 2026-10-23: وُلِّد 8 مسودة."
 }
