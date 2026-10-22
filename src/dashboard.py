@@ -246,6 +246,8 @@ def main() -> int:
                 f'<meta http-equiv="refresh" content="0;url={redirect}"><title>لوحة التحكم</title></head>'
                 f'<body style="font-family:sans-serif;text-align:center;padding:40px"><a href="{redirect}">انتقل إلى لوحة التحكم</a></body></html>')
     (args.out / "index.html").write_text(html, encoding="utf-8")
+    if args.vercel:        # صفحة 404 تعيد التحميل تلقائياً: بعد كل حفظ يُنشر الموقع من جديد وقد تتأخر الملفات لحظات
+        (args.out / "404.html").write_text('<!doctype html><html dir="rtl" lang="ar"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><meta http-equiv="refresh" content="4;url=/"><title>جارٍ التحديث</title><style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b1018;color:#e6eaf2;font-family:Segoe UI,Tahoma,sans-serif;text-align:center}p{color:#9aa4b5}.s{width:34px;height:34px;border:4px solid #243044;border-top-color:#2dd4bf;border-radius:50%;margin:0 auto 14px;animation:r 1s linear infinite}@keyframes r{to{transform:rotate(360deg)}}</style></head><body><div><div class="s"></div><h2>جارٍ تحديث اللوحة…</h2><p>تُنشر نسخة جديدة بعد حفظك. ستُعاد الصفحة تلقائياً خلال ثوانٍ.</p></div></body></html>', encoding="utf-8")
     print(f"لوحة: {args.out / 'index.html'}  ({len(items)} منشور)")
     if args.publish:
         import hosting
