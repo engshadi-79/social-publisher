@@ -213,8 +213,85 @@ def write_log(**kw):
     LOG.write_text(json.dumps(kw, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
+def build_entries(req: dict, queue: list[dict]) -> tuple[list[dict], dict, str]:
+    """يولّد مسودات طلب واحد ويتحقق منها (دون كتابتها). يرجع (المسودات، الموضوع، وصف الطريقة)."""
+    count = max(1, min(int(req.get("count", 1)), 7))
+    topic = load_topic(req)
+    recent = [p["image"]["title"] for p in queue if isinstance(p.get("image"), dict) and p["image"].get("title")]
+    trends = fetch_trends()
+    text, method = generator.generate_text(build_prompt(topic, count, load_brand(), recent, trends, req.get("style") or "photo", int(req.get("slides") or 7)))
+    method += f" | ترند Google: {len(trends)} عنصر" if trends else " | ترند Google غير متاح"
+    items = generator.extract_json(text)
+    if not isinstance(items, list) or not items:
+        raise generator.GeneratorError("قائمة المنشورات فارغة")
+    recent_styles = [str((p.get("image") or {}).get("style")) for p in queue if isinstance(p.get("image"), dict) and (p.get("image") or {}).get("style")]
+    recent_hues = [(p.get("image") or {}).get("hue") for p in queue if isinstance(p.get("image"), dict) and isinstance((p.get("image") or {}).get("hue"), int)]
+    entries = make_entries(items[:count], req, topic, {p["id"] for p in queue}, recent_styles, recent_hues)
+    entries = [e for e in entries if e["image"]["title"] and e["platforms"] and (e["template"] != "infographic" or len(e["image"].get("points", [])) >= 2) and (e["template"] != "carousel" or len(e["image"].get("slides", [])) >= 3) and (e["template"] != "reel" or len(e["image"].get("scenes", [])) >= 3)]
+    if not entries:
+        raise generator.GeneratorError("لم يصلح أي منشور مولَّد")
+    errors = fatal(validate(queue + entries))
+    if errors:
+        raise generator.GeneratorError("فشل التحقق: " + "؛ ".join(errors)[:300])
+    return entries, topic, method
+
+
+def append_entries(entries: list[dict]) -> None:
+    block = yaml.safe_dump(entries, allow_unicode=True, sort_keys=False, width=1000)
+    current = QUEUE_PATH.read_text(encoding="utf-8") if QUEUE_PATH.exists() else ""
+    current = re.sub(r"^\[\]\s*$", "", current, flags=re.M)
+    if current and not current.endswith("\n"):
+        current += "\n"
+    QUEUE_PATH.write_text(current + block, encoding="utf-8")
+
+
+DAILY_STYLES = ["infographic", "carousel", "infographic", "reel"]     # الريل بنسبة ربع المنشورات: بناؤه أثقل
+DAILY_HOUR = "08:00"
+
+
+def daily(target: str | None = None) -> int:
+    """منشور واحد لكل موضوع في topics.yaml، مجدول الساعة 8 صباحاً من اليوم المستهدف (افتراضياً: غداً بتوقيت الجهة).
+
+    مسودات فقط (approved:false) تنتظر موافقة المالك. لا تكرّر موضوعاً له منشور في ذلك اليوم،
+    فيمكن تشغيله أكثر من مرة بأمان.
+    """
+    import time
+    from datetime import datetime
+    from queue_io import now_local
+
+    day = target or (now_local() + timedelta(days=1)).strftime("%Y-%m-%d")
+    topics = yaml.safe_load(TOPICS_PATH.read_text(encoding="utf-8")).get("topics") if TOPICS_PATH.exists() else []
+    topics = [t for t in (topics or []) if isinstance(t, dict) and t.get("id")]
+    ordinal = datetime.strptime(day, "%Y-%m-%d").toordinal()
+    done, failed = [], []
+    for i, t in enumerate(topics):
+        queue = load_queue()
+        if any(p.get("topic") == t["id"] and str(p["publish_at"])[:10] == day for p in queue):
+            continue
+        style = DAILY_STYLES[(ordinal + i) % len(DAILY_STYLES)]
+        req = {"id": f"daily-{day}-{t['id']}", "count": 1, "topic_id": t["id"], "style": style,
+               "slides": 6 if style == "carousel" else 5, "start": f"{day} {DAILY_HOUR}"}
+        try:
+            entries, topic, method = build_entries(req, queue)
+            append_entries(entries)
+            done.append(f"{topic['name']} ({style})")
+            print(f"✓ {topic['name']} → {entries[0]['id']} [{style}]")
+        except Exception as e:  # noqa: BLE001
+            failed.append(f"{t.get('name', t['id'])}: {str(e)[:120]}")
+            print(f"✗ {t.get('name', t['id'])}: {e}")
+        time.sleep(8)                         # حدّ معدّل الطبقة المجانية
+    msg = f"يومي {day}: وُلِّد {len(done)} مسودة" + (f"، وفشل {len(failed)}" if failed else "") + "."
+    write_log(id=f"daily-{day}", ok=not failed or bool(done), count=len(done), topic="كل المواضيع", method="daily",
+              message=msg + ((" " + " | ".join(failed))[:300] if failed else ""))
+    print(msg)
+    return 0
+
+
 def main() -> int:
     sys.stdout.reconfigure(encoding="utf-8")
+    if "--daily" in sys.argv:
+        i = sys.argv.index("--daily")
+        return daily(sys.argv[i + 1] if len(sys.argv) > i + 1 and not sys.argv[i + 1].startswith("-") else None)
     if not REQUEST.exists():
         print("لا يوجد طلب توليد")
         return 0
@@ -223,31 +300,8 @@ def main() -> int:
         req["style"] = "infographic"          # لا منشورات بصور فوتوغرافية بعد الآن
     rid = str(req.get("id", ""))
     try:
-        count = max(1, min(int(req.get("count", 1)), 7))
-        topic = load_topic(req)
-        queue = load_queue()
-        recent = [p["image"]["title"] for p in queue if isinstance(p.get("image"), dict) and p["image"].get("title")]
-        trends = fetch_trends()
-        text, method = generator.generate_text(build_prompt(topic, count, load_brand(), recent, trends, req.get("style") or "photo", int(req.get("slides") or 7)))
-        method += f" | ترند Google: {len(trends)} عنصر" if trends else " | ترند Google غير متاح"
-        items = generator.extract_json(text)
-        if not isinstance(items, list) or not items:
-            raise generator.GeneratorError("قائمة المنشورات فارغة")
-        recent_styles = [str((p.get("image") or {}).get("style")) for p in queue if isinstance(p.get("image"), dict) and (p.get("image") or {}).get("style")]
-        recent_hues = [(p.get("image") or {}).get("hue") for p in queue if isinstance(p.get("image"), dict) and isinstance((p.get("image") or {}).get("hue"), int)]
-        entries = make_entries(items[:count], req, topic, {p["id"] for p in queue}, recent_styles, recent_hues)
-        entries = [e for e in entries if e["image"]["title"] and e["platforms"] and (e["template"] != "infographic" or len(e["image"].get("points", [])) >= 2) and (e["template"] != "carousel" or len(e["image"].get("slides", [])) >= 3) and (e["template"] != "reel" or len(e["image"].get("scenes", [])) >= 3)]
-        if not entries:
-            raise generator.GeneratorError("لم يصلح أي منشور مولَّد")
-        errors = fatal(validate(queue + entries))
-        if errors:
-            raise generator.GeneratorError("فشل التحقق: " + "؛ ".join(errors)[:300])
-        block = yaml.safe_dump(entries, allow_unicode=True, sort_keys=False, width=1000)
-        current = QUEUE_PATH.read_text(encoding="utf-8") if QUEUE_PATH.exists() else ""
-        current = re.sub(r"^\[\]\s*$", "", current, flags=re.M)
-        if current and not current.endswith("\n"):
-            current += "\n"
-        QUEUE_PATH.write_text(current + block, encoding="utf-8")
+        entries, topic, method = build_entries(req, load_queue())
+        append_entries(entries)
         write_log(id=rid, ok=True, count=len(entries), topic=topic["name"], method=method,
                   message=f"وُلِّدت {len(entries)} مسودات عن «{topic['name']}»")
         print(f"تم: {len(entries)} مسودات — {method}")
