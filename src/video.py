@@ -96,7 +96,7 @@ def render_poster(renderer, post: dict, out_png: Path, scene: int = 1) -> Path:
     try:
         page.goto(page_file.as_uri())
         page.wait_for_function("window.__ready === true", timeout=30000)
-        page.evaluate("t => window.seek(t)", min(1.6, spec["duration"] - 0.6))
+        page.evaluate("t => window.seek(t)", min(2.4, spec["duration"] - 0.6))
         out_png.parent.mkdir(parents=True, exist_ok=True)
         page.screenshot(path=str(out_png), clip={"x": 0, "y": 0, "width": w, "height": h})
     finally:
