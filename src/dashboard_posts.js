@@ -296,7 +296,9 @@ function renderStats() {
     note.textContent = "لا أرقام بعد. تُسحب إحصاءات المنشورات مع الفحص اليومي (الساعة 8 صباحاً تقريباً)، وقد ترفض المنصة بعضها إن كانت صلاحية القراءة غير ممنوحة للتوكن.";
     body.innerHTML = ""; return;
   }
-  note.textContent = "التقييم = إعجابات + ٢×تعليقات + ٣×مشاركات + ٢×حفظ. المتوسط لكل منشور، وكلما زاد العدد كان الرقم أدق.";
+  const denied = new Set(); Object.values(INS).forEach((per) => Object.entries(per).forEach(([k, m]) => { if (m && m.error && /permission|صلاحية|Page Public/i.test(m.error)) denied.add(PLAT_NAME[k.split(":")[0]] || k); }));
+  const warn = denied.size ? " ⚠️ لا تتوفر أرقام " + [...denied].join(" و") + ": توكنها ينقصه إذن قراءة الإحصاءات (يلزم تجديد التوكن بإذن إضافي)." : "";
+  note.textContent = warn + " التقييم = إعجابات + ٢×تعليقات + ٣×مشاركات + ٢×حفظ. المتوسط لكل منشور، وكلما زاد العدد كان الرقم أدق.";
   const topicName = (id) => { const o = [...$("qTopic").options].find((x) => x.value === id); return o ? o.textContent : (id || "—"); };
   const groupBy = (keyFn) => { const g = {}; rows.forEach((r) => { const k = keyFn(r.p); if (k == null) return; (g[k] = g[k] || []).push(r.s); }); return Object.entries(g).map(([k, v]) => [k, v.reduce((a, b) => a + b, 0) / v.length, v.length]).sort((a, b) => b[1] - a[1]); };
   const TPL = { infographic: "إنفوجرافك", carousel: "كاروسيل", reel: "ريل", split: "صورة", photo: "صورة", tip: "نصيحة", quote: "اقتباس" };
