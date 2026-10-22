@@ -1,5 +1,8 @@
 """يولّد لوحة تحكم ثابتة (HTML) من الطابور والحالة، لتُنشر على GitHub Pages."""
 import argparse
+import base64
+import hashlib
+import hmac
 import json
 import os
 import sys
@@ -20,6 +23,31 @@ LABELS = {"facebook": "فيسبوك", "instagram": "إنستغرام", "threads"
 SITE = OUT_DIR / "dashboard"
 DAYS = ["الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت", "الأحد"]
 MONTHS = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"]
+
+
+PASSWORD = os.environ.get("DASHBOARD_PASSWORD", "")
+
+
+def img_token(pid: str) -> str:
+    """لاحقة غير قابلة للتخمين في أسماء صور المعاينة، مشتقة من كلمة المرور، فلا يصل لها من لا يعرفها."""
+    if not PASSWORD:
+        return ""
+    return "-" + hmac.new(PASSWORD.encode("utf-8"), ("img:" + pid).encode("utf-8"), hashlib.sha256).hexdigest()[:14]
+
+
+def encrypt_page(html: str) -> str:
+    """يغلّف صفحة اللوحة بتشفير AES-GCM (مفتاح من PBKDF2) ويُفكّ في المتصفح بكلمة المرور."""
+    from cryptography.hazmat.primitives import hashes
+    from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+    from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+
+    iters, salt, iv = 250000, os.urandom(16), os.urandom(12)
+    key = PBKDF2HMAC(algorithm=hashes.SHA256(), length=32, salt=salt, iterations=iters).derive(PASSWORD.encode("utf-8"))
+    ct = AESGCM(key).encrypt(iv, html.encode("utf-8"), None)
+    b64 = lambda b: base64.b64encode(b).decode("ascii")
+    payload = json.dumps({"salt": b64(salt), "iv": b64(iv), "iter": iters, "ct": b64(ct)})
+    gate = Environment(loader=FileSystemLoader(str(Path(__file__).parent)), autoescape=True).get_template("gate_template.html")
+    return gate.render(payload=payload)
 
 
 def when_ar(d):
@@ -164,15 +192,17 @@ def main() -> int:
             fulls = []
             for n, png in enumerate(pngs, 1):
                 im = Image.open(png).convert("RGB")
-                name = f"full-{it['id']}.jpg" if len(pngs) == 1 else f"full-{it['id']}-s{n}.jpg"
+                tok = img_token(it["id"])
+                name = f"full-{it['id']}{tok}.jpg" if len(pngs) == 1 else f"full-{it['id']}{tok}-s{n}.jpg"
                 im.save(img_dir / name, quality=85)
                 fulls.append("images/" + name)
                 if n == 1:
                     th = im.copy()
                     th.thumbnail((540, 960))
-                    th.save(img_dir / f"thumb-{it['id']}.jpg", quality=82)
+                    th.save(img_dir / f"thumb-{it['id']}{tok}.jpg", quality=82)
             it["slides_json"] = json.dumps(fulls) if len(fulls) > 1 else ""
             it["slide_count"] = len(fulls)
+            it["tok"] = img_token(it["id"])
             it["reel_scenes"] = len((post.get("image") or {}).get("scenes") or []) if post["template"] == "reel" else 0
 
     acc_json = json.dumps([{"id": a.id, "platform": a.platform, "label": a.label, "default": a.default}
@@ -196,6 +226,11 @@ def main() -> int:
         topics=load_topics(), repo=os.environ.get("GITHUB_REPOSITORY", "engshadi-79/social-publisher"),
         posts=items, counts=counts, next_post=nxt, tz=TIMEZONE,
         updated=now.strftime("%Y-%m-%d %H:%M"))
+    if PASSWORD:
+        html = encrypt_page(html)
+        print("اللوحة مشفّرة بكلمة المرور")
+    else:
+        print("تنبيه: DASHBOARD_PASSWORD غير مضبوط، اللوحة مفتوحة لكل من معه الرابط")
     (args.out / "index.html").write_text(html, encoding="utf-8")
     print(f"لوحة: {args.out / 'index.html'}  ({len(items)} منشور)")
     if args.publish:

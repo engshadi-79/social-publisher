@@ -1,0 +1,59 @@
+<!doctype html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>لوحة التحكم</title>
+<style>
+:root{--bg:#f4f7fa;--card:#fff;--ink:#0b1f3a;--mute:#5d6b7c;--line:#e2e8ef;--teal:#0f9d8f}
+@media (prefers-color-scheme:dark){:root{--bg:#0d1520;--card:#15202e;--ink:#e8eef5;--mute:#93a1b3;--line:#263446;--teal:#2dd4bf}}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:grid;place-items:center;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Tahoma,sans-serif}
+form{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:28px 24px;width:min(92vw,380px);text-align:center}
+h1{font-size:1.2rem;margin:0 0 6px}
+p{color:var(--mute);margin:0 0 18px;font-size:.92rem}
+input{width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;margin-bottom:12px}
+button{width:100%;padding:12px;border:0;border-radius:10px;background:var(--teal);color:#04211e;font:inherit;font-weight:800;cursor:pointer}
+button:disabled{opacity:.6}
+#err{color:#d64545;min-height:1.4em;margin-top:10px;font-size:.9rem}
+</style>
+</head>
+<body>
+<form id="f">
+  <h1>🔒 لوحة التحكم</h1>
+  <p>أدخل كلمة المرور للمتابعة.</p>
+  <input id="pw" type="password" autocomplete="current-password" placeholder="كلمة المرور" autofocus>
+  <button id="go" type="submit">دخول</button>
+  <div id="err" role="alert"></div>
+</form>
+<script>
+const DATA = {{ payload|safe }};
+const b2u = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+async function open(pw) {
+  const enc = new TextEncoder();
+  const base = await crypto.subtle.importKey("raw", enc.encode(pw), "PBKDF2", false, ["deriveKey"]);
+  const key = await crypto.subtle.deriveKey({ name: "PBKDF2", salt: b2u(DATA.salt), iterations: DATA.iter, hash: "SHA-256" },
+    base, { name: "AES-GCM", length: 256 }, false, ["decrypt"]);
+  const buf = await crypto.subtle.decrypt({ name: "AES-GCM", iv: b2u(DATA.iv) }, key, b2u(DATA.ct));
+  return new TextDecoder().decode(buf);
+}
+async function enter(pw, remember) {
+  const html = await open(pw);
+  if (remember) { try { sessionStorage.setItem("dash_pw", pw); } catch (e) { /* الخصوصية تمنع التخزين: لا بأس */ } }
+  document.open(); document.write(html); document.close();
+}
+document.getElementById("f").onsubmit = async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById("go"), err = document.getElementById("err");
+  btn.disabled = true; err.textContent = "";
+  try { await enter(document.getElementById("pw").value, true); }
+  catch (x) { err.textContent = "كلمة المرور غير صحيحة."; btn.disabled = false; }
+};
+(async () => {
+  let saved = null; try { saved = sessionStorage.getItem("dash_pw"); } catch (e) { /* لا شيء */ }
+  if (saved) { try { await enter(saved, false); } catch (x) { try { sessionStorage.removeItem("dash_pw"); } catch (e) { /* لا شيء */ } } }
+})();
+</script>
+</body>
+</html>

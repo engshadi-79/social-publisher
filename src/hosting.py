@@ -65,6 +65,8 @@ def upload_site(src: Path) -> str:
     """ينسخ محتويات مجلد (index.html و images/) إلى جذر gh-pages دون حذف صور المنشورات."""
     def copy(root: Path):
         shutil.copy2(src / "index.html", root / "index.html")
+        for stale in list((root / "images").glob("full-*")) + list((root / "images").glob("thumb-*")):
+            stale.unlink()                      # معاينات اللوحة تُبنى من جديد كل مرة، فلا تبقى قديمة أو بأسماء مكشوفة
         for f in (src / "images").glob("*"):
             shutil.copy2(f, root / "images" / f.name)
 
