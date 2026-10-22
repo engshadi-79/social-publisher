@@ -24,7 +24,7 @@ if ($pat) {
 
 Write-Host "`n2) توكن Vercel (لتحديث اللوحة تلقائياً مع كل بناء)" -ForegroundColor Cyan
 Start-Process "https://vercel.com/account/tokens"
-$vt = Read-Secret "الصق توكن Vercel هنا ثم Enter"
+$vt = Read-Secret "الصق توكن Vercel هنا ثم Enter (أو اضغط Enter فقط للتخطي الآن)"
 if ($vt) {
   $vt | gh secret set VERCEL_TOKEN -R $repo
   Write-Host "   تم حفظه في GitHub" -ForegroundColor Green
