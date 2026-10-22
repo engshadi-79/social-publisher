@@ -52,6 +52,56 @@ button.del{font:inherit;background:transparent;color:var(--bad);border:1px solid
 ol{padding-inline-start:20px;color:var(--mute);font-size:.9rem}
 select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
 .acts{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.acts button.act{margin-top:0;padding:5px 14px}
+
+/* ===== تصميم v2: بطاقات أنظف، شريط تبويبات ثابت، مؤشرات علوية ===== */
+:root{--r:16px;--shadow:0 1px 2px rgba(11,31,58,.05),0 8px 24px rgba(11,31,58,.06);--c-up:#0f9d8f;--c-dr:#7c6cf0;--c-ok:#0f9d58;--c-bad:#c5372c}
+@media (prefers-color-scheme:dark){:root{--bg:#0a111d;--card:#111b2b;--line:#1f2d41;--chip:#18263a;--shadow:0 1px 2px rgba(0,0,0,.35),0 10px 30px rgba(0,0,0,.28);--c-up:#2dd4bf;--c-dr:#a99dff;--c-ok:#4ade80;--c-bad:#f87171}}
+body{font-size:16px}
+.wrap{max-width:1040px;padding-top:18px}
+.top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:14px}
+h1{font-size:1.55rem;font-weight:800;margin:0;display:flex;align-items:center;gap:10px}
+h1::before{content:"";width:12px;height:28px;border-radius:6px;background:linear-gradient(180deg,var(--teal),#6d5df0)}
+.upd{margin:2px 0 0;padding-inline-start:22px}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(88px,1fr));gap:10px;flex:1;min-width:min(100%,420px);max-width:560px}
+.kpi{all:unset;box-sizing:border-box;cursor:pointer;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;box-shadow:var(--shadow);transition:transform .15s,border-color .15s;display:flex;flex-direction:column;gap:0}
+.kpi:hover{transform:translateY(-2px);border-color:var(--teal)}
+.kpi b{font-size:1.7rem;line-height:1.2;font-weight:800}.kpi span{font-size:.78rem;color:var(--mute)}
+.kpi.up b{color:var(--c-up)}.kpi.dr b{color:var(--c-dr)}.kpi.ok b{color:var(--c-ok)}.kpi.bad b{color:var(--c-bad)}
+.summary{border-radius:var(--r);box-shadow:var(--shadow);font-size:.98rem;padding:12px 16px}
+.health{border-radius:var(--r);box-shadow:var(--shadow)}
+.health summary{font-size:.95rem}
+details.how{background:transparent;padding:0;margin-bottom:14px}details.how summary{color:var(--mute);font-size:.85rem;cursor:pointer}details.how div{background:var(--chip);border-radius:12px;padding:10px 14px;margin-top:8px;color:var(--mute);font-size:.9rem}
+.tabs{position:sticky;top:0;z-index:30;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);padding:10px 0;margin:0 0 12px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--line)}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{white-space:nowrap;display:inline-flex;gap:6px;align-items:center;padding:7px 15px;transition:background .15s}
+.tabs button .n{font-size:.72rem;background:var(--chip);border-radius:99px;padding:0 7px;color:var(--mute);font-weight:700}
+.tabs button[aria-pressed=true] .n{background:rgba(0,0,0,.18);color:inherit}
+.tools{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:10px;box-shadow:var(--shadow)}
+.tools select{width:auto;min-width:130px}.tools input{flex:2 1 220px}
+.post{border-radius:var(--r);box-shadow:var(--shadow);border-inline-start:6px solid var(--line);transition:transform .15s,box-shadow .15s}
+.post:hover{transform:translateY(-2px)}
+.post[data-s=upcoming]{border-inline-start-color:var(--c-up)}.post[data-s=draft]{border-inline-start-color:var(--c-dr)}.post[data-s=published]{border-inline-start-color:var(--c-ok)}.post[data-s=failed]{border-inline-start-color:var(--c-bad)}
+.post img{width:230px;min-width:230px;border-radius:0}
+.body{padding:16px 18px;gap:9px}
+.title{font-size:1.12rem;line-height:1.5}
+.line{color:var(--mute);font-size:.9rem}
+.badge{font-weight:700;letter-spacing:.01em}
+.chip{border-radius:99px;padding:1px 12px;font-size:.8rem}
+.acts{margin-top:4px;padding-top:10px;border-top:1px dashed var(--line);gap:8px}
+button.act{border-radius:10px;box-shadow:0 2px 8px rgba(15,157,143,.28);transition:transform .1s,filter .15s}
+button.act:hover{filter:brightness(1.08);transform:translateY(-1px)}
+button.del{border-radius:10px;padding:4px 13px;transition:background .15s}
+button.del:hover{background:rgba(127,127,127,.12)}
+.panel{border-radius:var(--r);box-shadow:var(--shadow)}
+.scount{white-space:nowrap;top:10px;left:10px;font-size:.74rem;backdrop-filter:blur(4px)}
+@media (max-width:640px){
+  .wrap{padding-inline:12px}.top{align-items:stretch}.kpis{grid-template-columns:repeat(2,1fr);max-width:none}
+  .post{flex-direction:column;border-inline-start-width:1px;border-top:5px solid var(--line)}
+  .post[data-s=upcoming]{border-top-color:var(--c-up)}.post[data-s=draft]{border-top-color:var(--c-dr)}.post[data-s=published]{border-top-color:var(--c-ok)}.post[data-s=failed]{border-top-color:var(--c-bad)}
+  .post img{width:100%;min-width:0;max-width:none;max-height:520px;object-fit:cover}
+  .imgwrap{width:100%}
+  .tools select,.tools input{flex:1 1 100%}
+}
 @media (max-width:560px){.post{flex-direction:column}.post img{width:100%;min-width:0;max-width:420px;margin:0 auto}}
 #lb{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;z-index:50;padding:16px;cursor:zoom-out}#lb.on{display:flex}#lb img,#lb video{max-width:100%;max-height:100%;object-fit:contain;border-radius:6px}#lb video{cursor:auto}
 .health{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 16px;margin-bottom:12px}.health summary{cursor:pointer;font-weight:700}.health ul{list-style:none;padding:0;margin:8px 0 0}.health li{padding:3px 0;font-size:.92rem}.h-bad{color:var(--bad)}.h-warn{color:var(--warn)}.h-off{color:var(--mute)}
@@ -115,27 +165,29 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
 </div></div>
 <div id="lb"><button id="lbPrev" aria-label="السابق">›</button><img alt=""><video id="lbVid" controls playsinline hidden></video><button id="lbNext" aria-label="التالي">‹</button><span id="lbCtr"></span></div>
 <div class="wrap">
-<h1>لوحة النشر</h1>
-<div class="upd">آخر تحديث: <bdi dir="ltr">{{ updated }}</bdi></div>
-
+<div class="top">
+  <div><h1>لوحة النشر</h1><div class="upd">آخر تحديث: <bdi dir="ltr">{{ updated }}</bdi></div></div>
+  <div class="kpis">
+    <button class="kpi up" data-f="upcoming"><b>{{ counts.upcoming }}</b><span>مجدول</span></button>
+    <button class="kpi dr" data-f="draft"><b>{{ counts.draft }}</b><span>بانتظار موافقتك</span></button>
+    <button class="kpi ok" data-f="published"><b>{{ counts.published }}</b><span>تم نشره</span></button>
+    <button class="kpi bad" data-f="failed"><b>{{ counts.failed }}</b><span>فيه مشكلة</span></button>
+  </div>
+</div>
 <div class="summary">{{ counts.summary }}</div>
 
 {% if health %}
-<details class="health" {% if health.bad or health.warn %}open{% endif %}>
+<details class="health" {% if health.bad %}open{% endif %}>
   <summary>{% if health.bad %}❌ صحة النظام: {{ health.bad }} مشكلة تحتاج انتباهك{% elif health.warn %}⚠️ صحة النظام: {{ health.warn }} تنبيه{% else %}✅ صحة النظام: كل شيء سليم{% endif %}
     <span class="hint">— آخر فحص <bdi dir="ltr">{{ health.checked_at[:16]|replace("T"," ") }}</bdi> UTC</span></summary>
   <ul>{% for i in health['items'] %}<li class="h-{{ i.status }}"><b>{{ {"ok":"✅","warn":"⚠️","bad":"❌","off":"➖"}[i.status] }} {{ i.name }}:</b> {{ i.detail }}</li>{% endfor %}</ul>
 </details>
 {% endif %}
-<div class="how">
-  <b>كيف تقرأ هذه الصفحة؟</b> كل بطاقة هي منشور واحد: الصورة التي ستظهر، وتحتها متى سيُنشر وعلى أي منصة.
-  علامة ✅ تعني أنه نُشر، و⏳ تعني أنه ينتظر موعده، و❌ تعني أن النشر لم ينجح.
-  المنشور الذي مكتوب عليه «بانتظار موافقتك» <b>لن يُنشر</b> حتى تطلب مني الموافقة عليه.
-</div>
+<details class="how"><summary>كيف أقرأ هذه الصفحة؟</summary><div>كل بطاقة هي منشور واحد: صورته، ومتى سيُنشر، وعلى أي منصة. علامة ✅ نُشر، و⏳ ينتظر موعده، و❌ لم ينجح. المنشور المكتوب عليه «بانتظار موافقتك» <b>لن يُنشر</b> حتى توافق عليه.</div></details>
 
 <div class="tabs" id="tabs">
   {% for key,label in [("all","الكل"),("upcoming","سيُنشر"),("published","تم نشره"),("draft","بانتظار موافقتك"),("failed","فيه مشكلة"),("topics","المواضيع"),("addpost","إضافة منشور"),("calendar","التقويم"),("stats","الأداء")] %}
-  <button data-f="{{ key }}" aria-pressed="{{ 'true' if key=='all' else 'false' }}">{{ label }}</button>
+  <button data-f="{{ key }}" aria-pressed="{{ 'true' if key=='all' else 'false' }}">{{ label }}{% if key == 'all' %}<span class="n">{{ posts|length }}</span>{% elif key in counts and key != 'summary' %}<span class="n">{{ counts[key] }}</span>{% endif %}</button>
   {% endfor %}
 </div>
 
@@ -263,7 +315,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
 <div class="list" id="grid">
 {% for p in posts %}
 <article class="post" data-s="{{ p.group }}" data-tpl="{{ p.template }}" data-topic="{{ p.topic }}" data-q="{{ p.title }}">
-  <div class="imgwrap"><img loading="lazy" src="images/thumb-{{ p.id }}{{ p.tok }}.jpg" {% if p.reel_scenes and p.group == "published" %}data-video="images/{{ p.id }}.mp4" {% endif %}data-full="images/full-{{ p.id }}{{ p.tok }}{% if p.slide_count > 1 %}-s1{% endif %}.jpg"{% if p.slides_json %} data-slides='{{ p.slides_json }}'{% endif %} alt="{{ p.title }}" title="اضغط لعرض الصورة كاملة">{% if p.slide_count > 1 and not p.reel_scenes %}<span class="scount">{{ p.slide_count }} شرائح ▤</span>{% endif %}{% if p.reel_scenes %}<span class="scount">▶ فيديو · {{ p.reel_scenes }} مشاهد {% if p.group == "published" %}— اضغط للتشغيل{% else %}— اضغط لتصفّح المشاهد{% endif %}</span>{% endif %}</div>
+  <div class="imgwrap"><img loading="lazy" src="images/thumb-{{ p.id }}{{ p.tok }}.jpg" {% if p.reel_scenes and p.group == "published" %}data-video="images/{{ p.id }}.mp4" {% endif %}data-full="images/full-{{ p.id }}{{ p.tok }}{% if p.slide_count > 1 %}-s1{% endif %}.jpg"{% if p.slides_json %} data-slides='{{ p.slides_json }}'{% endif %} alt="{{ p.title }}" title="اضغط لعرض الصورة كاملة">{% if p.slide_count > 1 and not p.reel_scenes %}<span class="scount">{{ p.slide_count }} شرائح ▤</span>{% endif %}{% if p.reel_scenes %}<span class="scount">▶ فيديو · {{ p.reel_scenes }} مشاهد</span>{% endif %}</div>
   <div class="body">
     <span class="badge b-{{ p.badge }}">{{ p.badge_txt }}</span>
     <div class="title">{{ p.title }}</div>
@@ -320,6 +372,7 @@ let curF='upcoming';function matchTools(p){const q=(document.getElementById('qSe
 function show(f){curF=f;const PN={topics:'topicsPanel',addpost:'postPanel',calendar:'calPanel',stats:'statsPanel'};const tp=f in PN;Object.entries(PN).forEach(([k,id])=>document.getElementById(id).hidden=f!==k);document.getElementById('grid').hidden=tp;let n=0;posts.forEach(p=>{const ok=!tp&&(f==='all'||p.dataset.s===f)&&matchTools(p);p.hidden=!ok;if(ok)n++});empty.hidden=tp||n>0;tabs.forEach(b=>b.setAttribute('aria-pressed',b.dataset.f===f));document.getElementById('tools').hidden=tp;const dn=[...posts].filter(p=>p.dataset.s==='draft'&&!p.hidden).length;document.getElementById('bulkApprove').hidden=!(f==='draft'&&dn>0);document.getElementById('bulkN').textContent=dn}
 ['qSearch','qTopic','qTpl'].forEach(i=>{const el=document.getElementById(i);el.oninput=el.onchange=()=>show(curF)});
 tabs.forEach(b=>b.onclick=()=>show(b.dataset.f));
+document.querySelectorAll('.kpi').forEach(k=>k.onclick=()=>{show(k.dataset.f);window.scrollTo({top:document.getElementById('tabs').offsetTop-10,behavior:'smooth'})});
 const lb=document.getElementById('lb'),lbImg=lb.querySelector('img'),lbVid=document.getElementById('lbVid');let lbList=[],lbI=0;
 function lbShow(){lbImg.src=lbList[lbI];document.getElementById('lbCtr').textContent=lbList.length>1?(lbI+1)+' / '+lbList.length:'';lb.classList.toggle('multi',lbList.length>1)}
 function lbMove(d){lbI=(lbI+d+lbList.length)%lbList.length;lbShow()}
