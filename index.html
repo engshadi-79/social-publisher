@@ -20,6 +20,9 @@ h1{font-size:1.7rem;margin-bottom:4px}
 .tabs button[aria-pressed=true]{background:var(--teal);color:#06201d;border-color:var(--teal);font-weight:700}
 .list{display:flex;flex-direction:column;gap:14px}
 [hidden]{display:none!important}
+.hues{display:flex;gap:8px;flex-wrap:wrap}.hues button{width:34px;height:34px;border-radius:50%;border:3px solid var(--line);cursor:pointer;padding:0}.hues button.on{border-color:#fff;box-shadow:0 0 0 2px var(--teal)}.hues .auto{width:auto;border-radius:99px;padding:0 12px;background:var(--card);color:var(--ink);font:inherit;font-size:.85rem}
+.st{width:100%;border-collapse:collapse;margin:6px 0 18px}.st td{padding:8px 10px;border-bottom:1px solid var(--line)}.st td:nth-child(2){font-weight:800;color:var(--teal);width:70px}.st td:nth-child(3){color:var(--mute);width:90px}
+.tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:0 0 14px}.tools input,.tools select{background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:9px 12px;font:inherit;min-width:140px}.tools input{flex:1;min-width:200px}
 .post{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;gap:0}
 .post img{width:250px;min-width:250px;height:auto;align-self:flex-start;object-fit:contain;background:var(--chip);display:block;cursor:zoom-in}
 .body{padding:14px 16px;display:flex;flex-direction:column;gap:8px;flex:1;min-width:0}
@@ -73,6 +76,8 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
   <label>الموضوع</label><select id="eTopic"><option value="">— اختر —</option><option value="tmvet3asy">الذكاء الصناعي</option><option value="tmvgcv3kj">تطبيقات الذكاء الاصطناعي في تطوير الويب والأنظمة (Technical &amp; How-To)</option><option value="tmvgcvmh5">نصائح للمطورين والمبتدئين (Mindset &amp; Career)</option><option value="tmvgcw0d5">دراسات حالة وأتمتة الأعمال (Business &amp; Automation)</option><option value="tmvgcw9c3">اقتباسات سريعة وتفاعل خفيف (Quotes &amp; Engagement)</option><option value="tmvgczjo2">منهجيات إدارة المشاريع (Agile vs Waterfall)</option><option value="tmvgczrg1">إدارة الفرق والقيادة (Leadership &amp; Team Dynamics)</option><option value="tmvgczzq9">أدوات وتقنيات رفع الإنتاجية (Tools &amp; Frameworks)</option><option value="tmvgd08zd">إدارة المخاطر والأزمات (Risk &amp; Crisis Management)</option><option value="tmhu66go9">رسالة أمل لكل قلب متعب</option><option value="tm0952paf">غدًا أجمل بإذن الله</option><option value="tmhsg2a5u">لا تفقد الأمل مهما تأخرت أمنياتك</option><option value="tmnzqwwy6">كل صباح بداية جديدة</option><option value="tmevf98ss">ابتسم فالحياة ما زالت جميلة</option><option value="tm3jtbxx3">لا تجعل يومًا سيئًا يسرق تفاؤلك</option><option value="tm1fz95h1">أجمل الأشياء قد تأتي دون موعد</option><option value="tm65z7q04">امنح نفسك فرصة أخرى</option><option value="tm67boid7">هناك دائمًا سبب للابتسام</option><option value="tmg14j4oh">رسائل صباحية تزرع السعادة</option><option value="tm348q9zt">خطوة صغيرة نحو حلم كبير</option><option value="tm964z1ms">لا تقارن بدايتك بنهاية الآخرين</option><option value="tmracj375">أنت قادر على تعلّم شيء جديد</option><option value="tmxmq5365">الفشل درس وليس نهاية</option><option value="tm19csu3g">اصنع نسختك الأفضل كل يوم</option><option value="tm26q2l14">لا تنتظر الوقت المثالي</option><option value="tmer5xgm0">نجاحك يبدأ من إيمانك بقدراتك</option><option value="tmj2afa28">احتفل بإنجازاتك الصغيرة</option><option value="tmfmphc8r">رحلتك تستحق أن تستمر</option><option value="tmwjau5i8">اجعل من كل يوم فرصة للتعلم</option><option value="tmo4i6sf0">الحمد لله على النعم الصغيرة</option><option value="tmkit60yj">حسن الظن بالله يزرع الطمأنينة</option><option value="tm7myagye">كلمة طيبة قد تغيّر يومًا كاملًا</option><option value="tmdwwbb64">السعادة في التفاصيل البسيطة</option><option value="tmut2uh53">سامح نفسك وابدأ من جديد</option><option value="tmkj7n1v3">كن سببًا في فرحة إنسان</option><option value="tmoe9zcml">كل مرحلة تحمل درسًا جديدًا</option><option value="tmc8d2m4b">رسالة إلى شخص يحتاج إلى الأمل</option><option value="tmi7n7ikl">انشر الخير ولو بشيء بسيط</option><option value="tmyr180fy">غدًا فرصة جديدة لنصنع شيئًا جميلًا</option></select>
   <label>شكل الصورة</label>
   <select id="eTemplate"><option value="carousel">كاروسيل</option><option value="reel">ريل (فيديو عمودي)</option><option value="infographic">إنفوجرافك</option><option value="split">صورة + لوحة نص</option><option value="photo">صورة كاملة</option><option value="tip">نصيحة</option><option value="quote">اقتباس</option><option value="announcement">إعلان</option><option value="story">ستوري</option></select>
+  <div id="eLook"><label>نمط التصميم <span class="hint">(تلقائي = يُشتق من المنشور)</span></label><select id="eStyle"></select>
+  <label>لون التصميم</label><div id="eHueBox" class="hues"></div></div>
   <label>العنوان على الصورة *</label><input id="eTitle">
   <label>النص الصغير</label><input id="eBody">
   <label>شرائح الكاروسيل أو مشاهد الريل (انظر التنسيق في نموذج الإضافة)</label><textarea id="eSlides" rows="10"></textarea>
@@ -131,15 +136,15 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
 <div id="lb"><button id="lbPrev" aria-label="السابق">›</button><img alt=""><video id="lbVid" controls playsinline hidden></video><button id="lbNext" aria-label="التالي">‹</button><span id="lbCtr"></span></div>
 <div class="wrap">
 <h1>لوحة النشر</h1>
-<div class="upd">آخر تحديث: <bdi dir="ltr">2026-10-22 10:31</bdi></div>
+<div class="upd">آخر تحديث: <bdi dir="ltr">2026-10-22 10:32</bdi></div>
 
 <div class="summary">يوجد 7 منشور مجدول، وأقربها يوم الخميس 22 أكتوبر الساعة 1:00 مساءً. 4 منشور ينتظر موافقتك ولن يُنشر قبلها. تم نشر 8 منشور حتى الآن.</div>
 
 
 <details class="health" open>
   <summary>⚠️ صحة النظام: 1 تنبيه
-    <span class="hint">— آخر فحص <bdi dir="ltr">2026-10-21 09:45</bdi> UTC</span></summary>
-  <ul><li class="h-ok"><b>✅ فيسبوك — الوان:</b> متصل: الوان</li><li class="h-ok"><b>✅ إنستغرام — engshadi2011:</b> متصل: engshadi2011</li><li class="h-ok"><b>✅ ثريدز — engshadi2011:</b> متصل: engshadi2011</li><li class="h-off"><b>➖ تيليجرام — القناة:</b> غير مُعدّ بعد (اختياري)</li><li class="h-ok"><b>✅ لينكدإن — المهندس شادي:</b> متصل: shadi abdullah</li><li class="h-warn"><b>⚠️ صلاحية توكن ثريدز:</b> ينتهي بعد 57 يوماً. فعّل التجديد التلقائي بإضافة سرّ GH_PAT</li><li class="h-ok"><b>✅ صلاحية توكن لينكدإن:</b> ينتهي بعد 59 يوماً (التجديد يدوي)</li><li class="h-ok"><b>✅ توليد النصوص (Gemini):</b> مفتاح موجود</li><li class="h-ok"><b>✅ صور حقيقية:</b> Openverse (مجاني بلا مفتاح)</li><li class="h-ok"><b>✅ تشغيل النشر الدوري:</b> آخر تشغيل قبل 227 دقيقة</li></ul>
+    <span class="hint">— آخر فحص <bdi dir="ltr">2026-10-22 07:31</bdi> UTC</span></summary>
+  <ul><li class="h-ok"><b>✅ فيسبوك — الوان:</b> متصل: الوان</li><li class="h-ok"><b>✅ إنستغرام — engshadi2011:</b> متصل: engshadi2011</li><li class="h-ok"><b>✅ ثريدز — engshadi2011:</b> متصل: engshadi2011</li><li class="h-off"><b>➖ تيليجرام — القناة:</b> غير مُعدّ بعد (اختياري)</li><li class="h-ok"><b>✅ لينكدإن — المهندس شادي:</b> متصل: Eng.Shadi Abdullah</li><li class="h-warn"><b>⚠️ صلاحية توكن ثريدز:</b> ينتهي بعد 56 يوماً. فعّل التجديد التلقائي بإضافة سرّ GH_PAT</li><li class="h-ok"><b>✅ صلاحية توكن لينكدإن:</b> ينتهي بعد 58 يوماً (التجديد يدوي)</li><li class="h-ok"><b>✅ توليد النصوص (Gemini):</b> مفتاح موجود</li><li class="h-ok"><b>✅ صور حقيقية:</b> Openverse (مجاني بلا مفتاح)</li><li class="h-ok"><b>✅ تشغيل النشر الدوري:</b> آخر تشغيل قبل 2 دقيقة</li></ul>
 </details>
 
 <div class="how">
@@ -165,6 +170,8 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
   <button data-f="addpost" aria-pressed="false">إضافة منشور</button>
   
   <button data-f="calendar" aria-pressed="false">التقويم</button>
+  
+  <button data-f="stats" aria-pressed="false">الأداء</button>
   
 </div>
 
@@ -464,6 +471,11 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
 
 </section>
 
+<section id="statsPanel" class="panel" hidden>
+  <h2>أداء المنشورات</h2>
+  <p class="hint" id="statsNote"></p>
+  <div id="statsBody"></div>
+</section>
 <section id="calPanel" hidden>
   <div class="panel">
     <h2>التقويم الأسبوعي</h2>
@@ -544,9 +556,16 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
   </div>
 </section>
 
+<div class="tools" id="tools">
+  <input id="qSearch" type="search" placeholder="🔎 ابحث في العناوين…">
+  <select id="qTopic"><option value="">كل المواضيع</option><option value="tmvet3asy">الذكاء الصناعي</option><option value="tmvgcv3kj">تطبيقات الذكاء الاصطناعي في تطوير الويب والأنظمة (Technical &amp; How-To)</option><option value="tmvgcvmh5">نصائح للمطورين والمبتدئين (Mindset &amp; Career)</option><option value="tmvgcw0d5">دراسات حالة وأتمتة الأعمال (Business &amp; Automation)</option><option value="tmvgcw9c3">اقتباسات سريعة وتفاعل خفيف (Quotes &amp; Engagement)</option><option value="tmvgczjo2">منهجيات إدارة المشاريع (Agile vs Waterfall)</option><option value="tmvgczrg1">إدارة الفرق والقيادة (Leadership &amp; Team Dynamics)</option><option value="tmvgczzq9">أدوات وتقنيات رفع الإنتاجية (Tools &amp; Frameworks)</option><option value="tmvgd08zd">إدارة المخاطر والأزمات (Risk &amp; Crisis Management)</option><option value="tmhu66go9">رسالة أمل لكل قلب متعب</option><option value="tm0952paf">غدًا أجمل بإذن الله</option><option value="tmhsg2a5u">لا تفقد الأمل مهما تأخرت أمنياتك</option><option value="tmnzqwwy6">كل صباح بداية جديدة</option><option value="tmevf98ss">ابتسم فالحياة ما زالت جميلة</option><option value="tm3jtbxx3">لا تجعل يومًا سيئًا يسرق تفاؤلك</option><option value="tm1fz95h1">أجمل الأشياء قد تأتي دون موعد</option><option value="tm65z7q04">امنح نفسك فرصة أخرى</option><option value="tm67boid7">هناك دائمًا سبب للابتسام</option><option value="tmg14j4oh">رسائل صباحية تزرع السعادة</option><option value="tm348q9zt">خطوة صغيرة نحو حلم كبير</option><option value="tm964z1ms">لا تقارن بدايتك بنهاية الآخرين</option><option value="tmracj375">أنت قادر على تعلّم شيء جديد</option><option value="tmxmq5365">الفشل درس وليس نهاية</option><option value="tm19csu3g">اصنع نسختك الأفضل كل يوم</option><option value="tm26q2l14">لا تنتظر الوقت المثالي</option><option value="tmer5xgm0">نجاحك يبدأ من إيمانك بقدراتك</option><option value="tmj2afa28">احتفل بإنجازاتك الصغيرة</option><option value="tmfmphc8r">رحلتك تستحق أن تستمر</option><option value="tmwjau5i8">اجعل من كل يوم فرصة للتعلم</option><option value="tmo4i6sf0">الحمد لله على النعم الصغيرة</option><option value="tmkit60yj">حسن الظن بالله يزرع الطمأنينة</option><option value="tm7myagye">كلمة طيبة قد تغيّر يومًا كاملًا</option><option value="tmdwwbb64">السعادة في التفاصيل البسيطة</option><option value="tmut2uh53">سامح نفسك وابدأ من جديد</option><option value="tmkj7n1v3">كن سببًا في فرحة إنسان</option><option value="tmoe9zcml">كل مرحلة تحمل درسًا جديدًا</option><option value="tmc8d2m4b">رسالة إلى شخص يحتاج إلى الأمل</option><option value="tmi7n7ikl">انشر الخير ولو بشيء بسيط</option><option value="tmyr180fy">غدًا فرصة جديدة لنصنع شيئًا جميلًا</option></select>
+  <select id="qTpl"><option value="">كل القوالب</option><option value="infographic">إنفوجرافك</option><option value="carousel">كاروسيل</option><option value="reel">ريل</option><option value="split">صورة</option><option value="tip">نصيحة</option><option value="quote">اقتباس</option></select>
+  <button class="act" id="bulkApprove" hidden>✅ وافق على كل المسودات (<span id="bulkN">0</span>)</button>
+  <div class="msg" id="bulkMsg"></div>
+</div>
 <div class="list" id="grid">
 
-<article class="post" data-s="upcoming">
+<article class="post" data-s="upcoming" data-tpl="reel" data-topic="tmvet3asy" data-q="كم ساعة تضيعها على مهام مكررة؟">
   <div class="imgwrap"><img loading="lazy" src="images/thumb-2026-10-22-reel2.jpg" data-full="images/full-2026-10-22-reel2-s1.jpg" data-slides='[&#34;images/full-2026-10-22-reel2-s1.jpg&#34;, &#34;images/full-2026-10-22-reel2-s2.jpg&#34;, &#34;images/full-2026-10-22-reel2-s3.jpg&#34;, &#34;images/full-2026-10-22-reel2-s4.jpg&#34;, &#34;images/full-2026-10-22-reel2-s5.jpg&#34;]' alt="كم ساعة تضيعها على مهام مكررة؟" title="اضغط لعرض الصورة كاملة"><span class="scount">▶ فيديو · 5 مشاهد — اضغط لتصفّح المشاهد</span></div>
   <div class="body">
     <span class="badge b-scheduled">سيُنشر في موعده</span>
@@ -599,7 +618,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
   </div>
 </article>
 
-<article class="post" data-s="upcoming">
+<article class="post" data-s="upcoming" data-tpl="infographic" data-topic="tmvgd08zd" data-q="كيف تتوقع مشاكل مشروعك قبل أن تقع؟">
   <div class="imgwrap"><img loading="lazy" src="images/thumb-2026-10-23-g1.jpg" data-full="images/full-2026-10-23-g1.jpg" alt="كيف تتوقع مشاكل مشروعك قبل أن تقع؟" title="اضغط لعرض الصورة كاملة"></div>
   <div class="body">
     <span class="badge b-scheduled">سيُنشر في موعده</span>
@@ -671,7 +690,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
   </div>
 </article>
 
-<article class="post" data-s="upcoming">
+<article class="post" data-s="upcoming" data-tpl="carousel" data-topic="tmvgcv3kj" data-q="كيف تجعل البحث في موقعك يفهم المعنى لا الحروف؟">
   <div class="imgwrap"><img loading="lazy" src="images/thumb-2026-10-23-g3.jpg" data-full="images/full-2026-10-23-g3-s1.jpg" data-slides='[&#34;images/full-2026-10-23-g3-s1.jpg&#34;, &#34;images/full-2026-10-23-g3-s2.jpg&#34;, &#34;images/full-2026-10-23-g3-s3.jpg&#34;, &#34;images/full-2026-10-23-g3-s4.jpg&#34;, &#34;images/full-2026-10-23-g3-s5.jpg&#34;, &#34;images/full-2026-10-23-g3-s6.jpg&#34;]' alt="كيف تجعل البحث في موقعك يفهم المعنى لا الحروف؟" title="اضغط لعرض الصورة كاملة"><span class="scount">6 شرائح ▤</span></div>
   <div class="body">
     <span class="badge b-scheduled">سيُنشر في موعده</span>
@@ -741,7 +760,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
   </div>
 </article>
 
-<article class="post" data-s="upcoming">
+<article class="post" data-s="upcoming" data-tpl="reel" data-topic="tmvgcw0d5" data-q="كم ساعة تضيع أسبوعياً في تنسيق ونشر المحتوى؟">
   <div class="imgwrap"><img loading="lazy" src="images/thumb-2026-10-23-g5.jpg" data-full="images/full-2026-10-23-g5-s1.jpg" data-slides='[&#34;images/full-2026-10-23-g5-s1.jpg&#34;, &#34;images/full-2026-10-23-g5-s2.jpg&#34;, &#34;images/full-2026-10-23-g5-s3.jpg&#34;, &#34;images/full-2026-10-23-g5-s4.jpg&#34;, &#34;images/full-2026-10-23-g5-s5.jpg&#34;]' alt="كم ساعة تضيع أسبوعياً في تنسيق ونشر المحتوى؟" title="اضغط لعرض الصورة كاملة"><span class="scount">▶ فيديو · 5 مشاهد — اضغط لتصفّح المشاهد</span></div>
   <div class="body">
     <span class="badge b-scheduled">سيُنشر في موعده</span>
@@ -819,7 +838,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
   </div>
 </article>
 
-<article class="post" data-s="upcoming">
+<article class="post" data-s="upcoming" data-tpl="infographic" data-topic="tmvgczrg1" data-q="مدير مهام أم قائد تقني؟ الفرق يصنع المستحيل">
   <div class="imgwrap"><img loading="lazy" src="images/thumb-2026-10-23-g8.jpg" data-full="images/full-2026-10-23-g8.jpg" alt="مدير مهام أم قائد تقني؟ الفرق يصنع المستحيل" title="اضغط لعرض الصورة كاملة"></div>
   <div class="body">
     <span class="badge b-scheduled">سيُنشر في موعده</span>
@@ -890,7 +909,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
   </div>
 </article>
 
-<article class="post" data-s="upcoming">
+<article class="post" data-s="upcoming" data-tpl="infographic" data-topic="tmvgcw9c3" data-q="عقلك يقود.. والذكاء الاصطناعي يسرّع!">
   <div class="imgwrap"><img loading="lazy" src="images/thumb-2026-10-23-g6.jpg" data-full="images/full-2026-10-23-g6.jpg" alt="عقلك يقود.. والذكاء الاصطناعي يسرّع!" title="اضغط لعرض الصورة كاملة"></div>
   <div class="body">
     <span class="badge b-scheduled">سيُنشر في موعده</span>
@@ -948,7 +967,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
   </div>
 </article>
 
-<article class="post" data-s="upcoming">
+<article class="post" data-s="upcoming" data-tpl="infographic" data-topic="tmvgd08zd" data-q="كيف أنقذتنا خطة الطوارئ من توقف مفاجئ؟">
   <div class="imgwrap"><img loading="lazy" src="images/thumb-2026-10-24-g1.jpg" data-full="images/full-2026-10-24-g1.jpg" alt="كيف أنقذتنا خطة الطوارئ من توقف مفاجئ؟" title="اضغط لعرض الصورة كاملة"></div>
   <div class="body">
     <span class="badge b-scheduled">سيُنشر في موعده</span>
@@ -1019,7 +1038,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
   </div>
 </article>
 
-<article class="post" data-s="draft">
+<article class="post" data-s="draft" data-tpl="reel" data-topic="tmvgczzq9" data-q="تطفي حرائق طول اليوم بدون إنجاز حقيقي؟">
   <div class="imgwrap"><img loading="lazy" src="images/thumb-2026-10-23-g9.jpg" data-full="images/full-2026-10-23-g9-s1.jpg" data-slides='[&#34;images/full-2026-10-23-g9-s1.jpg&#34;, &#34;images/full-2026-10-23-g9-s2.jpg&#34;, &#34;images/full-2026-10-23-g9-s3.jpg&#34;, &#34;images/full-2026-10-23-g9-s4.jpg&#34;, &#34;images/full-2026-10-23-g9-s5.jpg&#34;]' alt="تطفي حرائق طول اليوم بدون إنجاز حقيقي؟" title="اضغط لعرض الصورة كاملة"><span class="scount">▶ فيديو · 5 مشاهد — اضغط لتصفّح المشاهد</span></div>
   <div class="body">
     <span class="badge b-draft">بانتظار موافقتك</span>
@@ -1096,7 +1115,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
   </div>
 </article>
 
-<article class="post" data-s="draft">
+<article class="post" data-s="draft" data-tpl="carousel" data-topic="tmvgczjo2" data-q="Agile أم Waterfall؟ كيف تختار منهجية مشروعك؟">
   <div class="imgwrap"><img loading="lazy" src="images/thumb-2026-10-23-g7.jpg" data-full="images/full-2026-10-23-g7-s1.jpg" data-slides='[&#34;images/full-2026-10-23-g7-s1.jpg&#34;, &#34;images/full-2026-10-23-g7-s2.jpg&#34;, &#34;images/full-2026-10-23-g7-s3.jpg&#34;, &#34;images/full-2026-10-23-g7-s4.jpg&#34;, &#34;images/full-2026-10-23-g7-s5.jpg&#34;, &#34;images/full-2026-10-23-g7-s6.jpg&#34;]' alt="Agile أم Waterfall؟ كيف تختار منهجية مشروعك؟" title="اضغط لعرض الصورة كاملة"><span class="scount">6 شرائح ▤</span></div>
   <div class="body">
     <span class="badge b-draft">بانتظار موافقتك</span>
@@ -1157,7 +1176,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
   </div>
 </article>
 
-<article class="post" data-s="draft">
+<article class="post" data-s="draft" data-tpl="infographic" data-topic="tmvgcvmh5" data-q="البرمجة أكبر من مجرد كتابة كود">
   <div class="imgwrap"><img loading="lazy" src="images/thumb-2026-10-23-g4.jpg" data-full="images/full-2026-10-23-g4.jpg" alt="البرمجة أكبر من مجرد كتابة كود" title="اضغط لعرض الصورة كاملة"></div>
   <div class="body">
     <span class="badge b-draft">بانتظار موافقتك</span>
@@ -1227,7 +1246,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
   </div>
 </article>
 
-<article class="post" data-s="draft">
+<article class="post" data-s="draft" data-tpl="infographic" data-topic="tmvet3asy" data-q="دمج الذكاء الاصطناعي في موقعك: من أين تبدأ؟">
   <div class="imgwrap"><img loading="lazy" src="images/thumb-2026-10-23-g2.jpg" data-full="images/full-2026-10-23-g2.jpg" alt="دمج الذكاء الاصطناعي في موقعك: من أين تبدأ؟" title="اضغط لعرض الصورة كاملة"></div>
   <div class="body">
     <span class="badge b-draft">بانتظار موافقتك</span>
@@ -1288,7 +1307,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
   </div>
 </article>
 
-<article class="post" data-s="published">
+<article class="post" data-s="published" data-tpl="infographic" data-topic="tmvgd08zd" data-q="قاعدة 80/20 لحماية مشروعك من التعثر">
   <div class="imgwrap"><img loading="lazy" src="images/thumb-2026-10-25-g1.jpg" data-full="images/full-2026-10-25-g1.jpg" alt="قاعدة 80/20 لحماية مشروعك من التعثر" title="اضغط لعرض الصورة كاملة"></div>
   <div class="body">
     <span class="badge b-published">تم النشر</span>
@@ -1356,7 +1375,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
   </div>
 </article>
 
-<article class="post" data-s="published">
+<article class="post" data-s="published" data-tpl="split" data-topic="tmvet3asy" data-q="تعلم البرمجة في عصر الذكاء الاصطناعي">
   <div class="imgwrap"><img loading="lazy" src="images/thumb-2026-10-21-g1.jpg" data-full="images/full-2026-10-21-g1.jpg" alt="تعلم البرمجة في عصر الذكاء الاصطناعي" title="اضغط لعرض الصورة كاملة"></div>
   <div class="body">
     <span class="badge b-published">تم النشر</span>
@@ -1399,7 +1418,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
   </div>
 </article>
 
-<article class="post" data-s="published">
+<article class="post" data-s="published" data-tpl="reel" data-topic="tmvet3asy" data-q="تكرر نفس المهمة كل يوم؟">
   <div class="imgwrap"><img loading="lazy" src="images/thumb-2026-10-21-reel1.jpg" data-video="images/2026-10-21-reel1.mp4" data-full="images/full-2026-10-21-reel1-s1.jpg" data-slides='[&#34;images/full-2026-10-21-reel1-s1.jpg&#34;, &#34;images/full-2026-10-21-reel1-s2.jpg&#34;, &#34;images/full-2026-10-21-reel1-s3.jpg&#34;, &#34;images/full-2026-10-21-reel1-s4.jpg&#34;]' alt="تكرر نفس المهمة كل يوم؟" title="اضغط لعرض الصورة كاملة"><span class="scount">▶ فيديو · 4 مشاهد — اضغط للتشغيل</span></div>
   <div class="body">
     <span class="badge b-published">تم النشر</span>
@@ -1440,7 +1459,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
   </div>
 </article>
 
-<article class="post" data-s="published">
+<article class="post" data-s="published" data-tpl="carousel" data-topic="tmvgcw0d5" data-q="كيف بنيت نظام نشر آلي بالذكاء الاصطناعي؟">
   <div class="imgwrap"><img loading="lazy" src="images/thumb-2026-10-20-g2.jpg" data-full="images/full-2026-10-20-g2-s1.jpg" data-slides='[&#34;images/full-2026-10-20-g2-s1.jpg&#34;, &#34;images/full-2026-10-20-g2-s2.jpg&#34;, &#34;images/full-2026-10-20-g2-s3.jpg&#34;, &#34;images/full-2026-10-20-g2-s4.jpg&#34;, &#34;images/full-2026-10-20-g2-s5.jpg&#34;, &#34;images/full-2026-10-20-g2-s6.jpg&#34;, &#34;images/full-2026-10-20-g2-s7.jpg&#34;]' alt="كيف بنيت نظام نشر آلي بالذكاء الاصطناعي؟" title="اضغط لعرض الصورة كاملة"><span class="scount">7 شرائح ▤</span></div>
   <div class="body">
     <span class="badge b-published">تم النشر</span>
@@ -1513,7 +1532,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
   </div>
 </article>
 
-<article class="post" data-s="published">
+<article class="post" data-s="published" data-tpl="carousel" data-topic="tmvet3asy" data-q="كيف أجعل الذكاء الاصطناعي مساعد برمجة لا بديلاً عني">
   <div class="imgwrap"><img loading="lazy" src="images/thumb-2026-10-22-car1-rs99s.jpg" data-full="images/full-2026-10-22-car1-rs99s-s1.jpg" data-slides='[&#34;images/full-2026-10-22-car1-rs99s-s1.jpg&#34;, &#34;images/full-2026-10-22-car1-rs99s-s2.jpg&#34;, &#34;images/full-2026-10-22-car1-rs99s-s3.jpg&#34;, &#34;images/full-2026-10-22-car1-rs99s-s4.jpg&#34;, &#34;images/full-2026-10-22-car1-rs99s-s5.jpg&#34;, &#34;images/full-2026-10-22-car1-rs99s-s6.jpg&#34;, &#34;images/full-2026-10-22-car1-rs99s-s7.jpg&#34;, &#34;images/full-2026-10-22-car1-rs99s-s8.jpg&#34;]' alt="كيف أجعل الذكاء الاصطناعي مساعد برمجة لا بديلاً عني" title="اضغط لعرض الصورة كاملة"><span class="scount">8 شرائح ▤</span></div>
   <div class="body">
     <span class="badge b-published">تم النشر</span>
@@ -1546,7 +1565,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
   </div>
 </article>
 
-<article class="post" data-s="published">
+<article class="post" data-s="published" data-tpl="split" data-topic="tmvet3asy" data-q="كيف تحول موقعك إلى نظام تفاعلي ذكي؟">
   <div class="imgwrap"><img loading="lazy" src="images/thumb-2026-10-20-g1.jpg" data-full="images/full-2026-10-20-g1.jpg" alt="كيف تحول موقعك إلى نظام تفاعلي ذكي؟" title="اضغط لعرض الصورة كاملة"></div>
   <div class="body">
     <span class="badge b-published">تم النشر</span>
@@ -1587,7 +1606,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
   </div>
 </article>
 
-<article class="post" data-s="published">
+<article class="post" data-s="published" data-tpl="carousel" data-topic="tmvet3asy" data-q="كيف أجعل الذكاء الاصطناعي مساعد برمجة لا بديلاً عني">
   <div class="imgwrap"><img loading="lazy" src="images/thumb-2026-10-22-car1.jpg" data-full="images/full-2026-10-22-car1-s1.jpg" data-slides='[&#34;images/full-2026-10-22-car1-s1.jpg&#34;, &#34;images/full-2026-10-22-car1-s2.jpg&#34;, &#34;images/full-2026-10-22-car1-s3.jpg&#34;, &#34;images/full-2026-10-22-car1-s4.jpg&#34;, &#34;images/full-2026-10-22-car1-s5.jpg&#34;, &#34;images/full-2026-10-22-car1-s6.jpg&#34;, &#34;images/full-2026-10-22-car1-s7.jpg&#34;, &#34;images/full-2026-10-22-car1-s8.jpg&#34;]' alt="كيف أجعل الذكاء الاصطناعي مساعد برمجة لا بديلاً عني" title="اضغط لعرض الصورة كاملة"><span class="scount">8 شرائح ▤</span></div>
   <div class="body">
     <span class="badge b-published">تم النشر</span>
@@ -1636,7 +1655,7 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
   </div>
 </article>
 
-<article class="post" data-s="published">
+<article class="post" data-s="published" data-tpl="split" data-topic="tmvet3asy" data-q="الذكاء الاصطناعي لا يستبدلك، بل يدعمك">
   <div class="imgwrap"><img loading="lazy" src="images/thumb-2026-10-19-g1.jpg" data-full="images/full-2026-10-19-g1.jpg" alt="الذكاء الاصطناعي لا يستبدلك، بل يدعمك" title="اضغط لعرض الصورة كاملة"></div>
   <div class="body">
     <span class="badge b-published">تم النشر</span>
@@ -1696,10 +1715,156 @@ select{width:100%;font:inherit;font-size:.95rem;background:var(--bg);color:var(-
 
 </div>
 <script type="application/json" id="accdata">[{"id": "fb-alwan", "platform": "facebook", "label": "فيسبوك — الوان", "default": true}, {"id": "ig-engshadi2011", "platform": "instagram", "label": "إنستغرام — engshadi2011", "default": true}, {"id": "threads-engshadi2011", "platform": "threads", "label": "ثريدز — engshadi2011", "default": true}, {"id": "telegram-channel", "platform": "telegram", "label": "تيليجرام — القناة", "default": true}, {"id": "linkedin-engshadi", "platform": "linkedin", "label": "لينكدإن — المهندس شادي", "default": true}]</script>
+<script type="application/json" id="insdata">{
+ "2026-10-25-g1": {
+  "linkedin": {
+   "fetched_at": "2026-10-22T07:31+00:00",
+   "error": "المنصة لا تدعم الإحصاءات بعد"
+  },
+  "threads": {
+   "fetched_at": "2026-10-22T07:31+00:00",
+   "error": "Application does not have permission for this action"
+  },
+  "instagram": {
+   "fetched_at": "2026-10-22T07:31+00:00",
+   "likes": 1,
+   "comments": 1
+  },
+  "facebook": {
+   "fetched_at": "2026-10-22T07:31+00:00",
+   "error": "(#10) This endpoint requires the 'pages_read_user_content' permission or the 'Page Public Content Access' feature. Refer to https://developers.facebook.com/docs"
+  }
+ },
+ "2026-10-21-g1": {
+  "threads": {
+   "fetched_at": "2026-10-22T07:31+00:00",
+   "error": "Application does not have permission for this action"
+  },
+  "linkedin": {
+   "fetched_at": "2026-10-22T07:31+00:00",
+   "error": "المنصة لا تدعم الإحصاءات بعد"
+  },
+  "instagram": {
+   "fetched_at": "2026-10-22T07:31+00:00",
+   "likes": 2,
+   "comments": 0
+  },
+  "facebook": {
+   "fetched_at": "2026-10-22T07:31+00:00",
+   "error": "(#10) This endpoint requires the 'pages_read_user_content' permission or the 'Page Public Content Access' feature. Refer to https://developers.facebook.com/docs"
+  }
+ },
+ "2026-10-21-reel1": {
+  "threads": {
+   "fetched_at": "2026-10-22T07:31+00:00",
+   "error": "Application does not have permission for this action"
+  },
+  "instagram": {
+   "fetched_at": "2026-10-22T07:31+00:00",
+   "likes": 0,
+   "comments": 0
+  },
+  "facebook": {
+   "fetched_at": "2026-10-22T07:31+00:00",
+   "error": "(#100) Tried accessing nonexisting field (reactions)"
+  }
+ },
+ "2026-10-20-g2": {
+  "threads": {
+   "fetched_at": "2026-10-22T07:31+00:00",
+   "error": "Application does not have permission for this action"
+  },
+  "linkedin": {
+   "fetched_at": "2026-10-22T07:31+00:00",
+   "error": "المنصة لا تدعم الإحصاءات بعد"
+  },
+  "instagram": {
+   "fetched_at": "2026-10-22T07:31+00:00",
+   "likes": 2,
+   "comments": 0
+  },
+  "facebook": {
+   "fetched_at": "2026-10-22T07:31+00:00",
+   "error": "(#10) This endpoint requires the 'pages_read_user_content' permission or the 'Page Public Content Access' feature. Refer to https://developers.facebook.com/docs"
+  }
+ },
+ "2026-10-22-car1-rs99s": {
+  "instagram": {
+   "fetched_at": "2026-10-22T07:31+00:00",
+   "likes": 3,
+   "comments": 0
+  }
+ },
+ "2026-10-20-g1": {
+  "threads": {
+   "fetched_at": "2026-10-22T07:31+00:00",
+   "error": "Application does not have permission for this action"
+  },
+  "instagram": {
+   "fetched_at": "2026-10-22T07:31+00:00",
+   "likes": 3,
+   "comments": 0
+  },
+  "facebook": {
+   "fetched_at": "2026-10-22T07:31+00:00",
+   "error": "(#10) This endpoint requires the 'pages_read_user_content' permission or the 'Page Public Content Access' feature. Refer to https://developers.facebook.com/docs"
+  }
+ },
+ "2026-10-22-car1": {
+  "threads": {
+   "fetched_at": "2026-10-22T07:31+00:00",
+   "error": "Application does not have permission for this action"
+  },
+  "instagram": {
+   "fetched_at": "2026-10-22T07:31+00:00",
+   "likes": 0,
+   "comments": 0
+  },
+  "facebook": {
+   "fetched_at": "2026-10-22T07:31+00:00",
+   "error": "(#10) This endpoint requires the 'pages_read_user_content' permission or the 'Page Public Content Access' feature. Refer to https://developers.facebook.com/docs"
+  }
+ },
+ "2026-10-19-g1": {
+  "threads": {
+   "fetched_at": "2026-10-22T07:32+00:00",
+   "error": "Application does not have permission for this action"
+  },
+  "instagram": {
+   "fetched_at": "2026-10-22T07:32+00:00",
+   "likes": 0,
+   "comments": 0
+  },
+  "facebook": {
+   "fetched_at": "2026-10-22T07:32+00:00",
+   "error": "(#10) This endpoint requires the 'pages_read_user_content' permission or the 'Page Public Content Access' feature. Refer to https://developers.facebook.com/docs"
+  }
+ },
+ "2026-10-18-test2": {
+  "threads": {
+   "fetched_at": "2026-10-22T07:32+00:00",
+   "error": "Application does not have permission for this action"
+  }
+ },
+ "2026-10-18-test1": {
+  "instagram": {
+   "fetched_at": "2026-10-22T07:32+00:00",
+   "likes": 0,
+   "comments": 0
+  },
+  "facebook": {
+   "fetched_at": "2026-10-22T07:32+00:00",
+   "error": "(#10) This endpoint requires the 'pages_read_user_content' permission or the 'Page Public Content Access' feature. Refer to https://developers.facebook.com/docs"
+  }
+ }
+}
+</script>
 <script type="application/json" id="postdata">{"2026-10-19-g1": {"id": "2026-10-19-g1", "approved": true, "publish_at": "2026-10-19 08:32", "template": "split", "topic": "tmvet3asy", "image": {"title": "الذكاء الاصطناعي لا يستبدلك، بل يدعمك", "body": "أدوات البرمجة الذكية هي مساعدك الشخصي لإنجاز المشاريع بدقة وسرعة أكبر.", "photo_query": "coding laptop screen glowing", "seed": 1}, "platforms": {"facebook": "مرحباً بكم جميعاً! كثير من الأصدقاء يسألونني: \"مهندس شادي، هل سيقضي الذكاء الاصطناعي على وظائف المبرمجين وصناع المواقع؟\"\n\nالإجابة المباشرة: لا، ولكن المبرمج الذي يستعين بأدوات الذكاء الاصطناعي سيتفوق حتماً على من يتجاهلها. اليوم، يمكنك استخدام نماذج ذكية مثل جيميناي لكتابة دوال معقدة، فحص الأخطاء البرمجية وتصحيحها في لحظات، أو حتى اقتراح تصاميم وتوزيع عناصر الصفحات.\n\nالذكاء الاصطناعي ليس بديلاً عن فهمك للمنطق البرمجي، بل هو مسرّع قوي يختصر عليك الساعات الروتينية لتركز أنت على الإبداع وبناء أنظمة حقيقية ذات قيمة. جرب دمج هذه الأدوات في روتينك البرمجي اليوم وستشهد قفزة واضحة في إنتاجيتك.\n\n#جيميناي #الذكاء_الاصطناعي #برمجة #تطوير_الويب #تقنية", "instagram": "مرحباً بكم جميعاً! كثير من الأصدقاء يسألونني: \"مهندس شادي، هل سيقضي الذكاء الاصطناعي على وظائف المبرمجين وصناع المواقع؟\"\n\nالإجابة المباشرة: لا، ولكن المبرمج الذي يستعين بأدوات الذكاء الاصطناعي سيتفوق حتماً على من يتجاهلها. اليوم، يمكنك استخدام نماذج ذكية مثل جيميناي لكتابة دوال معقدة، فحص الأخطاء البرمجية وتصحيحها في لحظات، أو حتى اقتراح تصاميم وتوزيع عناصر الصفحات.\n\nالذكاء الاصطناعي ليس بديلاً عن فهمك للمنطق البرمجي، بل هو مسرّع قوي يختصر عليك الساعات الروتينية لتركز أنت على الإبداع وبناء أنظمة حقيقية ذات قيمة. جرب دمج هذه الأدوات في روتينك البرمجي اليوم وستشهد قفزة واضحة في إنتاجيتك.\n\n#جيميناي #الذكاء_الاصطناعي #برمجة #تطوير_الويب #تقنية", "threads": "هل يلغي الذكاء الاصطناعي دور المبرمج؟ لا، بل يمنحه سرعة فائقة لبناء المواقع والأنظمة! استغل أدوات ذكية مثل جيميناي في تصحيح الأكواد واقتراح الحلول، واجعل تركيزك الأساسي على المنطق وتجربة المستخدم.\n\n#جيميناي #الذكاء_الاصطناعي #برمجة"}, "group": "published"}, "2026-10-20-g1": {"id": "2026-10-20-g1", "approved": true, "publish_at": "2026-10-20 08:32", "template": "split", "topic": "tmvet3asy", "image": {"title": "كيف تحول موقعك إلى نظام تفاعلي ذكي؟", "body": "دمج الذكاء الاصطناعي في المواقع صار خطوة عملية وسهلة التنفيذ.", "photo_query": "modern technology server data", "seed": 8}, "platforms": {"facebook": "صناعة المواقع لم تعد مقتصرة على صفحات ثابتة تعرض نصوصاً وصوراً. اليوم، تستطيع تحويل أي موقع إلى منصة ذكية تتفاعل مع الزائر بشكل مخصص وتفهم متطلباته بدقة.\n\nربط واجهات الذكاء الاصطناعي البرمجية (APIs) بالأنظمة أصبح في غاية البساطة والسرعة. يمكنك إضافة محرك بحث دلالي يفهم قصد المستخدم، أو روبوت دعم فني ذكي يجيب عن الاستفسارات بمستوى احترافي، أو حتى نظام يحلل سلوك التصفح ليعرض المحتوى الأنسب لكل شخص.\n\nالجميل في الأمر أنك لست بحاجة لإنشاء نماذج ذكاء اصطناعي من الصفر؛ الحلول والمكتبات البرمجية متوفرة وجاهزة للتكامل مع موقعك فوراً. خطوة بسيطة كهذه تصنع فارقاً هائلاً في جودة مشروعك ورضا مستخدميه.\n\n#منصة #الذكاء_الاصطناعي #تطوير_المواقع #برمجة_ويب #أنظمة", "instagram": "صناعة المواقع لم تعد مقتصرة على صفحات ثابتة تعرض نصوصاً وصوراً. اليوم، تستطيع تحويل أي موقع إلى منصة ذكية تتفاعل مع الزائر بشكل مخصص وتفهم متطلباته بدقة.\n\nربط واجهات الذكاء الاصطناعي البرمجية (APIs) بالأنظمة أصبح في غاية البساطة والسرعة. يمكنك إضافة محرك بحث دلالي يفهم قصد المستخدم، أو روبوت دعم فني ذكي يجيب عن الاستفسارات بمستوى احترافي، أو حتى نظام يحلل سلوك التصفح ليعرض المحتوى الأنسب لكل شخص.\n\nالجميل في الأمر أنك لست بحاجة لإنشاء نماذج ذكاء اصطناعي من الصفر؛ الحلول والمكتبات البرمجية متوفرة وجاهزة للتكامل مع موقعك فوراً. خطوة بسيطة كهذه تصنع فارقاً هائلاً في جودة مشروعك ورضا مستخدميه.\n\n#منصة #الذكاء_الاصطناعي #تطوير_المواقع #برمجة_ويب #أنظمة", "threads": "المواقع اليوم لم تعد صفحات جامدة! دمج الذكاء الاصطناعي في أي منصة عبر الـ APIs يتيح لك تقديم بحث ذكي، ودعم فوري، وتجربة مخصصة لكل زائر بكل سلاسة وسرعة.\n\n#منصة #الذكاء_الاصطناعي #تطوير_المواقع"}, "group": "published"}, "2026-10-21-g1": {"id": "2026-10-21-g1", "approved": true, "publish_at": "2026-10-21 08:32", "template": "split", "topic": "tmvet3asy", "image": {"title": "تعلم البرمجة في عصر الذكاء الاصطناعي", "body": "الأساسيات الهندسية وحل المشكلات أهم بكثير من مجرد حفظ الأكواد.", "photo_query": "dual computer monitors desk", "seed": 15}, "platforms": {"facebook": "إذا كنت تفكر في دخول عالم البرمجة وصناعة الأنظمة، فقد تسأل نفسك: هل لا يزال التعلم مجدياً بينما الذكاء الاصطناعي يكتب الأكواد الجاهزة؟\n\nنعم وبكل تأكيد! الذكاء الاصطناعي يكتب السطور البرمجية، لكنه يحتاج إلى عقل مهندس يفهم كيف يوجهه، وكيف يدقق النتائج، وكيف يربط مكونات النظام لتكون آمنة وقابلة للتطوير.\n\nالمطلوب منك الآن لم يعد حفظ الأوامر والتراكيب عن ظهر قلب؛ الأولوية الحقيقية أصبحت لفهم هياكل البيانات، وهندسة البرمجيات، وأسلوب التفكير التحليلي. اعتبر أدوات الذكاء الاصطناعي معلماً شخصياً يرافقك: اسألها عما يستعصي عليك، ودعها تشرح لك المفاهيم المعقدة، وسترى كيف تختصر رحلة تعلمك إلى النصف.\n\n#الذكاء_الاصطناعي #تعلم_البرمجة #هندسة_البرمجيات #مطورين", "instagram": "إذا كنت تفكر في دخول عالم البرمجة وصناعة الأنظمة، فقد تسأل نفسك: هل لا يزال التعلم مجدياً بينما الذكاء الاصطناعي يكتب الأكواد الجاهزة؟\n\nنعم وبكل تأكيد! الذكاء الاصطناعي يكتب السطور البرمجية، لكنه يحتاج إلى عقل مهندس يفهم كيف يوجهه، وكيف يدقق النتائج، وكيف يربط مكونات النظام لتكون آمنة وقابلة للتطوير.\n\nالمطلوب منك الآن لم يعد حفظ الأوامر والتراكيب عن ظهر قلب؛ الأولوية الحقيقية أصبحت لفهم هياكل البيانات، وهندسة البرمجيات، وأسلوب التفكير التحليلي. اعتبر أدوات الذكاء الاصطناعي معلماً شخصياً يرافقك: اسألها عما يستعصي عليك، ودعها تشرح لك المفاهيم المعقدة، وسترى كيف تختصر رحلة تعلمك إلى النصف.\n\n#الذكاء_الاصطناعي #تعلم_البرمجة #هندسة_البرمجيات #مطورين", "threads": "في عصر الذكاء الاصطناعي، لا تشغل بالك بحفظ الأكواد؛ ركّز على فهم الأساسيات الهندسية وطريقة بناء الأنظمة وحل المشكلات. الأداة الذكية تكتب الكود، لكن المهندس هو من يدير الفكرة ويوجهها للنجاح.\n\n#تعلم_البرمجة #الذكاء_الاصطناعي #تقنية", "linkedin": "في عصر الذكاء الاصطناعي، لا تشغل بالك بحفظ الأكواد؛ ركّز على فهم الأساسيات الهندسية وطريقة بناء الأنظمة وحل المشكلات. الأداة الذكية تكتب الكود، لكن المهندس هو من يدير الفكرة ويوجهها للنجاح."}, "group": "published"}, "2026-10-22-car1": {"id": "2026-10-22-car1", "approved": true, "publish_at": "2026-10-20 08:10", "template": "carousel", "topic": "tmvet3asy", "image": {"title": "كيف أجعل الذكاء الاصطناعي مساعد برمجة لا بديلاً عني", "body": "", "style": "terminal", "slides": [{"kicker": "دراسة حالة · ذكاء اصطناعي", "title": "كيف أجعل الذكاء الاصطناعي مساعد برمجة لا بديلاً عني", "body": "ثماني شرائح: الطريقة التي وفّرت عليّ ساعات أسبوعياً دون أن أفقد فهمي.", "points": ["يكتب المسودة الأولى", "يراجع الأخطاء", "وأنا صاحب القرار"]}, {"kicker": "المشكلة", "title": "كل مرة أبدأ مشروعاً أضيّع أول ساعاته في أمور متكررة", "body": "هيكلة الملفات، كتابة الأكواد المعتادة، والبحث عن الصيغة نفسها للمرة العاشرة."}, {"kicker": "الفكرة", "title": "ماذا لو سلّمت الروتين لمساعد ذكي وركّزت أنا على القرار؟", "body": "", "points": ["هو يقترح", "أنا أراجع", "ثم أُقرّر"]}, {"kicker": "الخطوة الأولى", "title": "اشرح له ما تريد بجملة واضحة", "body": "كلما كان طلبك أدق كانت النتيجة أقرب لما في ذهنك وأقل حاجة للتعديل."}, {"kicker": "الخطوة الثانية", "title": "راجع كل سطر قبل أن تعتمده", "body": "", "points": ["افهم لماذا كُتب هكذا", "جرّبه في بيئة آمنة", "لا تنسخ ما لا تفهمه"]}, {"kicker": "الخطوة الثالثة", "title": "اجعله يشرح لك ما لا تفهمه", "body": "المساعد الذكي معلّم صبور: يجيب بلا ملل ويعيد الشرح بطرق مختلفة."}, {"kicker": "الخلاصة", "title": "المهندس يقود، والأداة تسرّع", "body": "من يفهم الأساسيات يستفيد من الذكاء الاصطناعي أكثر بكثير ممن يكتفي بنسخ الأكواد."}, {"kicker": "", "title": "وأنت، ما أول مهمة ستسلّمها لمساعدك الذكي؟", "body": "اكتب لي في التعليقات، واحفظ المنشور للرجوع إليه."}], "seed": 1}, "platforms": {"facebook": "كل مرة أبدأ مشروعاً أجد نفسي أضيّع أول ساعاته في أمور أكررها: هيكلة الملفات، وأكواد أعرفها عن ظهر قلب 😅\nفسألت نفسي: ماذا لو سلّمت هذا الروتين لمساعد ذكي، وركّزت أنا على القرار؟\n\n✦ أشرح له ما أريد بجملة واضحة ليبدأ بالمسودة الأولى\n✦ أراجع كل سطر وأفهم لماذا كُتب هكذا قبل أن أعتمده\n✦ أجعله يشرح لي ما لا أفهمه، فهو معلّم صبور لا يملّ\n✦ والقرار النهائي يبقى لي أنا، فالمهندس يقود والأداة تسرّع\n\nاسحب للآخر ← وقل لي: ما أول مهمة ستسلّمها لمساعدك الذكي؟\n\n#الذكاء_الاصطناعي #برمجة #تطوير_الويب #تقنية #مهندس", "instagram": "كل مرة أبدأ مشروعاً أجد نفسي أضيّع أول ساعاته في أمور أكررها: هيكلة الملفات، وأكواد أعرفها عن ظهر قلب 😅\nفسألت نفسي: ماذا لو سلّمت هذا الروتين لمساعد ذكي، وركّزت أنا على القرار؟\n\n✦ أشرح له ما أريد بجملة واضحة ليبدأ بالمسودة الأولى\n✦ أراجع كل سطر وأفهم لماذا كُتب هكذا قبل أن أعتمده\n✦ أجعله يشرح لي ما لا أفهمه، فهو معلّم صبور لا يملّ\n✦ والقرار النهائي يبقى لي أنا، فالمهندس يقود والأداة تسرّع\n\nاسحب للآخر ← وقل لي: ما أول مهمة ستسلّمها لمساعدك الذكي؟\n\n#الذكاء_الاصطناعي #برمجة #تطوير_الويب #تقنية #مهندس", "threads": "المهندس يقود والأداة تسرّع: لا تنسخ كود الذكاء الاصطناعي قبل أن تفهمه، واجعله يشرح لك ما لا تعرفه. ما أول مهمة ستسلّمها لمساعدك؟\n\n#الذكاء_الاصطناعي #برمجة #تقنية"}, "group": "published"}, "2026-10-22-car1-rs99s": {"id": "2026-10-22-car1-rs99s", "approved": true, "publish_at": "2026-10-20 09:23", "template": "carousel", "topic": "tmvet3asy", "image": {"title": "كيف أجعل الذكاء الاصطناعي مساعد برمجة لا بديلاً عني", "body": "", "slides": [{"kicker": "دراسة حالة · ذكاء اصطناعي", "title": "كيف أجعل الذكاء الاصطناعي مساعد برمجة لا بديلاً عني", "body": "ثماني شرائح: الطريقة التي وفّرت عليّ ساعات أسبوعياً دون أن أفقد فهمي.", "points": ["يكتب المسودة الأولى", "يراجع الأخطاء", "وأنا صاحب القرار"]}, {"kicker": "المشكلة", "title": "كل مرة أبدأ مشروعاً أضيّع أول ساعاته في أمور متكررة", "body": "هيكلة الملفات، كتابة الأكواد المعتادة، والبحث عن الصيغة نفسها للمرة العاشرة."}, {"kicker": "الفكرة", "title": "ماذا لو سلّمت الروتين لمساعد ذكي وركّزت أنا على القرار؟", "body": "", "points": ["هو يقترح", "أنا أراجع", "ثم أُقرّر"]}, {"kicker": "الخطوة الأولى", "title": "اشرح له ما تريد بجملة واضحة", "body": "كلما كان طلبك أدق كانت النتيجة أقرب لما في ذهنك وأقل حاجة للتعديل."}, {"kicker": "الخطوة الثانية", "title": "راجع كل سطر قبل أن تعتمده", "body": "", "points": ["افهم لماذا كُتب هكذا", "جرّبه في بيئة آمنة", "لا تنسخ ما لا تفهمه"]}, {"kicker": "الخطوة الثالثة", "title": "اجعله يشرح لك ما لا تفهمه", "body": "المساعد الذكي معلّم صبور: يجيب بلا ملل ويعيد الشرح بطرق مختلفة."}, {"kicker": "الخلاصة", "title": "المهندس يقود، والأداة تسرّع", "body": "من يفهم الأساسيات يستفيد من الذكاء الاصطناعي أكثر بكثير ممن يكتفي بنسخ الأكواد."}, {"kicker": "", "title": "وأنت، ما أول مهمة ستسلّمها لمساعدك الذكي؟", "body": "اكتب لي في التعليقات، واحفظ المنشور للرجوع إليه."}], "seed": 1}, "platforms": {"instagram": "كل مرة أبدأ مشروعاً أجد نفسي أضيّع أول ساعاته في أمور أكررها: هيكلة الملفات، وأكواد أعرفها عن ظهر قلب 😅\nفسألت نفسي: ماذا لو سلّمت هذا الروتين لمساعد ذكي، وركّزت أنا على القرار؟\n\n✦ أشرح له ما أريد بجملة واضحة ليبدأ بالمسودة الأولى\n✦ أراجع كل سطر وأفهم لماذا كُتب هكذا قبل أن أعتمده\n✦ أجعله يشرح لي ما لا أفهمه، فهو معلّم صبور لا يملّ\n✦ والقرار النهائي يبقى لي أنا، فالمهندس يقود والأداة تسرّع\n\nاسحب للآخر ← وقل لي: ما أول مهمة ستسلّمها لمساعدك الذكي؟\n\n#الذكاء_الاصطناعي #برمجة #تطوير_الويب #تقنية #مهندس"}, "group": "published"}, "2026-10-20-g2": {"id": "2026-10-20-g2", "approved": true, "publish_at": "2026-10-20 19:40", "template": "carousel", "topic": "tmvgcw0d5", "image": {"title": "كيف بنيت نظام نشر آلي بالذكاء الاصطناعي؟", "body": "", "slides": [{"kicker": "خلف الكواليس", "title": "كيف بنيت نظام نشر آلي بالذكاء الاصطناعي؟", "body": "تجربة حقيقية لأتمتة صناعة المحتوى ونشره بضغطة زر واحدة لتوفير الوقت والجهد.", "points": ["التخلص من روتين النشر اليومي", "ربط الذكاء الاصطناعي بمنصات التواصل", "توفير أكثر من 8 ساعات أسبوعياً"]}, {"kicker": "التحدي الحقيقي", "title": "إهدار ساعات طويلة في النقل والتنسيق", "body": "كتابة الأفكار وتصميم الشرائح وتعديل النصوص لكل منصة كان يستهلك طاقتي الإبداعية ويعطل مهامي البرمجية الأساسية.", "points": ["تشتت دائم بين عدة منصات وأدوات", "تكرار خطوات روتينية دون قيمة مضافة", "صعوبة الالتزام بالنشر المستمر"]}, {"kicker": "الحل المقترح", "title": "خط إنتاج رقمي يبدأ بالفكرة وينتهي بالنشر", "body": "بدلاً من الإجراءات اليدوية، صممت خط سير عمل مؤتمت: تدخل الفكرة كمدخلات، لتخرج منشوراً كاملاً ومجدولاً تلقائياً.", "points": ["هيكلة النصوص حسب الجمهور المستهدف", "توليد قوالب الشرائح برمجياً", "إرسال المحتوى مباشرة عبر الـ APIs"]}, {"kicker": "التنفيذ البرمجي", "title": "كيف ربطت الأدوات الذكية معاً؟", "body": "بنيت النظام بلغة بايثون وربطته بنماذج الذكاء الاصطناعي اللغوية مع أدوات بناء التصاميم ومفاتيح ربط الشبكات الاجتماعية.", "points": ["توجيه النموذج الذكي لضبط النبرة والأسلوب", "توليد الصور والكاروسيل تلقائياً بدقة", "برمجة الجدولة الزمنية للنشر المؤتمت"]}, {"kicker": "النتيجة والفاعلية", "title": "دقيقة واحدة بدلاً من نصف يوم عمل", "body": "تحول دوري من العمل التنفيذي اليدوي إلى دور المراجع؛ أطرح الفكرة الأولية ثم أراجع النتيجة وأعتمدها بلمسة واحدة.", "points": ["استمرارية يومية في التواجد الرقمي", "توفير ساعات ثمينة لخدمة العملاء", "جودة وتنسيق بصري ثابت للمحتوى"]}, {"kicker": "درس للأعمال", "title": "متى تبدأ بأتمتة مهامك في مشروعك؟", "body": "الأتمتة ليست ترفاً تقنياً، بل استثمار استراتيجي لاستعادة وقتك؛ أي مهمة تكررها أكثر من ثلاث مرات أسبوعياً تستحق الأتمتة.", "points": ["احصر الإجراءات المتكررة ذات الخطوات الثابتة", "ابدأ بحلول ربط بسيطة قبل بناء أنظمة معقدة", "احتفظ دائماً بلمستك البشرية للمراجعة النهائية"]}, {"kicker": "شاركني رأيك", "title": "ما أكثر مهمة روتينية تود أتمتتها في عملك؟", "body": "احفظ المنشور للرجوع إليه عند بناء نظامك، وأخبرني في التعليقات عن التحدي الأكبر الذي يضيع وقتك أسبوعياً."}], "seed": 1}, "platforms": {"facebook": "اسحب للآخر ⬅️\n\nكنت أقضي ساعات طويلة أسبوعياً في نسخ النصوص وتنسيق الشرائح بين المنصات المختلفة، حتى قررت تحويل هذا الروتين إلى كود برمجي ذكي يتكفل بالعملية كاملة.\n\nبنيت نظام نشر آلياً يربط الذكاء الاصطناعي بواجهات المنصات، والنتيجة كانت استعادة وقتي وتركيزي:\n\n✦ الذكاء الاصطناعي يصيغ المسودات ويوزع الأفكار داخل قوالب مخصصة ومحددة مسبقاً.\n✦ النظام يولد التصاميم ويحدد المواعيد المناسبة للنشر التلقائي عبر الـ APIs دون تدخل يدوي.\n✦ تحول دوري من العمل اليدوي المكرر إلى الإشراف الإبداعي والاعتماد النهائي بضغطة زر واحدة.\n\nالأتمتة ليست مجرد كفاءة تقنية، بل هي وسيلتك الحقيقية لضمان الاستمرارية والتركيز على نمو أعمالك ومشاريعك.\n\nما هي أكثر مهمة متكررة في يومك تتمنى لو تؤتمتها بالكامل؟\n\n#أتمتة_الأعمال #ذكاء_اصطناعي #صناع_المحتوى #برمجة", "instagram": "اسحب للآخر ⬅️\n\nكنت أقضي ساعات طويلة أسبوعياً في نسخ النصوص وتنسيق الشرائح بين المنصات المختلفة، حتى قررت تحويل هذا الروتين إلى كود برمجي ذكي يتكفل بالعملية كاملة.\n\nبنيت نظام نشر آلياً يربط الذكاء الاصطناعي بواجهات المنصات، والنتيجة كانت استعادة وقتي وتركيزي:\n\n✦ الذكاء الاصطناعي يصيغ المسودات ويوزع الأفكار داخل قوالب مخصصة ومحددة مسبقاً.\n✦ النظام يولد التصاميم ويحدد المواعيد المناسبة للنشر التلقائي عبر الـ APIs دون تدخل يدوي.\n✦ تحول دوري من العمل اليدوي المكرر إلى الإشراف الإبداعي والاعتماد النهائي بضغطة زر واحدة.\n\nالأتمتة ليست مجرد كفاءة تقنية، بل هي وسيلتك الحقيقية لضمان الاستمرارية والتركيز على نمو أعمالك ومشاريعك.\n\nما هي أكثر مهمة متكررة في يومك تتمنى لو تؤتمتها بالكامل؟\n\n#أتمتة_الأعمال #ذكاء_اصطناعي #صناع_المحتوى #برمجة", "threads": "بنيت نظام نشر آلي يربط الذكاء الاصطناعي بمنصات التواصل، فتحولت مهمة كتابة وتصميم وجدولة المنشورات من ساعات إهدار أسبوعياً إلى مجرد مراجعة سريعة بضغطة زر. الأتمتة هي بوابتك الحقيقية لاستعادة وقتك والتركيز على تطوير مشاريعك.\nما أكثر عملية روتينية تتمنى أتمتتها في عملك اليوم؟\n#أتمتة_الأعمال #ذكاء_اصطناعي #ريادة_أعمال", "linkedin": "اسحب للآخر ⬅️\n\nكنت أقضي ساعات طويلة أسبوعياً في نسخ النصوص وتنسيق الشرائح بين المنصات المختلفة، حتى قررت تحويل هذا الروتين إلى كود برمجي ذكي يتكفل بالعملية كاملة.\n\nبنيت نظام نشر آلياً يربط الذكاء الاصطناعي بواجهات المنصات، والنتيجة كانت استعادة وقتي وتركيزي:\n\n✦ الذكاء الاصطناعي يصيغ المسودات ويوزع الأفكار داخل قوالب مخصصة ومحددة مسبقاً.\n✦ النظام يولد التصاميم ويحدد المواعيد المناسبة للنشر التلقائي عبر الـ APIs دون تدخل يدوي.\n✦ تحول دوري من العمل اليدوي المكرر إلى الإشراف الإبداعي والاعتماد النهائي بضغطة زر واحدة.\n\nالأتمتة ليست مجرد كفاءة تقنية، بل هي وسيلتك الحقيقية لضمان الاستمرارية والتركيز على نمو أعمالك ومشاريعك.\n\nما هي أكثر مهمة متكررة في يومك تتمنى لو تؤتمتها بالكامل؟\n\n#أتمتة_الأعمال #ذكاء_اصطناعي #صناع_المحتوى #برمجة"}, "group": "published"}, "2026-10-21-reel1": {"id": "2026-10-21-reel1", "approved": true, "publish_at": "2026-10-21 08:30", "template": "reel", "topic": "tmvet3asy", "image": {"title": "تكرر نفس المهمة كل يوم؟", "body": "", "scenes": [{"kicker": "المشكلة", "title": "تكرر نفس المهمة كل يوم؟", "body": "نسخ ولصق وتنسيق… ساعات تضيع من وقتك.", "seconds": 3.4, "photo_query": "tired person laptop night"}, {"kicker": "الفكرة", "title": "سلّم الروتين لنظام آلي", "body": "يكتب ويصمّم وينشر في موعده دون أن تلمسه.", "seconds": 3.4, "photo_query": "automation robot arm factory"}, {"kicker": "النتيجة", "title": "دقيقة بدل نصف يوم", "body": "أنت تراجع وتوافق، والباقي عليه.", "seconds": 3.4, "photo_query": "man relaxing coffee laptop"}, {"kicker": "", "title": "ما أول مهمة ستؤتمتها؟", "body": "احفظ المنشور واكتب لي في التعليقات.", "seconds": 3.2, "photo_query": "typing keyboard hands close"}], "seed": 3}, "platforms": {"facebook": "كم ساعة تضيعها أسبوعياً في مهام تتكرر بنفس الخطوات؟ ⏱️\n\nبنيت نظاماً يكتب المنشور ويصمّم الفيديو وينشره وحده، وأنا أكتفي بالمراجعة والموافقة.\n\nما أول مهمة تتمنى لو تؤتمت لك؟ اكتبها في التعليقات 👇\n\n#الذكاء_الاصطناعي #أتمتة #إنتاجية #تطوير_الأعمال #المهندس_شادي", "instagram": "كم ساعة تضيعها أسبوعياً في مهام تتكرر بنفس الخطوات؟ ⏱️\n\nبنيت نظاماً يكتب المنشور ويصمّم الفيديو وينشره وحده، وأنا أكتفي بالمراجعة والموافقة.\n\nما أول مهمة تتمنى لو تؤتمت لك؟ اكتبها في التعليقات 👇\n\n#الذكاء_الاصطناعي #أتمتة #إنتاجية #تطوير_الأعمال #المهندس_شادي", "threads": "كم ساعة تضيعها أسبوعياً في مهام تتكرر بنفس الخطوات؟ ⏱️\n\n#الذكاء_الاصطناعي #أتمتة"}, "group": "published"}, "2026-10-22-reel2": {"id": "2026-10-22-reel2", "approved": true, "publish_at": "2026-10-22 13:00", "template": "reel", "topic": "tmvet3asy", "image": {"title": "كم ساعة تضيعها على مهام مكررة؟", "body": "", "scenes": [{"kicker": "سؤال", "title": "كم ساعة تضيعها على مهام مكررة؟", "body": "كل أسبوع، بنفس الخطوات، بلا أي قيمة جديدة.", "seconds": 3.4}, {"kicker": "الخطوة 1", "title": "اكتب مهامك المتكررة", "body": "أي شيء تفعله أكثر من مرتين في الأسبوع.", "seconds": 3.4}, {"kicker": "الخطوة 2", "title": "اختر أبسطها وأتمتها", "body": "ابدأ بمهمة واحدة صغيرة، لا بنظام ضخم.", "seconds": 3.4}, {"kicker": "الخطوة 3", "title": "راجع النتيجة بنفسك", "body": "الأتمتة تنفّذ، وأنت من يقرّر.", "seconds": 3.4}, {"kicker": "", "title": "ما أول مهمة ستؤتمتها؟", "body": "احفظ المنشور واكتب لي في التعليقات.", "seconds": 3.2}], "seed": 5}, "platforms": {"facebook": "كم ساعة تضيعها أسبوعياً في مهام بنفس الخطوات؟ ⏱️\n\n3 خطوات بسيطة تبدأ بها اليوم:\n✦ اكتب مهامك المتكررة\n✦ أتمت أبسطها أولاً\n✦ راجع النتيجة بنفسك\n\nما أول مهمة ستؤتمتها؟ اكتبها في التعليقات 👇\n\n#أتمتة #إنتاجية #الذكاء_الاصطناعي #تطوير_الأعمال #المهندس_شادي", "instagram": "كم ساعة تضيعها أسبوعياً في مهام بنفس الخطوات؟ ⏱️\n\n3 خطوات بسيطة تبدأ بها اليوم:\n✦ اكتب مهامك المتكررة\n✦ أتمت أبسطها أولاً\n✦ راجع النتيجة بنفسك\n\nما أول مهمة ستؤتمتها؟ اكتبها في التعليقات 👇\n\n#أتمتة #إنتاجية #الذكاء_الاصطناعي #تطوير_الأعمال #المهندس_شادي", "threads": "كم ساعة تضيعها أسبوعياً في مهام بنفس الخطوات؟ ⏱️\n\nاكتب مهامك المتكررة، أتمت أبسطها، وراجع النتيجة بنفسك.\n\n#أتمتة #إنتاجية"}, "group": "upcoming"}, "2026-10-23-g1": {"id": "2026-10-23-g1", "approved": true, "publish_at": "2026-10-22 21:00", "template": "infographic", "topic": "tmvgd08zd", "image": {"title": "كيف تتوقع مشاكل مشروعك قبل أن تقع؟", "body": "معادلة بسيطة تحميك من المفاجآت غير السارة وتضمن الاستقرار.", "points": ["تحديد كل خطر محتمل يهدد المشروع بدقة ووضوح", "تقييم احتمالية حدوث الخطر ومستوى تكراره", "قياس حجم الأثر الفعلي على التكلفة والوقت والجودة", "التركيز فوراً على المخاطر ذات الاحتمالية والأثر العالي", "تجهيز خطة بديلة واضحة وجاهزة للتنفيذ عند الطوارئ"], "seed": 1}, "platforms": {"facebook": "أكبر فخ يقع فيه أي فريق عمل هو التفاؤل المفرط بافتراض أن كل خطوة ستسير بلا عقبات!\n\nإدارة المخاطر لا تعني التشاؤم، بل تعني الجاهزية والاحترافية. ببساطة، قسّم المخاطر عبر معادلة:\n(الاحتمالية × الأثر)\n\n1. الاحتمالية: ما فرصة وقوع هذه المشكلة؟ (منخفضة، متوسطة، مرتفعة).\n2. الأثر: إذا وقعت، ما حجم الضرر على المشروع؟\n\nاضرب الاثنين معاً؛ أي خطر يحمل احتمالية عالية وأثراً كبيراً هو قنبلة موقوتة تتطلب وضع خطة طوارئ (Plan B) فوراً، مثل تعطل مزود خدمة، أو نقص في الكفاءات.\n\nالنجاح في المشاريع ليس في انعدام المشاكل، بل في امتلاك خطة تجعل الفريق يتعامل معها بهدوء وسرعة.\n\n#إدارة_المخاطر #إدارة_المشاريع #تطوير_الأعمال #ريادة_الأعمال #نمو", "instagram": "أكبر فخ يقع فيه أي فريق عمل هو التفاؤل المفرط بافتراض أن كل خطوة ستسير بلا عقبات!\n\nإدارة المخاطر لا تعني التشاؤم، بل تعني الجاهزية والاحترافية. ببساطة، قسّم المخاطر عبر معادلة:\n(الاحتمالية × الأثر)\n\n1. الاحتمالية: ما فرصة وقوع هذه المشكلة؟ (منخفضة، متوسطة، مرتفعة).\n2. الأثر: إذا وقعت، ما حجم الضرر على المشروع؟\n\nاضرب الاثنين معاً؛ أي خطر يحمل احتمالية عالية وأثراً كبيراً هو قنبلة موقوتة تتطلب وضع خطة طوارئ (Plan B) فوراً، مثل تعطل مزود خدمة، أو نقص في الكفاءات.\n\nالنجاح في المشاريع ليس في انعدام المشاكل، بل في امتلاك خطة تجعل الفريق يتعامل معها بهدوء وسرعة.\n\n#إدارة_المخاطر #إدارة_المشاريع #تطوير_الأعمال #ريادة_الأعمال #نمو", "threads": "التفاؤل الزائد في المشاريع مخاطرة غير محسوبة!\nقبل إطلاق أي خطوة، قيّم المشاكل المحتملة بمعادلة: (الاحتمالية × الأثر).\nإذا كان الأثر كبيراً واحتمال حدوثه وارداً، جهّز الخطة البديلة اليوم ولا تنتظر حتى تقع الأزمة.\n#إدارة_المخاطر #إدارة_المشاريع #نمو", "linkedin": "أكبر فخ يقع فيه أي فريق عمل هو التفاؤل المفرط بافتراض أن كل خطوة ستسير بلا عقبات!\n\nإدارة المخاطر لا تعني التشاؤم، بل تعني الجاهزية والاحترافية. ببساطة، قسّم المخاطر عبر معادلة:\n(الاحتمالية × الأثر)\n\n1. الاحتمالية: ما فرصة وقوع هذه المشكلة؟ (منخفضة، متوسطة، مرتفعة).\n2. الأثر: إذا وقعت، ما حجم الضرر على المشروع؟\n\nاضرب الاثنين معاً؛ أي خطر يحمل احتمالية عالية وأثراً كبيراً هو قنبلة موقوتة تتطلب وضع خطة طوارئ (Plan B) فوراً، مثل تعطل مزود خدمة، أو نقص في الكفاءات.\n\nالنجاح في المشاريع ليس في انعدام المشاكل، بل في امتلاك خطة تجعل الفريق يتعامل معها بهدوء وسرعة.\n\n#إدارة_المخاطر #إدارة_المشاريع #تطوير_الأعمال #ريادة_الأعمال #نمو"}, "group": "upcoming"}, "2026-10-24-g1": {"id": "2026-10-24-g1", "approved": true, "publish_at": "2026-10-25 21:00", "template": "infographic", "topic": "tmvgd08zd", "image": {"title": "كيف أنقذتنا خطة الطوارئ من توقف مفاجئ؟", "body": "دراسة حالة سريعة لخلل تقني حرج تداركناه في ساعتين فقط.", "points": ["توقف مفاجئ في الخادم الرئيسي أثناء ذروة الاستخدام", "تفعيل بروتوكول الطوارئ والتحويل التلقائي للبديل", "استرجاع البيانات من آخر نقطة حفظ دون أي فقدان", "معالجة جذر المشكلة بهدوء وبلا ضغط من المستخدمين", "توثيق الحادثة وتحديث خطة الاستجابة لمنع تكرارها"], "seed": 8}, "platforms": {"facebook": "في أحد المشاريع التي أدرتها، وقبل موعد تسليم أساسي بساعات قليلة، واجهنا أسوأ كابوس تقني: تعطل الخادم بالكامل!\n\nفي الظروف العادية، هذا السيناريو قد يسبب توتراً هائلاً وخسائر وتعطيلاً لأيام. لكن الفارق الحقيقي كان وجود خطة استجابة سريعة للأزمات مُجربة مسبقاً:\n\n- تم تفعيل الخادم الاحتياطي بشكل فوري لتستمر الخدمة دون انقطاع.\n- استعدنا النسخ الاحتياطية المحدثة بنجاح.\n- تعامل الفريق الفني مع المشكلة الأساسية بهدوء ودون ضغط، وخلال ساعتين فقط كان النظام يعمل بكامل طاقته.\n\nالأزمة لا تكمن في وقوع الحادث المفاجئ، بل في الوقوف أمامه دون سيناريو مكتوب ومحدد للتعامل معه.\n\n#إدارة_الأزمات #دراسة_حالة #حلول_تقنية #استمرارية_الأعمال", "instagram": "في أحد المشاريع التي أدرتها، وقبل موعد تسليم أساسي بساعات قليلة، واجهنا أسوأ كابوس تقني: تعطل الخادم بالكامل!\n\nفي الظروف العادية، هذا السيناريو قد يسبب توتراً هائلاً وخسائر وتعطيلاً لأيام. لكن الفارق الحقيقي كان وجود خطة استجابة سريعة للأزمات مُجربة مسبقاً:\n\n- تم تفعيل الخادم الاحتياطي بشكل فوري لتستمر الخدمة دون انقطاع.\n- استعدنا النسخ الاحتياطية المحدثة بنجاح.\n- تعامل الفريق الفني مع المشكلة الأساسية بهدوء ودون ضغط، وخلال ساعتين فقط كان النظام يعمل بكامل طاقته.\n\nالأزمة لا تكمن في وقوع الحادث المفاجئ، بل في الوقوف أمامه دون سيناريو مكتوب ومحدد للتعامل معه.\n\n#إدارة_الأزمات #دراسة_حالة #حلول_تقنية #استمرارية_الأعمال", "threads": "في أحد المشاريع التي أدرتها، وقبل موعد تسليم أساسي بساعات قليلة، واجهنا أسوأ كابوس تقني: تعطل الخادم بالكامل!\n\nفي الظروف العادية، هذا السيناريو قد يسبب توتراً هائلاً وخسائر وتعطيلاً لأيام. لكن الفارق الحقيقي كان وجود خطة استجابة سريعة للأزمات مُجربة مسبقاً:\n\n- تم تفعيل الخادم الاحتياطي بشكل فوري لتستمر الخدمة دون انقطاع.\n- استعدنا النسخ الاحتياطية المحدثة بنجاح.\n- تعامل الفريق الفني مع المشكلة الأساسية بهدوء ودون ضغط، وخلال ساعتين فقط كان النظام يعمل بكامل طاقته.\n\nالأزمة لا…", "linkedin": "في أحد المشاريع التي أدرتها، وقبل موعد تسليم أساسي بساعات قليلة، واجهنا أسوأ كابوس تقني: تعطل الخادم بالكامل!\n\nفي الظروف العادية، هذا السيناريو قد يسبب توتراً هائلاً وخسائر وتعطيلاً لأيام. لكن الفارق الحقيقي كان وجود خطة استجابة سريعة للأزمات مُجربة مسبقاً:\n\n- تم تفعيل الخادم الاحتياطي بشكل فوري لتستمر الخدمة دون انقطاع.\n- استعدنا النسخ الاحتياطية المحدثة بنجاح.\n- تعامل الفريق الفني مع المشكلة الأساسية بهدوء ودون ضغط، وخلال ساعتين فقط كان النظام يعمل بكامل طاقته.\n\nالأزمة لا تكمن في وقوع الحادث المفاجئ، بل في الوقوف أمامه دون سيناريو مكتوب ومحدد للتعامل معه.\n\n#إدارة_الأزمات #دراسة_حالة #حلول_تقنية #استمرارية_الأعمال"}, "group": "upcoming"}, "2026-10-25-g1": {"id": "2026-10-25-g1", "approved": true, "publish_at": "2026-10-22 08:37", "template": "infographic", "topic": "tmvgd08zd", "image": {"title": "قاعدة 80/20 لحماية مشروعك من التعثر", "body": "ركّز على الأهم أولاً، وأطلق منتجك بالوقت المناسب وبلا تأخير.", "points": ["20% من الميزات تحقق 80% من القيمة الفعلية للمستخدم", "تحديد النسخة الأولية الأدنى (MVP) القابلة للإطلاق", "تجنب فخ المثالية الزائدة وتوسيع نطاق العمل دون داعٍ", "تقليل مخاطر التأخير عبر تقسيم الإطلاق إلى مراحل", "تطوير باقي الميزات لاحقاً بناءً على تقييم المستخدمين"], "seed": 15}, "platforms": {"facebook": "أحد أبرز أسباب تعثر المشاريع وتأخرها ليس قلة الإمكانيات، بل محاولة بناء كل شيء دفعة واحدة والوقوع في فخ المثالية المرهقة.\n\nهنا تظهر القوة الحقيقية لقاعدة 80/20 (مبدأ باريتو):\n20% فقط من ميزات نظامك أو فكرتك هي التي تقدم 80% من الفائدة الحقيقية لجمهورك.\n\nلإدارة مخاطر الوقت والتكلفة بذكاء:\n1. حدد بدقة النواة الأساسية التي تحل المشكلة الرئيسية لعميلك (MVP).\n2. أطلقها مبكراً واختبر تفاعل السوق والجمهور معها.\n3. أضف باقي الميزات والتحسينات تدريجياً وفق معطيات حقيقية.\n\nإنجاز ملموس يقدم فائدة واقعية اليوم أفضل بكثير من مشروع مكتمل على الورق لكنه يتعثر ولا يرى النور.\n\n#مبدأ_باريتو #إدارة_المشاريع #تطوير_المنتجات #فائدة #نمو", "instagram": "أحد أبرز أسباب تعثر المشاريع وتأخرها ليس قلة الإمكانيات، بل محاولة بناء كل شيء دفعة واحدة والوقوع في فخ المثالية المرهقة.\n\nهنا تظهر القوة الحقيقية لقاعدة 80/20 (مبدأ باريتو):\n20% فقط من ميزات نظامك أو فكرتك هي التي تقدم 80% من الفائدة الحقيقية لجمهورك.\n\nلإدارة مخاطر الوقت والتكلفة بذكاء:\n1. حدد بدقة النواة الأساسية التي تحل المشكلة الرئيسية لعميلك (MVP).\n2. أطلقها مبكراً واختبر تفاعل السوق والجمهور معها.\n3. أضف باقي الميزات والتحسينات تدريجياً وفق معطيات حقيقية.\n\nإنجاز ملموس يقدم فائدة واقعية اليوم أفضل بكثير من مشروع مكتمل على الورق لكنه يتعثر ولا يرى النور.\n\n#مبدأ_باريتو #إدارة_المشاريع #تطوير_المنتجات #فائدة #نمو", "threads": "محاولة تنفيذ كل التفاصيل دفعة واحدة هي أسهل طريق لتأخير المشروع!\nاستخدم قاعدة 80/20: ركّز على الـ 20% من الميزات التي تمنح 80% من القيمة للعميل (MVP).\nأطلق مشروعك أولاً، ثم طوّر الميزات الإضافية خطوة بخطوة بناءً على التجربة الفعلية.\n#مبدأ_باريتو #إدارة_المشاريع #فائدة", "linkedin": "أحد أبرز أسباب تعثر المشاريع وتأخرها ليس قلة الإمكانيات، بل محاولة بناء كل شيء دفعة واحدة والوقوع في فخ المثالية المرهقة.\n\nهنا تظهر القوة الحقيقية لقاعدة 80/20 (مبدأ باريتو):\n20% فقط من ميزات نظامك أو فكرتك هي التي تقدم 80% من الفائدة الحقيقية لجمهورك.\n\nلإدارة مخاطر الوقت والتكلفة بذكاء:\n1. حدد بدقة النواة الأساسية التي تحل المشكلة الرئيسية لعميلك (MVP).\n2. أطلقها مبكراً واختبر تفاعل السوق والجمهور معها.\n3. أضف باقي الميزات والتحسينات تدريجياً وفق معطيات حقيقية.\n\nإنجاز ملموس يقدم فائدة واقعية اليوم أفضل بكثير من مشروع مكتمل على الورق لكنه يتعثر ولا يرى النور.\n\n#مبدأ_باريتو #إدارة_المشاريع #تطوير_المنتجات #فائدة #نمو"}, "group": "published"}, "2026-10-23-g2": {"id": "2026-10-23-g2", "approved": false, "publish_at": "2026-10-23 08:00", "template": "infographic", "topic": "tmvet3asy", "image": {"title": "دمج الذكاء الاصطناعي في موقعك: من أين تبدأ؟", "body": "خطوات بسيطة لتحويل نظام موقعك البرمجي إلى منصة تفاعلية وذكية", "points": ["حدد المشكلة التي تحتاج حلاً ذكياً قبل كتابة الكود", "استخدم واجهات جاهزة (APIs) لتوفير الوقت والجهد", "اربط الذكاء الاصطناعي بقاعدة بياناتك بأمان تام", "اختبر النظام وتأكد من سهولة تجربة الزائر وسرعتها"], "style": "cards", "hue": 0, "seed": 1}, "platforms": {"facebook": "مرحباً بكم جميعاً! كثير من أصحاب المواقع والمبرمجين يتساءلون: كيف نبدأ فعلياً بإدخال أدوات الذكاء الاصطناعي في برمجياتنا وأنظمتنا الرقمية؟\n\nالسر لا يكمن في كتابة خوارزميات معقدة من الصفر، بل في اختيار الأداة المناسبة لخدمة زوار موقعك. يمكنك اليوم ترقية أي موقع أو منصة بسهولة عبر الخطوات التالية:\n- ابدأ بالاستفادة من الواجهات البرمجية (APIs) المتوفرة، سواء للمساعدة الفورية أو تلخيص البيانات أو تقديم التوصيات التلقائية.\n- احرص على حماية خصوصية بيانات المستخدمين أثناء ربط الأنظمة ببعضها.\n- اجعل الهدف الأساسي هو تبسيط حياة العميل وتسهيل وصوله لما يبحث عنه داخل الموقع.\n\nالذكاء التقني الحقيقي يظهر عندما يختصر موقعك وقت الناس ويقدم لهم قيمة مباشرة وسلسة.\n\n#ذكاء_اصطناعي #برمجة_مواقع #تطوير_الويب #تقنية", "instagram": "مرحباً بكم جميعاً! كثير من أصحاب المواقع والمبرمجين يتساءلون: كيف نبدأ فعلياً بإدخال أدوات الذكاء الاصطناعي في برمجياتنا وأنظمتنا الرقمية؟\n\nالسر لا يكمن في كتابة خوارزميات معقدة من الصفر، بل في اختيار الأداة المناسبة لخدمة زوار موقعك. يمكنك اليوم ترقية أي موقع أو منصة بسهولة عبر الخطوات التالية:\n- ابدأ بالاستفادة من الواجهات البرمجية (APIs) المتوفرة، سواء للمساعدة الفورية أو تلخيص البيانات أو تقديم التوصيات التلقائية.\n- احرص على حماية خصوصية بيانات المستخدمين أثناء ربط الأنظمة ببعضها.\n- اجعل الهدف الأساسي هو تبسيط حياة العميل وتسهيل وصوله لما يبحث عنه داخل الموقع.\n\nالذكاء التقني الحقيقي يظهر عندما يختصر موقعك وقت الناس ويقدم لهم قيمة مباشرة وسلسة.\n\n#ذكاء_اصطناعي #برمجة_مواقع #تطوير_الويب #تقنية", "threads": "دمج الذكاء الاصطناعي في موقعك أو نظامك البرمجي أصبح أسهل بكثير! لست بحاجة لبناء كل شيء من البداية، ابدأ بالواجهات الجاهزة (APIs) لتقديم ميزات تفاعلية تدعم تجربة الزائر وترتقي بخدمتك الرقمية بشكل آمن وعملي.\n\n#ذكاء_اصطناعي #برمجة_مواقع #تقنية", "linkedin": "مرحباً بكم جميعاً! كثير من أصحاب المواقع والمبرمجين يتساءلون: كيف نبدأ فعلياً بإدخال أدوات الذكاء الاصطناعي في برمجياتنا وأنظمتنا الرقمية؟\n\nالسر لا يكمن في كتابة خوارزميات معقدة من الصفر، بل في اختيار الأداة المناسبة لخدمة زوار موقعك. يمكنك اليوم ترقية أي موقع أو منصة بسهولة عبر الخطوات التالية:\n- ابدأ بالاستفادة من الواجهات البرمجية (APIs) المتوفرة، سواء للمساعدة الفورية أو تلخيص البيانات أو تقديم التوصيات التلقائية.\n- احرص على حماية خصوصية بيانات المستخدمين أثناء ربط الأنظمة ببعضها.\n- اجعل الهدف الأساسي هو تبسيط حياة العميل وتسهيل وصوله لما يبحث عنه داخل الموقع.\n\nالذكاء التقني الحقيقي يظهر عندما يختصر موقعك وقت الناس ويقدم لهم قيمة مباشرة وسلسة.\n\n#ذكاء_اصطناعي #برمجة_مواقع #تطوير_الويب #تقنية"}, "group": "draft"}, "2026-10-23-g3": {"id": "2026-10-23-g3", "approved": true, "publish_at": "2026-10-23 13:00", "template": "carousel", "topic": "tmvgcv3kj", "image": {"title": "كيف تجعل البحث في موقعك يفهم المعنى لا الحروف؟", "body": "", "slides": [{"kicker": "تطوير الأنظمة الذكية", "title": "كيف تجعل البحث في موقعك يفهم المعنى لا الحروف؟", "body": "دليل عملي لنقل نظام البحث التقليدي إلى بحث دلالي ذكي (Semantic Search) خطوة بخطوة.", "points": ["الفرق بين مطابقة الحروف وفهم النية", "تحويل النصوص إلى متجهات رقمية", "ربط قاعدة بيانات متجهة بسرعة وكفاءة"]}, {"kicker": "المشكلة الحقيقية", "title": "لماذا يفشل البحث التقليدي مع المستخدمين؟", "body": "البحث العادي بـ SQL يعتمد على تطابق الكلمات؛ إذا كتب العميل 'هاتف بطاريته تدوم طويلاً' لن يظهر له شيء إلا إذا كان الوصف يطابق كلماته حرفياً.", "points": ["تجاهل تام للمترادفات والمعاني", "نتائج صفرية عند اختلاف التعبير", "تجربة بحث محبطة تقلل التفاعل"]}, {"kicker": "الخطوة الأولى", "title": "تحويل نصوص الموقع إلى تضمينات (Embeddings)", "body": "أرسل نصوص المنتجات أو المقالات إلى نموذج ذكاء اصطناعي (مثل OpenAI أو Gemini) ليحول كل نص إلى مصفوفة أرقام تمثل جوهر المعنى وسياقه.", "points": ["استخدام نموذج Embeddings مخصص", "تمثيل الجمل رياضياً داخل فضاء دلالي", "تحديث المتجهات عند إضافة محتوى جديد"]}, {"kicker": "الخطوة الثانية", "title": "تخزين المتجهات في Vector Database", "body": "بدلاً من الجداول التقليدية، احفظ هذه المصفوفات في قاعدة بيانات موجهة تبحث عبر حساب المسافات الرياضية وتلتقط المعاني المتقاربة في أجزاء من الثانية.", "points": ["أدوات متخصصة مثل Pinecone أو Qdrant", "أو تفعيل إضافة pgvector على PostgreSQL", "استعلام فوري دون إرهاق الخادم"]}, {"kicker": "الخطوة الثالثة", "title": "معالجة استعلام المستخدم وإظهار النتيجة", "body": "عندما يكتب المستخدم سؤاله، حول كلماته لمتجه بنفس النموذج، واطلب من قاعدة البيانات استرجاع المحتوى الأقرب هندسياً لمعنى سؤاله.", "points": ["مقارنة المتجهات بحساب تشابه الزوايا", "عرض النتائج الأكثر صلة بالنية", "استيعاب الأخطاء الإملائية واللهجات"]}, {"kicker": "الخلاصة والتطبيق", "title": "هل جربت دمج البحث الدلالي في مشاريعك البرمجية؟", "body": "احفظ هذا الدليل لتطبقه في مشروعك القادم، وشاركني في التعليقات: ما أكبر عقبة تواجهك عند دمج أدوات الذكاء الاصطناعي مع أنظمتك؟", "points": []}], "style": "blueprint", "seed": 1}, "platforms": {"facebook": "اسحب للآخر ⬅️\nقبل فترة كنت أعمل على متجر إلكتروني، واشتكى العميل أن الزوار يبحثون عن عبارات مثل \"ملابس مريحة للعمل\" وتظهر لهم نتائج فارغة، مع أن المتجر مليء بالملابس الرسمية المريحة لكنها مسجلة بأسماء تقليدية!\n\nهنا يظهر عجز محركات البحث القديمة القائمة على مطابقة الحروف، والحل كان الانتقال إلى البحث الدلالي (Semantic Search):\n✦ تحويل أوصاف المنتجات إلى متجهات رياضية (Embeddings) تختزل المعنى الفعلي للكلمة وسياقها.\n✦ حفظ هذه المتجهات في قاعدة بيانات مخصصة مثل Qdrant أو إضافة pgvector إلى قاعدة بيانات PostgreSQL.\n✦ تحويل استعلام المستخدم فورياً ومقارنة المسافات الرياضية لتقديم أقرب المعاني لطلبه حتى لو لم يتطابق حرف واحد.\n\nالنتيجة كانت ارتفاعاً ملحوظاً في وصول المستخدمين للمنتجات وتحسن المبيعات من دون تعديل سطر واحد في الأوصاف القديمة.\n\nهل بدأت في اختبار قواعد البيانات المتجهة في أنظمتك؟\n#تطوير_الويب #ذكاء_اصطناعي #برمجة #قواعد_بيانات", "instagram": "اسحب للآخر ⬅️\nقبل فترة كنت أعمل على متجر إلكتروني، واشتكى العميل أن الزوار يبحثون عن عبارات مثل \"ملابس مريحة للعمل\" وتظهر لهم نتائج فارغة، مع أن المتجر مليء بالملابس الرسمية المريحة لكنها مسجلة بأسماء تقليدية!\n\nهنا يظهر عجز محركات البحث القديمة القائمة على مطابقة الحروف، والحل كان الانتقال إلى البحث الدلالي (Semantic Search):\n✦ تحويل أوصاف المنتجات إلى متجهات رياضية (Embeddings) تختزل المعنى الفعلي للكلمة وسياقها.\n✦ حفظ هذه المتجهات في قاعدة بيانات مخصصة مثل Qdrant أو إضافة pgvector إلى قاعدة بيانات PostgreSQL.\n✦ تحويل استعلام المستخدم فورياً ومقارنة المسافات الرياضية لتقديم أقرب المعاني لطلبه حتى لو لم يتطابق حرف واحد.\n\nالنتيجة كانت ارتفاعاً ملحوظاً في وصول المستخدمين للمنتجات وتحسن المبيعات من دون تعديل سطر واحد في الأوصاف القديمة.\n\nهل بدأت في اختبار قواعد البيانات المتجهة في أنظمتك؟\n#تطوير_الويب #ذكاء_اصطناعي #برمجة #قواعد_بيانات", "threads": "إذا كان محرك البحث في موقعك يبحث عن تطابق الحروف فقط، فأنت تخسر الكثير من المستخدمين دون أن تدري.\n\nالبحث الدلالي (Semantic Search) يحول كلمات الزائر إلى متجهات رياضية (Embeddings) ليفهم نية المستخدم ويعرض له ما يبحث عنه بدقة حتى لو اختلفت المفردات أو اللهجة.\n\n#تطوير_الويب #ذكاء_اصطناعي #برمجة", "linkedin": "اسحب للآخر ⬅️\nقبل فترة كنت أعمل على متجر إلكتروني، واشتكى العميل أن الزوار يبحثون عن عبارات مثل \"ملابس مريحة للعمل\" وتظهر لهم نتائج فارغة، مع أن المتجر مليء بالملابس الرسمية المريحة لكنها مسجلة بأسماء تقليدية!\n\nهنا يظهر عجز محركات البحث القديمة القائمة على مطابقة الحروف، والحل كان الانتقال إلى البحث الدلالي (Semantic Search):\n✦ تحويل أوصاف المنتجات إلى متجهات رياضية (Embeddings) تختزل المعنى الفعلي للكلمة وسياقها.\n✦ حفظ هذه المتجهات في قاعدة بيانات مخصصة مثل Qdrant أو إضافة pgvector إلى قاعدة بيانات PostgreSQL.\n✦ تحويل استعلام المستخدم فورياً ومقارنة المسافات الرياضية لتقديم أقرب المعاني لطلبه حتى لو لم يتطابق حرف واحد.\n\nالنتيجة كانت ارتفاعاً ملحوظاً في وصول المستخدمين للمنتجات وتحسن المبيعات من دون تعديل سطر واحد في الأوصاف القديمة.\n\nهل بدأت في اختبار قواعد البيانات المتجهة في أنظمتك؟\n#تطوير_الويب #ذكاء_اصطناعي #برمجة #قواعد_بيانات"}, "group": "upcoming"}, "2026-10-23-g4": {"id": "2026-10-23-g4", "approved": false, "publish_at": "2026-10-23 21:00", "template": "infographic", "topic": "tmvgcvmh5", "image": {"title": "البرمجة أكبر من مجرد كتابة كود", "body": "لماذا لن يستبدلك الذكاء الاصطناعي إن طوّرت عقليتك الهندسية؟", "points": ["كتابة الكود أداة، والأهم حل المشكلات الحقيقية", "الذكاء الاصطناعي يسرّع التنفيذ ولا يصمم المعمارية", "فهم متطلبات المشروع وبناء النظام هو جوهر دورك", "المطور المتقن للذكاء الاصطناعي سيتفوق على غيره"], "style": "bento", "hue": 35, "seed": 1}, "platforms": {"facebook": "هل سينتهي دور المبرمج قريباً؟\n\nالسؤال يتكرر يومياً، والإجابة تكمن في فهم الفرق بين «كاتب الكود» و«مهندس الحلول». الذكاء الاصطناعي ممتاز في إكمال الدوال واقتراح الأكواد المكررة، لكنه لا يفهم عمق المشكلة التجارية، ولا يستطيع تقييم الأثر المعماري لقرار تقني معقد.\n\nالبرمجة الحقيقية ليست حفظ صياغة (Syntax)، بل هي:\n- تفكيك المشكلات المعقدة لحلول قابلة للتنفيذ.\n- بناء معمارية نظيفة وقابلة للتوسع (Scalability).\n- حماية البيانات وتأمين النظام من الثغرات.\n\nالذكاء الاصطناعي لن يستبدل المبرمج الواعي، بل سيستبدل المبرمج الذي يرفض مواكبة الأدوات الحديثة. اجعل هذه الأدوات مساعدك الشخصي لرفع إنتاجيتك، وركّز طاقتك على التفكير المنطقي وهندسة النظم.\n\n#برمجة #تطوير_برمجيات #ذكاء_اصطناعي #نصائح_برمجية", "instagram": "هل سينتهي دور المبرمج قريباً؟\n\nالسؤال يتكرر يومياً، والإجابة تكمن في فهم الفرق بين «كاتب الكود» و«مهندس الحلول». الذكاء الاصطناعي ممتاز في إكمال الدوال واقتراح الأكواد المكررة، لكنه لا يفهم عمق المشكلة التجارية، ولا يستطيع تقييم الأثر المعماري لقرار تقني معقد.\n\nالبرمجة الحقيقية ليست حفظ صياغة (Syntax)، بل هي:\n- تفكيك المشكلات المعقدة لحلول قابلة للتنفيذ.\n- بناء معمارية نظيفة وقابلة للتوسع (Scalability).\n- حماية البيانات وتأمين النظام من الثغرات.\n\nالذكاء الاصطناعي لن يستبدل المبرمج الواعي، بل سيستبدل المبرمج الذي يرفض مواكبة الأدوات الحديثة. اجعل هذه الأدوات مساعدك الشخصي لرفع إنتاجيتك، وركّز طاقتك على التفكير المنطقي وهندسة النظم.\n\n#برمجة #تطوير_برمجيات #ذكاء_اصطناعي #نصائح_برمجية", "threads": "هل سيأخذ الذكاء الاصطناعي وظائفنا؟\nكتابة الكود مجرد خطوة تنفيذية، بينما هندسة الحلول وفهم متطلبات البزنس هي الأساس.\nالذكاء الاصطناعي يكتب الأسطر بسرعة، لكنه يحتاج مهندساً يوجهه ويصمم معمارية النظام.\nالمطور الذي يوظف الأدوات الذكية بذكاء هو من سيقود المستقبل.\n\n#برمجة #ذكاء_اصطناعي #تطوير_برمجيات", "linkedin": "هل سينتهي دور المبرمج قريباً؟\n\nالسؤال يتكرر يومياً، والإجابة تكمن في فهم الفرق بين «كاتب الكود» و«مهندس الحلول». الذكاء الاصطناعي ممتاز في إكمال الدوال واقتراح الأكواد المكررة، لكنه لا يفهم عمق المشكلة التجارية، ولا يستطيع تقييم الأثر المعماري لقرار تقني معقد.\n\nالبرمجة الحقيقية ليست حفظ صياغة (Syntax)، بل هي:\n- تفكيك المشكلات المعقدة لحلول قابلة للتنفيذ.\n- بناء معمارية نظيفة وقابلة للتوسع (Scalability).\n- حماية البيانات وتأمين النظام من الثغرات.\n\nالذكاء الاصطناعي لن يستبدل المبرمج الواعي، بل سيستبدل المبرمج الذي يرفض مواكبة الأدوات الحديثة. اجعل هذه الأدوات مساعدك الشخصي لرفع إنتاجيتك، وركّز طاقتك على التفكير المنطقي وهندسة النظم.\n\n#برمجة #تطوير_برمجيات #ذكاء_اصطناعي #نصائح_برمجية"}, "group": "draft"}, "2026-10-23-g5": {"id": "2026-10-23-g5", "approved": true, "publish_at": "2026-10-24 08:00", "template": "reel", "topic": "tmvgcw0d5", "image": {"title": "كم ساعة تضيع أسبوعياً في تنسيق ونشر المحتوى؟", "body": "", "scenes": [{"kicker": "المشكلة", "title": "كم ساعة تضيع أسبوعياً في تنسيق ونشر المحتوى؟", "body": "كتابة الأفكار تأخذ وقتاً، لكن التصميم والجدولة يستهلكان معظم طاقتك اليومية.", "seconds": 3.5}, {"kicker": "الفكرة", "title": "نظام يكتب، ينسّق، ويجدول المنشورات تلقائياً", "body": "بدل التشتت بين عدة أدوات، جمعت دورة العمل كاملة في مسار واحد متصل.", "seconds": 3.0}, {"kicker": "التنفيذ", "title": "ربط النماذج الذكية بواجهات المنصات مباشرة", "body": "توليد نصوص بقواعد دقيقة، تركيبها على قوالب جاهزة، ثم إرسالها عبر الـ APIs.", "seconds": 3.5}, {"kicker": "النتيجة", "title": "توفير 80% من الجهد اليدوي بجودة ثابتة", "body": "كل ما أحتاجه الآن هو مراجعة سريعة للاعتماد، والنظام يتولى الباقي بدقة.", "seconds": 3.0}, {"kicker": "سؤال لك", "title": "ما أكثر مهمة مكررة تتمنى أتمتتها في عملك؟", "body": "احفظ المقطع للرجوع إليه، وشاركنا فكرتك في التعليقات لنبحث حلولها التقنية!", "seconds": 3.5}], "hue": 70, "seed": 1}, "platforms": {"facebook": "كل صانع محتوى أو صاحب مشروع يعرف أن كتابة المنشور نصف المعركة فقط.. النصف الثاني المرهق هو: تعديل القوالب، ضبط الصور، وجدولة النشر يدوياً على المنصات.\n\nلذلك بنيت نظام Social Publisher كدراسة حالة حقيقية لحل هذه المعضلة عبر الأتمتة:\n1. توليد الأفكار وصياغة النصوص عبر نماذج ذكاء اصطناعي موجهة بقواعد صارمة.\n2. دمج المحتوى تلقائياً داخل قوالب تصميم محددة الهوية.\n3. جدولة النشر عبر الـ APIs مباشرة دون تدخل يدوي إلا للاعتماد النهائي.\n\nالنتيجة؟ توفير ساعات أسبوعياً وتحويل التواجد الرقمي من ضغط مستمر إلى نظام تقني يعمل بسلاسة ودقة.\n\nالأتمتة ليست مجرد رفاهية، بل استثمار يعيد لك وقتك للتركيز على تطوير عملك.\n\nما هي أكثر خطوة روتينية في مشروعك تتمنى تحويلها لنظام آلي؟\n\n#أتمتة_الأعمال #ذكاء_اصطناعي #تطوير_برمجيات #ريادة_الأعمال", "instagram": "كل صانع محتوى أو صاحب مشروع يعرف أن كتابة المنشور نصف المعركة فقط.. النصف الثاني المرهق هو: تعديل القوالب، ضبط الصور، وجدولة النشر يدوياً على المنصات.\n\nلذلك بنيت نظام Social Publisher كدراسة حالة حقيقية لحل هذه المعضلة عبر الأتمتة:\n1. توليد الأفكار وصياغة النصوص عبر نماذج ذكاء اصطناعي موجهة بقواعد صارمة.\n2. دمج المحتوى تلقائياً داخل قوالب تصميم محددة الهوية.\n3. جدولة النشر عبر الـ APIs مباشرة دون تدخل يدوي إلا للاعتماد النهائي.\n\nالنتيجة؟ توفير ساعات أسبوعياً وتحويل التواجد الرقمي من ضغط مستمر إلى نظام تقني يعمل بسلاسة ودقة.\n\nالأتمتة ليست مجرد رفاهية، بل استثمار يعيد لك وقتك للتركيز على تطوير عملك.\n\nما هي أكثر خطوة روتينية في مشروعك تتمنى تحويلها لنظام آلي؟\n\n#أتمتة_الأعمال #ذكاء_اصطناعي #تطوير_برمجيات #ريادة_الأعمال", "threads": "بدل تضييع ساعات في تجهيز المنشورات وجدولتها يدوياً، بنيت نظاماً مؤتمتاً يربط الذكاء الاصطناعي بقوالب التصميم وواجهات النشر مباشرة.\n\nالنتيجة وفرت أكثر من 80% من الوقت الروتيني وحولت النشر إلى عملية تقنية متقنة.\n\nما أكثر مهمة مكررة تود أتمتتها اليوم في مشروعك؟\n\n#أتمتة_الأعمال #ذكاء_اصطناعي #برمجة", "linkedin": "كل صانع محتوى أو صاحب مشروع يعرف أن كتابة المنشور نصف المعركة فقط.. النصف الثاني المرهق هو: تعديل القوالب، ضبط الصور، وجدولة النشر يدوياً على المنصات.\n\nلذلك بنيت نظام Social Publisher كدراسة حالة حقيقية لحل هذه المعضلة عبر الأتمتة:\n1. توليد الأفكار وصياغة النصوص عبر نماذج ذكاء اصطناعي موجهة بقواعد صارمة.\n2. دمج المحتوى تلقائياً داخل قوالب تصميم محددة الهوية.\n3. جدولة النشر عبر الـ APIs مباشرة دون تدخل يدوي إلا للاعتماد النهائي.\n\nالنتيجة؟ توفير ساعات أسبوعياً وتحويل التواجد الرقمي من ضغط مستمر إلى نظام تقني يعمل بسلاسة ودقة.\n\nالأتمتة ليست مجرد رفاهية، بل استثمار يعيد لك وقتك للتركيز على تطوير عملك.\n\nما هي أكثر خطوة روتينية في مشروعك تتمنى تحويلها لنظام آلي؟\n\n#أتمتة_الأعمال #ذكاء_اصطناعي #تطوير_برمجيات #ريادة_الأعمال"}, "group": "upcoming"}, "2026-10-23-g6": {"id": "2026-10-23-g6", "approved": true, "publish_at": "2026-10-25 13:00", "template": "infographic", "topic": "tmvgcw9c3", "image": {"title": "عقلك يقود.. والذكاء الاصطناعي يسرّع!", "body": "الأداة تضاعف إنتاجيتك، لكن رؤيتك الهندسية هي الأساس.", "points": ["الذكاء الاصطناعي يختصر وقت كتابة وتنسيق الكود", "التفكير المعماري وحل المشكلات يعتمد على عقلك", "الأتمتة تفرغ وقتك للقرارات الهندسية الكبرى", "المطور الماهر هو من يوجه الأداة بذكاء"], "style": "timeline", "hue": 140, "seed": 1}, "platforms": {"facebook": "الذكاء الاصطناعي اليوم صار مثل محرك نفاث بين يديك؛ يكتب، ينسّق، ويقترح حلولاً في ثوانٍ معدودة. لكن تذكّر دائماً: المحرك القوي بلا ربّان ماهر لن يوصل السفينة لوجهتها! 💡\n\nالأدوات الذكية خُلقت لتسرّع إنجازك وتوفر مجهودك، بينما عقلك، تحليلك للمنطق، وفهمك العميق لاحتياجات النظام هو ما يحدد نجاح المشروع من فشله. الأداة لا تصنع الرؤية، بل تترجمها فقط.\n\nسؤال سريع لأصدقائي المطورين وصنّاع التقنية:\nما هي أكثر مهمة روتينية مملة في مشروعك الحالي تتمنى لو يؤديها عنك الذكاء الاصطناعي بالكامل لترتاح منها؟ شاركونا تجاربكم وآراءكم في التعليقات! 👇\n\n#تطوير_البرمجيات #الذكاء_الاصطناعي #برمجة #نصائح_تقنية", "instagram": "الذكاء الاصطناعي اليوم صار مثل محرك نفاث بين يديك؛ يكتب، ينسّق، ويقترح حلولاً في ثوانٍ معدودة. لكن تذكّر دائماً: المحرك القوي بلا ربّان ماهر لن يوصل السفينة لوجهتها! 💡\n\nالأدوات الذكية خُلقت لتسرّع إنجازك وتوفر مجهودك، بينما عقلك، تحليلك للمنطق، وفهمك العميق لاحتياجات النظام هو ما يحدد نجاح المشروع من فشله. الأداة لا تصنع الرؤية، بل تترجمها فقط.\n\nسؤال سريع لأصدقائي المطورين وصنّاع التقنية:\nما هي أكثر مهمة روتينية مملة في مشروعك الحالي تتمنى لو يؤديها عنك الذكاء الاصطناعي بالكامل لترتاح منها؟ شاركونا تجاربكم وآراءكم في التعليقات! 👇\n\n#تطوير_البرمجيات #الذكاء_الاصطناعي #برمجة #نصائح_تقنية", "threads": "الذكاء الاصطناعي أداة لتسريع يدك، لكن عقلك وتفكيرك الهندسي هو الذي يقود دفة المشروع ويصنع الفرق الحقيقي. 🚀\n\nسؤال للمطورين: ما هي أكثر مهمة روتينية مملة في شغلك تتمنى لو يؤديها عنك الذكاء الاصطناعي بالكامل وتتخلص منها؟ شاركونا في الردود! 👇\n\n#برمجة #تطوير_البرمجيات #ذكاء_اصطناعي", "linkedin": "الذكاء الاصطناعي اليوم صار مثل محرك نفاث بين يديك؛ يكتب، ينسّق، ويقترح حلولاً في ثوانٍ معدودة. لكن تذكّر دائماً: المحرك القوي بلا ربّان ماهر لن يوصل السفينة لوجهتها! 💡\n\nالأدوات الذكية خُلقت لتسرّع إنجازك وتوفر مجهودك، بينما عقلك، تحليلك للمنطق، وفهمك العميق لاحتياجات النظام هو ما يحدد نجاح المشروع من فشله. الأداة لا تصنع الرؤية، بل تترجمها فقط.\n\nسؤال سريع لأصدقائي المطورين وصنّاع التقنية:\nما هي أكثر مهمة روتينية مملة في مشروعك الحالي تتمنى لو يؤديها عنك الذكاء الاصطناعي بالكامل لترتاح منها؟ شاركونا تجاربكم وآراءكم في التعليقات! 👇\n\n#تطوير_البرمجيات #الذكاء_الاصطناعي #برمجة #نصائح_تقنية"}, "group": "upcoming"}, "2026-10-23-g7": {"id": "2026-10-23-g7", "approved": false, "publish_at": "2026-10-24 13:00", "template": "carousel", "topic": "tmvgczjo2", "image": {"title": "Agile أم Waterfall؟ كيف تختار منهجية مشروعك؟", "body": "", "slides": [{"kicker": "دليل إداري", "title": "Agile أم Waterfall؟ كيف تختار منهجية مشروعك؟", "body": "أجايل ليست حلاً سحرياً لكل المشاكل، والمنهجية التقليدية ما زالت ملكة في مشاريع معينة.", "points": ["فرق بسيط يحميك من الفشل", "متى تختار المرونة؟", "متى تلتزم بالخطة الثابتة؟"]}, {"kicker": "المنهجية الأولى", "title": "متى تتألق منهجية Waterfall؟", "body": "تناسب المشاريع ذات المتطلبات الواضحة والثابتة منذ البداية، حيث تكلفة التغيير اللاحق تكون عالية جداً.", "points": ["مشاريع العتاد والبنية التحتية", "متطلبات واضحة ومحددة 100%", "خطة زمنية وميزانية صلبة"]}, {"kicker": "المنهجية الثانية", "title": "متى تكون Agile هي الخيار الأنسب؟", "body": "تتميز بالمرونة والتطوير التدريجي، وهي ممتازة للمنتجات الرقمية التي تحتاج اختباريات وتغذية راجعة مستمرة.", "points": ["التطبيقات والمواقع الذكية", "سوق متغيّر وسريع الحركة", "إطلاق سريع للتجارب الأولى"]}, {"kicker": "الخطأ الشائع", "title": "أسطورة: أجايل تعني غياب التخطيط!", "body": "أجايل لا تعني العشوائية، بل تعني التخطيط المعتمد على التكيف المستمر بدلاً من الالتزام بخطة صلبة لسنوات.", "points": ["تخطيط قصير المدى على مراحل", "تحديث مستمر لأولويات العمل", "تسليم قيمة حقيقية للعميل بسرعة"]}, {"kicker": "معيار القرار", "title": "كيف تقرر المنهجية بـ 3 أسئلة؟", "body": "اسأل نفسك هذه الأسئلة قبل بدء أي مشروع لتحديد المسار الإداري الصحيح بدقة.", "points": ["هل المتطلبات قابلة للتغيير؟", "هل يحتاج العميل لرؤية نتائج مبكرة؟", "هل تكلفة تعديل الخطأ مرتفعة؟"]}, {"kicker": "شاركنا رأيك", "title": "ما المنهجية التي تعتمد عليها في مشاريعك؟", "body": "احفظ هذا المنشور لترجع له عند التخطيط لمشروعك القادم، وشاركه مع فريقك لتحديد المسار المناسب!", "points": []}], "style": "editorial", "seed": 1}, "platforms": {"facebook": "اسحب للآخر 👈\nفي بداياتي كمدير مشاريع، كنت أظن أن تطبيق Agile في كل شيء هو سر النجاح المطلق، حتى واجهت مشروعاً تسبب فيه غياب التخطيط المسبق في إهدار وقت كبير! الحقيقة أن أجايل ليست عصا سحرية، وWaterfall ليست منهجية قديمة ملغاة.\n\n✦ Waterfall تنجح عندما تكون المتطلبات محددة وصارمة من اليوم الأول ولا تحتمل التغيير.\n✦ Agile تضمن لك المرونة والتأقلم السريع عند بناء المنتجات الرقمية والتطبيقات.\n✦ الاختيار الخاطئ للمنهجية يتسبب في تعثر وتأخير جزء كبير من المشاريع.\n\nما هي المنهجية الأكثر استخداماً في مجال عملك حالياً؟\n\n#إدارة_المشاريع #Agile #Waterfall #المهندس_شادي #تطوير_المنتجات", "instagram": "اسحب للآخر 👈\nفي بداياتي كمدير مشاريع، كنت أظن أن تطبيق Agile في كل شيء هو سر النجاح المطلق، حتى واجهت مشروعاً تسبب فيه غياب التخطيط المسبق في إهدار وقت كبير! الحقيقة أن أجايل ليست عصا سحرية، وWaterfall ليست منهجية قديمة ملغاة.\n\n✦ Waterfall تنجح عندما تكون المتطلبات محددة وصارمة من اليوم الأول ولا تحتمل التغيير.\n✦ Agile تضمن لك المرونة والتأقلم السريع عند بناء المنتجات الرقمية والتطبيقات.\n✦ الاختيار الخاطئ للمنهجية يتسبب في تعثر وتأخير جزء كبير من المشاريع.\n\nما هي المنهجية الأكثر استخداماً في مجال عملك حالياً؟\n\n#إدارة_المشاريع #Agile #Waterfall #المهندس_شادي #تطوير_المنتجات", "threads": "هل Agile دائماً أفضل من Waterfall؟ الحقيقة أن اختيار المنهجية يعتمد على طبيعة مشروعك ومدى وضوح المتطلبات. أجايل للمرونة والمنتجات الرقمية، وواترفول للمشاريع الصارمة والثابتة.\n\n#إدارة_المشاريع #Agile #المهندس_شادي", "linkedin": "اسحب للآخر 👈\nفي بداياتي كمدير مشاريع، كنت أظن أن تطبيق Agile في كل شيء هو سر النجاح المطلق، حتى واجهت مشروعاً تسبب فيه غياب التخطيط المسبق في إهدار وقت كبير! الحقيقة أن أجايل ليست عصا سحرية، وWaterfall ليست منهجية قديمة ملغاة.\n\n✦ Waterfall تنجح عندما تكون المتطلبات محددة وصارمة من اليوم الأول ولا تحتمل التغيير.\n✦ Agile تضمن لك المرونة والتأقلم السريع عند بناء المنتجات الرقمية والتطبيقات.\n✦ الاختيار الخاطئ للمنهجية يتسبب في تعثر وتأخير جزء كبير من المشاريع.\n\nما هي المنهجية الأكثر استخداماً في مجال عملك حالياً؟\n\n#إدارة_المشاريع #Agile #Waterfall #المهندس_شادي #تطوير_المنتجات"}, "group": "draft"}, "2026-10-23-g8": {"id": "2026-10-23-g8", "approved": true, "publish_at": "2026-10-24 21:00", "template": "infographic", "topic": "tmvgczrg1", "image": {"title": "مدير مهام أم قائد تقني؟ الفرق يصنع المستحيل", "body": "كيف تنتقل من موزع تذاكر إلى داعم حقيقي لنجاح فريقك؟", "points": ["المدير يركز على تتبع التذاكر، والقائد يركز على تمكين المبرمج", "المدير يسأل «متى ينتهي؟»، والقائد يسأل «كيف أساعدك لتنجزه؟»", "المدير يراقب ساعات العمل، والقائد يبني بيئة تبدع وتتطور", "المدير يحاسب على الأخطاء، والقائد يحولها إلى فرص للتعلّم"], "style": "bold", "hue": 190, "seed": 1}, "platforms": {"facebook": "كثير من المطورين يترقّون لمناصب قيادية، فيقعون في فخ «المدير التقليدي»: مراقبة مستمرة للتذاكر، وسؤال يومي مكرر: «متى تنتهي هذه المهمة؟»\n\nلكن القيادة التقنية الحقيقية شيء مختلف تماماً:\n- القائد لا يمارس الإدارة الدقيقة (Micromanagement)، بل يزيل العقبات التقنية والتنظيمية من طريق الفريق.\n- القائد لا يوزع الأوامر فقط، بل يوضح «الرؤية والهدف» وراء كل سطر كود يتم كتابته.\n- القائد يثق في كفاءة فريقه، ويمنحهم مساحة لاتخاذ القرار والابتكار.\n\nالنجاح الحقيقي لا يقاس بعدد التذاكر المغلقة في لوحة المهام، بل بمدى نضج الفريق وقدرته على حل التحديات المعقدة باستقلالية وثقة.\n\nإذا كنت تقود فريقاً تقنياً اليوم، اسأل نفسك: هل أنت مجرد مراقب للوقت، أم محرّك للنمو؟\n\n#teams #القيادة_التقنية #إدارة_الفرق #بيئة_العمل #تطوير_البرمجيات", "instagram": "كثير من المطورين يترقّون لمناصب قيادية، فيقعون في فخ «المدير التقليدي»: مراقبة مستمرة للتذاكر، وسؤال يومي مكرر: «متى تنتهي هذه المهمة؟»\n\nلكن القيادة التقنية الحقيقية شيء مختلف تماماً:\n- القائد لا يمارس الإدارة الدقيقة (Micromanagement)، بل يزيل العقبات التقنية والتنظيمية من طريق الفريق.\n- القائد لا يوزع الأوامر فقط، بل يوضح «الرؤية والهدف» وراء كل سطر كود يتم كتابته.\n- القائد يثق في كفاءة فريقه، ويمنحهم مساحة لاتخاذ القرار والابتكار.\n\nالنجاح الحقيقي لا يقاس بعدد التذاكر المغلقة في لوحة المهام، بل بمدى نضج الفريق وقدرته على حل التحديات المعقدة باستقلالية وثقة.\n\nإذا كنت تقود فريقاً تقنياً اليوم، اسأل نفسك: هل أنت مجرد مراقب للوقت، أم محرّك للنمو؟\n\n#teams #القيادة_التقنية #إدارة_الفرق #بيئة_العمل #تطوير_البرمجيات", "threads": "الفرق بين المدير والقائد التقني يظهر بوضوح في التعامل:\nالمدير يسأل: «متى تنتهي هذه التذكرة؟»\nالقائد يسأل: «ما العقبة التي تعطلك وكيف أساعدك لتتجاوزها؟»\nالقيادة ليست تتبعاً لساعات العمل، بل تمكين حقيقي للفريق ليبدع.\n\n#teams #القيادة #إدارة_المشاريع", "linkedin": "كثير من المطورين يترقّون لمناصب قيادية، فيقعون في فخ «المدير التقليدي»: مراقبة مستمرة للتذاكر، وسؤال يومي مكرر: «متى تنتهي هذه المهمة؟»\n\nلكن القيادة التقنية الحقيقية شيء مختلف تماماً:\n- القائد لا يمارس الإدارة الدقيقة (Micromanagement)، بل يزيل العقبات التقنية والتنظيمية من طريق الفريق.\n- القائد لا يوزع الأوامر فقط، بل يوضح «الرؤية والهدف» وراء كل سطر كود يتم كتابته.\n- القائد يثق في كفاءة فريقه، ويمنحهم مساحة لاتخاذ القرار والابتكار.\n\nالنجاح الحقيقي لا يقاس بعدد التذاكر المغلقة في لوحة المهام، بل بمدى نضج الفريق وقدرته على حل التحديات المعقدة باستقلالية وثقة.\n\nإذا كنت تقود فريقاً تقنياً اليوم، اسأل نفسك: هل أنت مجرد مراقب للوقت، أم محرّك للنمو؟\n\n#teams #القيادة_التقنية #إدارة_الفرق #بيئة_العمل #تطوير_البرمجيات"}, "group": "upcoming"}, "2026-10-23-g9": {"id": "2026-10-23-g9", "approved": false, "publish_at": "2026-10-25 08:00", "template": "reel", "topic": "tmvgczzq9", "image": {"title": "تطفي حرائق طول اليوم بدون إنجاز حقيقي؟", "body": "", "scenes": [{"kicker": "المشكلة", "title": "تطفي حرائق طول اليوم بدون إنجاز حقيقي؟", "body": "كثير من مديري المشاريع يخلطون بين المهم والمستعجل، فتضيع طاقتهم في التفاصيل.", "seconds": 3.5}, {"kicker": "المربع الذهبي", "title": "مهم وغير عاجل: هنا يُصنع النجاح!", "body": "التخطيط، التطوير، وبناء الأنظمة هي المهام التي تحميك مستقبلاً من أي أزمة طارئة.", "seconds": 3.5}, {"kicker": "الفخ الأكبر", "title": "عاجل لكن غير مهم.. فوّضه فوراً!", "body": "إشعارات، اجتماعات مفاجئة، وطلبات روتينية؛ لا تدعها تسرق وقتك الثمين ووكّل غيرك بها.", "seconds": 3.5}, {"kicker": "الحل الحاسم", "title": "غير مهم وغير عاجل؟ احذفه بلا تردد!", "body": "كل مهمة لا تضيف قيمة لمشروعك ولا تملك موعداً نهائياً مصيرها الإلغاء فوراً.", "seconds": 3.0}, {"kicker": "سؤال لك", "title": "أي مربع يأخذ أغلب ساعات يومك؟", "body": "شاركنا تجربتك في التعليقات، واحفظ الفيديو للرجوع إليه عند التخطيط القادم.", "seconds": 3.0}], "hue": 250, "seed": 1}, "platforms": {"facebook": "هل تقضي يوم عملك كأنك في وحدة إطفاء تتنقل بين أزمة وأخرى؟\n\nالسر ليس في كثرة ساعات العمل، بل في «مصفوفة أيزنهاور» لترتيب الأولويات:\n\n1. عاجل ومهم: نفّذه الآن (أزمات، تسليمات نهائية حاسمة).\n2. مهم وغير عاجل: خطط له وحدد موعده (التطوير، التخطيط، بناء الفريق).. هذا هو المربع الذي يبني مستقبلك ويمنع الأزمات قبل حدوثها!\n3. عاجل وغير مهم: فوّضه (مهام روتينية ومقاطعات يمكن لغيرك إنجازها).\n4. غير مهم وغير عاجل: احذفه تماماً (مضيعات الوقت والمهام الهامشية).\n\nالمحترف الحقيقي يقضي أغلب وقته في المربع الثاني ليقلل تلقائياً من حرائق المربع الأول.\n\nجرّب اليوم فرز مهامك، ولاحظ كيف يتغير إنجازك وهدوء ذهنك تماماً.\n\n#إدارة_المشاريع #إنتاجية #مصفوفة_أيزنهاور #تطوير_الذات #المهندس_شادي", "instagram": "هل تقضي يوم عملك كأنك في وحدة إطفاء تتنقل بين أزمة وأخرى؟\n\nالسر ليس في كثرة ساعات العمل، بل في «مصفوفة أيزنهاور» لترتيب الأولويات:\n\n1. عاجل ومهم: نفّذه الآن (أزمات، تسليمات نهائية حاسمة).\n2. مهم وغير عاجل: خطط له وحدد موعده (التطوير، التخطيط، بناء الفريق).. هذا هو المربع الذي يبني مستقبلك ويمنع الأزمات قبل حدوثها!\n3. عاجل وغير مهم: فوّضه (مهام روتينية ومقاطعات يمكن لغيرك إنجازها).\n4. غير مهم وغير عاجل: احذفه تماماً (مضيعات الوقت والمهام الهامشية).\n\nالمحترف الحقيقي يقضي أغلب وقته في المربع الثاني ليقلل تلقائياً من حرائق المربع الأول.\n\nجرّب اليوم فرز مهامك، ولاحظ كيف يتغير إنجازك وهدوء ذهنك تماماً.\n\n#إدارة_المشاريع #إنتاجية #مصفوفة_أيزنهاور #تطوير_الذات #المهندس_شادي", "threads": "هل تقضي يومك في إطفاء الحرائق بدلاً من الإنجاز؟\nمصفوفة أيزنهاور تختصر عليك الطريق:\nركّز على المهام (المهمة غير العاجلة) كالتخطيط والتطوير، فوّض المستعجل غير المهم، واحذف كل ما يهدر وقتك.\n\nأي ربع يستهلك معظم وقتك حالياً؟\n\n#إنتاجية #إدارة_المشاريع #تنظيم_الوقت", "linkedin": "هل تقضي يوم عملك كأنك في وحدة إطفاء تتنقل بين أزمة وأخرى؟\n\nالسر ليس في كثرة ساعات العمل، بل في «مصفوفة أيزنهاور» لترتيب الأولويات:\n\n1. عاجل ومهم: نفّذه الآن (أزمات، تسليمات نهائية حاسمة).\n2. مهم وغير عاجل: خطط له وحدد موعده (التطوير، التخطيط، بناء الفريق).. هذا هو المربع الذي يبني مستقبلك ويمنع الأزمات قبل حدوثها!\n3. عاجل وغير مهم: فوّضه (مهام روتينية ومقاطعات يمكن لغيرك إنجازها).\n4. غير مهم وغير عاجل: احذفه تماماً (مضيعات الوقت والمهام الهامشية).\n\nالمحترف الحقيقي يقضي أغلب وقته في المربع الثاني ليقلل تلقائياً من حرائق المربع الأول.\n\nجرّب اليوم فرز مهامك، ولاحظ كيف يتغير إنجازك وهدوء ذهنك تماماً.\n\n#إدارة_المشاريع #إنتاجية #مصفوفة_أيزنهاور #تطوير_الذات #المهندس_شادي"}, "group": "draft"}}</script>
 <script>
 const tabs=document.querySelectorAll('#tabs button'),posts=document.querySelectorAll('.post'),empty=document.getElementById('empty');
-function show(f){const PN={topics:'topicsPanel',addpost:'postPanel',calendar:'calPanel'};const tp=f in PN;Object.entries(PN).forEach(([k,id])=>document.getElementById(id).hidden=f!==k);document.getElementById('grid').hidden=tp;let n=0;posts.forEach(p=>{const ok=!tp&&(f==='all'||p.dataset.s===f);p.hidden=!ok;if(ok)n++});empty.hidden=tp||n>0;tabs.forEach(b=>b.setAttribute('aria-pressed',b.dataset.f===f))}
+let curF='upcoming';function matchTools(p){const q=(document.getElementById('qSearch').value||'').trim().toLowerCase(),tp=document.getElementById('qTopic').value,tl=document.getElementById('qTpl').value;return(!q||(p.dataset.q||'').toLowerCase().includes(q))&&(!tp||p.dataset.topic===tp)&&(!tl||p.dataset.tpl===tl)}
+function show(f){curF=f;const PN={topics:'topicsPanel',addpost:'postPanel',calendar:'calPanel',stats:'statsPanel'};const tp=f in PN;Object.entries(PN).forEach(([k,id])=>document.getElementById(id).hidden=f!==k);document.getElementById('grid').hidden=tp;let n=0;posts.forEach(p=>{const ok=!tp&&(f==='all'||p.dataset.s===f)&&matchTools(p);p.hidden=!ok;if(ok)n++});empty.hidden=tp||n>0;tabs.forEach(b=>b.setAttribute('aria-pressed',b.dataset.f===f));document.getElementById('tools').hidden=tp;const dn=[...posts].filter(p=>p.dataset.s==='draft'&&!p.hidden).length;document.getElementById('bulkApprove').hidden=!(f==='draft'&&dn>0);document.getElementById('bulkN').textContent=dn}
+['qSearch','qTopic','qTpl'].forEach(i=>{const el=document.getElementById(i);el.oninput=el.onchange=()=>show(curF)});
 tabs.forEach(b=>b.onclick=()=>show(b.dataset.f));
 const lb=document.getElementById('lb'),lbImg=lb.querySelector('img'),lbVid=document.getElementById('lbVid');let lbList=[],lbI=0;
 function lbShow(){lbImg.src=lbList[lbI];document.getElementById('lbCtr').textContent=lbList.length>1?(lbI+1)+' / '+lbList.length:'';lb.classList.toggle('multi',lbList.length>1)}
@@ -2029,6 +2194,26 @@ async function deleteChangedPhotos(id, oldList, newList, oldBase, newBase) {
 }
 
 // ---------- نافذة التعديل ----------
+// ---------- نمط التصميم ولونه ----------
+const STYLES = {
+  infographic: { cards: "بطاقات", bento: "بنتو", timeline: "خط زمني", bold: "جريء", glass: "زجاجي", steps: "درج", neon: "نيون", checklist: "قائمة تحقق", bignum: "الرقم الكبير", blueprint: "مخطط", pills: "كبسولات", columns: "شريط جانبي" },
+  carousel: { blueprint: "مخطط", editorial: "مجلة", terminal: "طرفية", poster: "ملصق", sticky: "ورقة ملصقة", duo: "لوحان", neon: "نيون", paper: "ورقي", gradient: "تدرج" },
+};
+const HUES = [0, 35, 70, 140, 190, 250, 290, 325];
+let eHue = null;
+function fillLook(tpl, style, hue) {
+  const box = $("eLook"), opts = STYLES[tpl];
+  box.hidden = !(tpl === "infographic" || tpl === "carousel" || tpl === "reel");
+  const sel = $("eStyle");
+  sel.parentElement.querySelector("label").hidden = sel.hidden = !opts;
+  sel.innerHTML = '<option value="">تلقائي</option>' + Object.entries(opts || {}).map(([k, n]) => '<option value="' + k + '">' + n + "</option>").join("");
+  sel.value = opts && opts[style] ? style : "";
+  eHue = hue != null ? hue : null;
+  const hb = $("eHueBox");
+  hb.innerHTML = '<button type="button" class="auto' + (eHue == null ? " on" : "") + '" data-h="">تلقائي</button>' +
+    HUES.map((h) => '<button type="button" data-h="' + h + '" class="' + (eHue === h ? "on" : "") + '" style="background:hsl(' + ((215 + h) % 360) + ',58%,38%)" title="لون ' + (HUES.indexOf(h) + 1) + '"></button>').join("");
+  hb.querySelectorAll("button").forEach((b) => (b.onclick = () => { eHue = b.dataset.h === "" ? null : parseInt(b.dataset.h, 10); hb.querySelectorAll("button").forEach((x) => x.classList.toggle("on", x === b)); }));
+}
 const PLATS = ["facebook", "instagram", "threads", "linkedin", "telegram"];
 let editId = null;
 function openEdit(id) {
@@ -2036,7 +2221,7 @@ function openEdit(id) {
   editId = id; const im = p.image || {};
   $("eTitle").value = im.title || ""; $("eBody").value = im.body || ""; $("ePoints").value = (im.points || []).join("\n"); $("eSlides").value = p.template === "reel" ? scenesToText(im.scenes) : slidesToText(im.slides);
   $("eQuery").value = im.photo_query || ""; $("eVP").value = im.visual_prompt || "";
-  $("eTemplate").value = p.template; $("eWhen").value = (p.publish_at || "").replace(" ", "T");
+  $("eTemplate").value = p.template; fillLook(p.template, im.style, im.hue); $("eWhen").value = (p.publish_at || "").replace(" ", "T");
   if ($("eTopic")) $("eTopic").value = p.topic || "";
   PLATS.forEach((k) => { $("ep_" + k).checked = !!(p.platforms && p.platforms[k]); $("et_" + k).value = (p.platforms && p.platforms[k]) || ""; });
   accPicker("eAcc", p.targets || null);
@@ -2044,6 +2229,7 @@ function openEdit(id) {
   $("eNote").textContent = p.approved ? "هذا المنشور معتمد: سيُنشر بالنص الجديد في موعده." : "";
   say($("eMsg"), "", true); $("editBox").classList.add("on");
 }
+$("eTemplate").onchange = () => fillLook($("eTemplate").value, "", null);
 $("eCancel").onclick = () => $("editBox").classList.remove("on");
 $("eSave").onclick = async () => {
   const m = $("eMsg"), v = (i) => $(i).value.trim(), old = POSTS[editId];
@@ -2058,7 +2244,7 @@ $("eSave").onclick = async () => {
     ($("eTopic") && !v("eTopic")) ? "اختر الموضوع." : "";
   if (err) { say(m, err, false); return; }
   const oi = old.image || {};
-  const img = { style: tpl === old.template ? oi.style : undefined, hue: oi.hue, title: multi ? eSlides[0].title : v("eTitle"), body: multi ? "" : v("eBody"), seed: oi.seed != null ? oi.seed : 1 };
+  const img = { style: $("eStyle").value || undefined, hue: eHue != null && (tpl === "infographic" || tpl === "reel" || tpl === "carousel") ? eHue : undefined, title: multi ? eSlides[0].title : v("eTitle"), body: multi ? "" : v("eBody"), seed: oi.seed != null ? oi.seed : 1 };
   if (tpl === "carousel") img.slides = eSlides; else if (tpl === "reel") { img.scenes = eSlides; if (v("eQuery")) img.photo_query = v("eQuery"); } else if (tpl === "infographic") img.points = points; else { img.photo_query = v("eQuery"); if (v("eVP")) img.visual_prompt = v("eVP"); }
   let targets;
   try { targets = readTargets("eAcc", Object.keys(platforms)); } catch (e4) { say(m, e4.message, false); return; }
@@ -2197,6 +2383,71 @@ $("rGo").onclick = async () => {
   } catch (e) { say(m, e.message, false); }
 };
 document.addEventListener("click", (e) => { const b = e.target.closest('[data-act="repub"]'); if (b) openRepub(b.dataset.id); });
+
+// ---------- موافقة بالجملة على المسودات الظاهرة ----------
+$("bulkApprove").onclick = async () => {
+  const ids = [...document.querySelectorAll('.post[data-s="draft"]')].filter((p) => !p.hidden)
+    .map((p) => (p.querySelector('[data-act="approve"]') || {}).dataset).filter(Boolean).map((d) => d.id);
+  const m = $("bulkMsg");
+  if (!ids.length) { say(m, "لا مسودات ظاهرة.", false); return; }
+  if (!confirm("سأوافق على " + ids.length + " منشور وتُنشر في مواعيدها. متابعة؟")) return;
+  try {
+    say(m, "جارٍ الحفظ…", true);
+    await edit((x) => ids.reduce((t, id) => setApproved(t, id, "true"), x), "queue: approve " + ids.length + " drafts", QFILE);
+    say(m, "تمت الموافقة على " + ids.length + " منشور ✅ تظهر في «سيُنشر» بعد دقائق.", true);
+    ids.forEach((id) => { const a = document.querySelector('[data-act="approve"][data-id="' + id + '"]'); if (a) a.parentElement.querySelectorAll("button").forEach((x) => (x.disabled = true)); });
+    $("bulkApprove").hidden = true;
+  } catch (e) { say(m, e.message, false); }
+};
+
+// ---------- الأداء: أرقام على البطاقات + لوحة تجميع ----------
+const INS = JSON.parse(document.getElementById("insdata").textContent || "{}");
+const PLAT_NAME = { facebook: "فيسبوك", instagram: "إنستغرام", threads: "ثريدز", linkedin: "لينكدإن", telegram: "تيليجرام" };
+const score = (m) => (m.likes || 0) + 2 * (m.comments || 0) + 3 * (m.shares || 0) + 2 * (m.saved || 0);
+function postScore(id) {
+  const per = INS[id] || {}; let s = 0, any = false;
+  Object.values(per).forEach((m) => { if (m && !m.error) { any = true; s += score(m); } });
+  return any ? s : null;
+}
+function metricsLine(id) {
+  const per = INS[id]; if (!per) return "";
+  return Object.entries(per).map(([k, m]) => {
+    const nm = PLAT_NAME[k.split(":")[0]] || k;
+    if (!m || m.error) return nm + ": —";
+    const bits = [];
+    if (m.views != null) bits.push("👁 " + m.views); if (m.reach != null) bits.push("👁 " + m.reach);
+    bits.push("❤ " + (m.likes || 0), "💬 " + (m.comments || 0));
+    if (m.shares) bits.push("↗ " + m.shares); if (m.saved) bits.push("🔖 " + m.saved);
+    return nm + ": " + bits.join(" ");
+  }).join(" · ");
+}
+document.querySelectorAll(".post").forEach((p) => {
+  const b = p.querySelector("[data-id]"); if (!b) return;
+  const t = metricsLine(b.dataset.id); if (!t) return;
+  const ln = p.querySelector(".line"); if (!ln) return;
+  const d = document.createElement("div"); d.className = "hint"; d.textContent = "📊 " + t; ln.after(d);
+});
+function renderStats() {
+  const rows = Object.values(POSTS).map((p) => ({ p, s: postScore(p.id) })).filter((r) => r.s != null);
+  const body = $("statsBody"), note = $("statsNote");
+  if (!rows.length) {
+    note.textContent = "لا أرقام بعد. تُسحب إحصاءات المنشورات مع الفحص اليومي (الساعة 8 صباحاً تقريباً)، وقد ترفض المنصة بعضها إن كانت صلاحية القراءة غير ممنوحة للتوكن.";
+    body.innerHTML = ""; return;
+  }
+  note.textContent = "التقييم = إعجابات + ٢×تعليقات + ٣×مشاركات + ٢×حفظ. المتوسط لكل منشور، وكلما زاد العدد كان الرقم أدق.";
+  const topicName = (id) => { const o = [...$("qTopic").options].find((x) => x.value === id); return o ? o.textContent : (id || "—"); };
+  const groupBy = (keyFn) => { const g = {}; rows.forEach((r) => { const k = keyFn(r.p); if (k == null) return; (g[k] = g[k] || []).push(r.s); }); return Object.entries(g).map(([k, v]) => [k, v.reduce((a, b) => a + b, 0) / v.length, v.length]).sort((a, b) => b[1] - a[1]); };
+  const TPL = { infographic: "إنفوجرافك", carousel: "كاروسيل", reel: "ريل", split: "صورة", photo: "صورة", tip: "نصيحة", quote: "اقتباس" };
+  const table = (title, data, label) => "<h3>" + title + "</h3><table class=\"st\">" + data.map(([k, avg, n]) => "<tr><td>" + label(k) + "</td><td>" + avg.toFixed(1) + "</td><td>" + n + " منشور</td></tr>").join("") + "</table>";
+  const top = rows.slice().sort((a, b) => b.s - a.s).slice(0, 5);
+  body.innerHTML =
+    "<h3>الأفضل أداءً</h3><table class=\"st\">" + top.map((r) => "<tr><td>" + (r.p.image && r.p.image.title || r.p.id) + "</td><td>" + r.s + "</td></tr>").join("") + "</table>" +
+    table("حسب القالب", groupBy((p) => p.template), (k) => TPL[k] || k) +
+    table("حسب النمط", groupBy((p) => (p.image && p.image.style) || null), (k) => k) +
+    table("حسب وقت النشر", groupBy((p) => (p.publish_at || "").slice(11, 13) + ":00"), (k) => k) +
+    table("حسب الموضوع", groupBy((p) => p.topic || null), topicName);
+}
+renderStats();
 </script>
 </body>
 </html>
