@@ -238,7 +238,7 @@ def build_entries(req: dict, queue: list[dict]) -> tuple[list[dict], dict, str]:
     recent_styles = [str((p.get("image") or {}).get("style")) for p in queue if isinstance(p.get("image"), dict) and (p.get("image") or {}).get("style")]
     recent_hues = [(p.get("image") or {}).get("hue") for p in queue if isinstance(p.get("image"), dict) and isinstance((p.get("image") or {}).get("hue"), int)]
     entries = make_entries(items[:count], req, topic, {p["id"] for p in queue}, recent_styles, recent_hues)
-    entries = [e for e in entries if e["image"]["title"] and e["platforms"] and (e["template"] != "infographic" or len(e["image"].get("points", [])) >= 2) and (e["template"] != "carousel" or len(e["image"].get("slides", [])) >= 3) and (e["template"] != "reel" or len(e["image"].get("scenes", [])) >= 3)]
+    entries = [e for e in entries if e["image"]["title"] and e["platforms"] and (e["template"] != "infographic" or len(e["image"].get("points", [])) >= 2) and (e["template"] != "carousel" or len(e["image"].get("slides", [])) >= 3) and (e["template"] != "reel" or len(e["image"].get("scenes", [])) >= int(req.get("min_scenes") or 3))]
     if not entries:
         raise generator.GeneratorError("لم يصلح أي منشور مولَّد")
     errors = fatal(validate(queue + entries))
@@ -256,10 +256,13 @@ def append_entries(entries: list[dict]) -> None:
     QUEUE_PATH.write_text(current + block, encoding="utf-8")
 
 
-DAILY_STYLES = ["infographic", "carousel", "infographic", "reel"]     # الريل بنسبة ربع المنشورات: بناؤه أثقل
+DAILY_STYLES = ["infographic", "carousel"]            # الريل له موعد يومي خاص به (REEL_SLOT) فلا يدخل هنا
 # أوقات الذروة لجمهور عربي (بتوقيت الجهة): صباح قبل العمل، استراحة الظهيرة، وذروة المساء
 SLOTS = ["08:00", "13:00", "21:00"]
 PER_DAY = len(SLOTS)
+REEL_SLOT = "18:00"                                    # ريل واحد يومياً على كل المنصات، قبل ذروة المساء
+REEL_MIN_SCENES = 7                                    # لا يقل الريل عن 7 مشاهد (صور متحرّكة)
+REEL_AHEAD_DAYS = 3                                    # يضمن وجود ريل جاهز للأيام الثلاثة القادمة
 
 
 def free_slots(queue: list[dict], day: str) -> list[str]:
@@ -267,11 +270,14 @@ def free_slots(queue: list[dict], day: str) -> list[str]:
     return [s for s in SLOTS if s not in taken]
 
 
-def daily(target: str | None = None) -> int:
-    """ثلاثة منشورات يومياً (8:00 و13:00 و21:00) من المواضيع الأقدم نشراً، مسودات تنتظر الموافقة.
+def reel_free(queue: list[dict], day: str) -> bool:
+    return not any(str(p["publish_at"])[:10] == day and str(p["publish_at"])[11:16] == REEL_SLOT for p in queue)
 
-    اليوم المستهدف: أول يوم من الغد فصاعداً فيه مواعيد شاغرة، فيتنظّم المخزون ذاتياً ولا يتراكم.
-    آمن عند التكرار: لا يملأ إلا الأوقات الشاغرة.
+
+def daily(target: str | None = None) -> int:
+    """كل يوم: 3 منشورات (8:00 و13:00 و21:00) وريل واحد (18:00) من 7 مشاهد على الأقل، كلها مسودات تنتظر موافقتك.
+
+    المواضيع الأقدم نشراً أولاً. آمن عند التكرار: لا يملأ إلا المواعيد الشاغرة، وينظّم المخزون ذاتياً.
     """
     import time
     from datetime import datetime
@@ -282,20 +288,48 @@ def daily(target: str | None = None) -> int:
     if not topics:
         print("لا مواضيع")
         return 0
+    done, failed = [], []
+
+    def order_topics(queue):
+        last = {t["id"]: "" for t in topics}
+        for p in queue:
+            if p.get("topic") in last:
+                last[p["topic"]] = max(last[p["topic"]], str(p["publish_at"]))
+        return sorted(topics, key=lambda t: (last[t["id"]], topics.index(t)))
+
+    def make(t, day, slot, style, slides, extra=None):
+        req = {"id": f"daily-{day}-{t['id']}", "count": 1, "topic_id": t["id"], "style": style,
+               "slides": slides, "start": f"{day} {slot}", **(extra or {})}
+        try:
+            entries, topic, method = build_entries(req, load_queue())
+            append_entries(entries)
+            done.append(f"{topic['name']} ({style})")
+            print(f"✓ {topic['name']} → {entries[0]['id']} [{style}] {slot}")
+        except Exception as e:  # noqa: BLE001
+            failed.append(f"{t.get('name', t['id'])}: {str(e)[:120]}")
+            print(f"✗ {t.get('name', t['id'])}: {e}")
+        time.sleep(8)                         # حدّ معدّل الطبقة المجانية
+
+    start = (now_local() + timedelta(days=1)).date()
+    # 1) الريلات: يوم واحد بعد آخر لأيام قادمة، من مواضيع غير صباحية
+    for k in range(REEL_AHEAD_DAYS):
+        rday = target or (start + timedelta(days=k)).strftime("%Y-%m-%d")
+        if reel_free(load_queue(), rday):
+            pool = [t for t in order_topics(load_queue()) if t.get("time") != "morning"] or topics
+            make(pool[0], rday, REEL_SLOT, "reel", 8, {"min_scenes": REEL_MIN_SCENES})
+        if target:
+            break
+
+    # 2) المنشورات الثابتة
     queue = load_queue()
     day = target
     if not day:
-        d = (now_local() + timedelta(days=1)).date()
+        d = start
         while not free_slots(queue, d.strftime("%Y-%m-%d")):
             d += timedelta(days=1)
         day = d.strftime("%Y-%m-%d")
     slots = free_slots(queue, day)
-    # الموضوع الأقدم نشراً أولاً (من لم يُنشر له شيء قط يتقدّم)
-    last = {t["id"]: "" for t in topics}
-    for p in queue:
-        if p.get("topic") in last:
-            last[p["topic"]] = max(last[p["topic"]], str(p["publish_at"]))
-    order = sorted(topics, key=lambda t: (last[t["id"]], topics.index(t)))
+    order = order_topics(queue)
     morning = [t for t in order if t.get("time") == "morning"]       # مواضيع الصباح: دائماً في موعد 8:00
     others = [t for t in order if t.get("time") != "morning"]
     pairs = []
@@ -304,21 +338,9 @@ def daily(target: str | None = None) -> int:
         if pool:
             pairs.append((pool.pop(0), slot))
     ordinal = datetime.strptime(day, "%Y-%m-%d").toordinal()
-    done, failed = [], []
     for i, (t, slot) in enumerate(pairs):
-        queue = load_queue()
         style = DAILY_STYLES[(ordinal + i) % len(DAILY_STYLES)]
-        req = {"id": f"daily-{day}-{t['id']}", "count": 1, "topic_id": t["id"], "style": style,
-               "slides": 6 if style == "carousel" else 5, "start": f"{day} {slot}"}
-        try:
-            entries, topic, method = build_entries(req, queue)
-            append_entries(entries)
-            done.append(f"{topic['name']} ({style})")
-            print(f"✓ {topic['name']} → {entries[0]['id']} [{style}] {slot}")
-        except Exception as e:  # noqa: BLE001
-            failed.append(f"{t.get('name', t['id'])}: {str(e)[:120]}")
-            print(f"✗ {t.get('name', t['id'])}: {e}")
-        time.sleep(8)                         # حدّ معدّل الطبقة المجانية
+        make(t, day, slot, style, 6 if style == "carousel" else 5)
     msg = f"يومي {day}: وُلِّد {len(done)} مسودة" + (f"، وفشل {len(failed)}" if failed else "") + "."
     write_log(id=f"daily-{day}", ok=not failed or bool(done), count=len(done), topic="كل المواضيع", method="daily",
               message=msg + ((" " + " | ".join(failed))[:300] if failed else ""))
