@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>لوحة النشر</title>
+<script>window.GH_PROXY={{ "true" if proxy else "false" }};</script>
 <style>
 :root{--bg:#f4f7fa;--card:#fff;--ink:#0b1f3a;--mute:#5d6b7c;--line:#e2e8ef;--teal:#0f9d8f;--ok:#0f9d58;--warn:#b86e00;--bad:#c5372c;--draft:#6b778a;--chip:#eef3f8}
 @media (prefers-color-scheme:dark){:root{--bg:#0d1520;--card:#15202e;--ink:#e8eef5;--mute:#93a1b3;--line:#243245;--teal:#2dd4bf;--ok:#4ade80;--warn:#fbbf24;--bad:#f87171;--draft:#93a1b3;--chip:#1c2a3b}}
@@ -348,7 +349,7 @@ button.del:hover{background:rgba(127,127,127,.12)}
 </div>
 <div class="empty" id="empty" hidden>لا توجد منشورات هنا.</div>
 
-  <div class="panel">
+  <div class="panel" {% if proxy %}hidden{% endif %}>
   <h2>ربط GitHub (مرة واحدة — للإضافة والموافقة والحذف)</h2>
   <p class="hint">الإضافة والحذف يحتاجان إذناً بالتعديل على المستودع. يبقى المفتاح في متصفحك فقط، ولا يُرسل إلا إلى GitHub.</p>
   <ol>

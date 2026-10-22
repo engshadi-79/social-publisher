@@ -1,5 +1,7 @@
 // ---- إدارة المواضيع والمنشورات عبر GitHub API (يُدرَج داخل اللوحة) ----
 const REPO = "__REPO__", TFILE = "content/topics.yaml", QFILE = "content/queue.yaml";
+const PROXY = !!window.GH_PROXY;     // على Vercel: الطلبات تمرّ عبر /api/gh والمفتاح على الخادم
+const hasAuth = () => PROXY || !!getTok();
 const getTok = () => { try { return localStorage.getItem("gh_tok") || sessionStorage.getItem("gh_tok") || ""; } catch (e) { return ""; } };
 const setTok = (v, keep) => { try { sessionStorage.setItem("gh_tok", v); keep ? localStorage.setItem("gh_tok", v) : localStorage.removeItem("gh_tok"); } catch (e) {} };
 const b64d = (b) => new TextDecoder().decode(Uint8Array.from(atob(b.replace(/\n/g, "")), (c) => c.charCodeAt(0)));
@@ -139,8 +141,12 @@ function addPost(text, p) {
 
 // ---------- GitHub ----------
 async function gh(path, opt) {
-  const r = await fetch("https://api.github.com/repos/" + REPO + "/" + path, Object.assign({}, opt, {
-    headers: { Authorization: "Bearer " + getTok(), Accept: "application/vnd.github+json", "Content-Type": "application/json" } }));
+  const r = PROXY
+    ? await fetch("/api/gh?p=" + encodeURIComponent(path), Object.assign({}, opt, { headers: { "Content-Type": "application/json" }, credentials: "same-origin" }))
+    : await fetch("https://api.github.com/repos/" + REPO + "/" + path, Object.assign({}, opt, {
+      headers: { Authorization: "Bearer " + getTok(), Accept: "application/vnd.github+json", "Content-Type": "application/json" } }));
+  if (PROXY && r.status === 401) { location.href = "/login"; throw new Error("انتهت الجلسة، سجّل الدخول من جديد."); }
+  if (PROXY && r.status === 501) throw new Error("لم يُضبط مفتاح GitHub على الخادم بعد (GITHUB_PAT على Vercel).");
   if ([401, 403, 404].includes(r.status)) throw new Error("المفتاح غير صالح أو صلاحيته ناقصة (يلزم Contents: Read and write على هذا المستودع).");
   if ([409, 422].includes(r.status)) throw new Error("تعارض أثناء الحفظ، أعد المحاولة.");
   if (!r.ok) throw new Error("تعذّر الاتصال بـ GitHub (" + r.status + ").");
@@ -149,7 +155,7 @@ async function gh(path, opt) {
 }
 async function edit(fn, msg, file) {
   file = file || TFILE;
-  if (!getTok()) throw new Error("ألصق مفتاح GitHub أولاً في قسم «ربط GitHub» أسفل الصفحة.");
+  if (!hasAuth()) throw new Error("ألصق مفتاح GitHub أولاً في قسم «ربط GitHub» أسفل الصفحة.");
   const f = await gh("contents/" + file);
   const text = fn(b64d(f.content));
   await gh("contents/" + file, { method: "PUT", body: JSON.stringify({ message: msg, content: b64e(text), sha: f.sha }) });
@@ -236,7 +242,7 @@ document.addEventListener("click", async (e) => {
 
 // ---- توليد منشورات تلقائياً: يكتب طلباً في المستودع فيشغّل سير عمل التوليد ----
 async function putRequest(text, msg) {
-  if (!getTok()) throw new Error("ألصق مفتاح GitHub أولاً في قسم «ربط GitHub» أسفل الصفحة.");
+  if (!hasAuth()) throw new Error("ألصق مفتاح GitHub أولاً في قسم «ربط GitHub» أسفل الصفحة.");
   let sha;
   try { sha = (await gh("contents/content/generate_request.yaml")).sha; } catch (e) { sha = undefined; }
   await gh("contents/content/generate_request.yaml", { method: "PUT",
