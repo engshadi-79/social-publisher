@@ -293,5 +293,73 @@
       "account": "لينكدإن — المهندس شادي",
       "published_at": "2026-10-22T21:35:07+00:00"
     }
+  },
+  "2026-10-23-g2": {
+    "facebook": {
+      "attempts": 0,
+      "status": "published",
+      "platform_post_id": "197449247358013_1614939547312367",
+      "error": null,
+      "account": "فيسبوك — الوان",
+      "published_at": "2026-10-23T10:00:46+00:00"
+    },
+    "instagram": {
+      "attempts": 0,
+      "status": "published",
+      "platform_post_id": "18028268405878915",
+      "error": null,
+      "account": "إنستغرام — engshadi2011",
+      "published_at": "2026-10-23T10:01:01+00:00"
+    },
+    "threads": {
+      "attempts": 0,
+      "status": "published",
+      "platform_post_id": "18108506225194823",
+      "error": null,
+      "account": "ثريدز — engshadi2011",
+      "published_at": "2026-10-23T10:01:20+00:00"
+    },
+    "linkedin": {
+      "attempts": 0,
+      "status": "published",
+      "platform_post_id": "urn:li:share:7519337178829832192",
+      "error": null,
+      "account": "لينكدإن — المهندس شادي",
+      "published_at": "2026-10-23T10:01:26+00:00"
+    }
+  },
+  "2026-10-23-g3": {
+    "facebook": {
+      "attempts": 0,
+      "status": "published",
+      "platform_post_id": "197449247358013_1614941070645548",
+      "error": null,
+      "account": "فيسبوك — الوان",
+      "published_at": "2026-10-23T10:02:42+00:00"
+    },
+    "instagram": {
+      "attempts": 0,
+      "status": "published",
+      "platform_post_id": "18119610085760516",
+      "error": null,
+      "account": "إنستغرام — engshadi2011",
+      "published_at": "2026-10-23T10:03:40+00:00"
+    },
+    "threads": {
+      "attempts": 0,
+      "status": "published",
+      "platform_post_id": "17876974521634732",
+      "error": null,
+      "account": "ثريدز — engshadi2011",
+      "published_at": "2026-10-23T10:04:41+00:00"
+    },
+    "linkedin": {
+      "attempts": 0,
+      "status": "published",
+      "platform_post_id": "urn:li:share:7519338036225200130",
+      "error": null,
+      "account": "لينكدإن — المهندس شادي",
+      "published_at": "2026-10-23T10:04:51+00:00"
+    }
   }
 }
