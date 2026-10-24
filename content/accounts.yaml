@@ -4,7 +4,7 @@
 accounts:
   - id: fb-alwan
     platform: facebook
-    label: "فيسبوك — الوان"
+    label: "فيسبوك — المهندس شادي"
     default: true
     secrets: {page_id: FB_PAGE_ID, token: FB_PAGE_TOKEN}
   - id: ig-engshadi2011
