@@ -1877,7 +1877,7 @@
 
       #مساء_الخير #مطر #أمل #اقتباسات #تفاؤل'
 - id: 2026-10-29-g1
-  approved: false
+  approved: true
   publish_at: 2026-10-29 18:00
   template: reel
   topic: pillar-automation
@@ -1987,7 +1987,7 @@
 
       #أتمتة_الأعمال #إدارة_المشاريع #تطوير_الأعمال #ريادة_الأعمال #تجارة_الكترونية'
 - id: 2026-10-27-g1
-  approved: false
+  approved: true
   publish_at: 2026-10-27 08:00
   template: infographic
   topic: pillar-ai-business
@@ -2078,7 +2078,7 @@
 
       #صباح_الخير #ذكاء_اصطناعي #ريادة_الأعمال #أتمتة'
 - id: 2026-10-27-g2
-  approved: false
+  approved: true
   publish_at: 2026-10-27 21:00
   template: carousel
   topic: pillar-automation
@@ -2194,7 +2194,7 @@
 
       #أتمتة_الأعمال #ريادة_الأعمال #إدارة_المشاريع #المشاريع_الصغيرة #تجارة_إلكترونية'
 - id: 2026-11-05-g1
-  approved: false
+  approved: true
   publish_at: 2026-11-05 18:00
   template: reel
   topic: pillar-casestudies
@@ -2295,7 +2295,7 @@
 
       #تطوير_برمجيات #إدارة_البيانات #أنظمة_معلومات #مهندس_برمجيات #خميسكم_مبارك'
 - id: 2026-10-28-g1
-  approved: false
+  approved: true
   publish_at: 2026-10-28 08:00
   template: carousel
   topic: pillar-ai-business
@@ -2405,7 +2405,7 @@
 
       #صباح_الخير #الذكاء_الاصطناعي #ادارة_الاعمال #تطوير_الاعمال #انتاجية'
 - id: 2026-10-28-g2
-  approved: false
+  approved: true
   publish_at: 2026-10-28 21:00
   template: infographic
   topic: pillar-automation
@@ -2495,7 +2495,7 @@
 
       #أتمتة_الأعمال #إدارة_المشاريع #تطوير_الأعمال #ريادة_الأعمال'
 - id: 2026-10-29-g2
-  approved: false
+  approved: true
   publish_at: 2026-10-29 08:00
   template: infographic
   topic: pillar-ai-business
@@ -2585,7 +2585,7 @@
 
       #صباح_الخير #الذكاء_الاصطناعي #أتمتة_الأعمال #إدارة_الأعمال'
 - id: 2026-10-29-g3
-  approved: false
+  approved: true
   publish_at: 2026-10-29 21:00
   template: carousel
   topic: pillar-automation
