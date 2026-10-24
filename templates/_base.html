@@ -26,12 +26,14 @@ body { font-family: "BrandFont", "Cairo", "Segoe UI", Tahoma, sans-serif; color:
 .handle { color: var(--accent); font-weight: 700; direction: ltr; }
 .badge { align-self: flex-start; background: var(--teal); color: var(--navy); font-weight: 800;
   padding: 8px 30px; border-radius: 999px; font-size: 34px; margin-bottom: 28px; }
+.series{position:absolute;top:30px;inset-inline-end:40px;z-index:9;display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,.14);color:#fff;border:2px solid rgba(255,255,255,.35);border-radius:99px;padding:6px 18px 6px 14px;font-size:24px;font-weight:800;backdrop-filter:blur(6px)}.series::before{content:"";width:12px;height:12px;border-radius:50%;background:#f59e0b}
 {% block style %}{% endblock %}
 {% if hue %}.canvas { filter: hue-rotate({{ hue }}deg); }{% endif %}
 </style>
 </head>
 <body>
 <div class="canvas">
+  {% if series %}<div class="series">{{ series }}</div>{% endif %}
   {% if bg %}<div class="bg" style="background-image:url('{{ bg }}')"></div>{% endif %}
   <div class="overlay"></div>
   <div class="frame">
@@ -47,7 +49,7 @@ body { font-family: "BrandFont", "Cairo", "Segoe UI", Tahoma, sans-serif; color:
   await document.fonts.ready;
   const box = document.querySelector('.text'), inner = document.querySelector('.inner');
   // نبدأ أكبر من المعتاد ثم نصغّر حتى يتّسع: المنشور القليل النقاط يملأ الصورة بدل أن يترك فراغاً في أسفلها
-  let k = document.querySelector('.pts, .tl, .rows, .gl, .st, .nn, .sheet, .lst, .bp, .pl, .cl, .grid') ? 1.32 : 1;
+  let k = document.querySelector('.vs, .pts, .tl, .rows, .gl, .st, .nn, .sheet, .lst, .bp, .pl, .cl, .grid') ? 1.32 : 1;
   box.style.setProperty('--k', k.toFixed(2));
   while (inner.offsetHeight > box.clientHeight && k > 0.35) { k -= 0.03; box.style.setProperty('--k', k.toFixed(2)); }
   window.__ready = true;

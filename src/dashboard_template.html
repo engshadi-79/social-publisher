@@ -237,6 +237,7 @@ input[type=checkbox],input[type=radio]{width:auto;min-height:0}
 .hues button{width:34px;height:34px;border-radius:50%;border:3px solid var(--line);padding:0}.hues button.on{border-color:#fff;box-shadow:0 0 0 2px #6366f1}.hues .auto{width:auto;border-radius:99px;padding:0 12px;background:var(--s2);color:var(--ink)}
 .tp small{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 ::selection{background:rgba(99,102,241,.4)}
+.onscreen{margin:10px 0;padding:10px 14px;border-radius:12px;background:rgba(99,102,241,.16);color:#c0c1ff;font-weight:800;font-size:1.05rem}.script ol{color:var(--ink);font-size:.88rem;line-height:1.7;margin:6px 0}.script p{color:var(--ink)}.script .hint{color:var(--mute)}.cpy{margin-top:8px}
 .toast{position:fixed;bottom:24px;inset-inline-end:24px;z-index:80;max-width:min(420px,90vw);padding:12px 18px;border-radius:12px;background:var(--s3);border:1px solid var(--line);box-shadow:0 16px 40px rgba(0,0,0,.5);font-size:.9rem;opacity:0;transform:translateY(12px);pointer-events:none}.toast.show{opacity:1;transform:none}.toast.ok{border-color:rgba(16,185,129,.5)}.toast.no{border-color:rgba(239,68,68,.55);color:#fca5a5}
 
 /* شاشات أصغر: الشريط الجانبي يصير شريطاً أفقياً */
@@ -332,6 +333,7 @@ input[type=checkbox],input[type=radio]{width:auto;min-height:0}
     <button class="navb" data-f="all" data-nav="queue"><svg class="i"><use href="#i-check-list"/></svg><span>طابور المراجعة</span>{% if counts.draft %}<em class="pend">{{ counts.draft }} بانتظار الاعتماد</em>{% endif %}</button>
     <button class="navb" data-f="calendar" data-nav="calendar"><svg class="i"><use href="#i-cal"/></svg><span>التقويم الأسبوعي</span></button>
     <button class="navb" data-f="stats" data-nav="stats"><svg class="i"><use href="#i-bar"/></svg><span>التحليلات والأداء</span></button>
+    <button class="navb" data-f="scripts" data-nav="scripts"><svg class="i"><use href="#i-play"/></svg><span>سكربتات التصوير</span>{% if scripts and scripts[0]["items"] %}<em class="pend">{{ scripts[0]["items"]|length }} هذا الأسبوع</em>{% endif %}</button>
     <button class="navb" data-f="topics" data-nav="topics"><svg class="i"><use href="#i-pulse"/></svg><span>المواضيع وصحة النظام</span>{% if health and health.bad %}<em class="bad">{{ health.bad }}</em>{% endif %}</button>
   </nav>
   <div class="sidefoot">
@@ -420,6 +422,10 @@ input[type=checkbox],input[type=radio]{width:auto;min-height:0}
     {% for i in health['items'] %}<div class="hcard h-{{ i.status }}"><div class="hc-top"><b>{{ i.name }}</b><span class="pill">{{ {"ok":"سليم","warn":"تنبيه","bad":"مشكلة","off":"غير مفعّل"}[i.status] }}</span></div><p>{{ i.detail }}</p></div>{% endfor %}
   </div>
   {% endif %}
+  <h2 class="sec"><i></i>روابط السيرة للتتبّع <small>ضع كل رابط في سيرة منصته لتعرف أي منصة تجلب الزوار</small></h2>
+  <div class="panel">
+    {% for name, url in utm %}<div class="tp"><div><b>{{ name }}</b><small dir="ltr">{{ url }}</small></div><button class="del cpy" type="button" data-copy="{{ url }}">نسخ</button></div>{% endfor %}
+  </div>
   <h2 class="sec"><i></i>مكتبة المواضيع <small>{{ topics|length }} موضوعاً</small></h2>
   <div class="panel">
     <h2>المواضيع المسموح بنشرها</h2>
@@ -460,6 +466,27 @@ input[type=checkbox],input[type=radio]{width:auto;min-height:0}
 </div>
 </section>
 
+<section id="scriptsPanel" hidden>
+  <div class="pagehead"><div><span class="eyebrow"><i class="pulse"></i>أسبوعياً</span>
+    <h1>سكربتات التصوير</h1><p>وجهك وصوتك هما ما ترفعه الخوارزمية أكثر. صوّر سكربتين أسبوعياً بالجوال (10 دقائق)، والباقي آلي.</p></div></div>
+  {% if not scripts %}<div class="empty">تُولَّد أول سكربتات مع التوليد اليومي القادم.</div>{% endif %}
+  {% for wk in scripts %}
+  <h2 class="sec"><i></i>أسبوع <bdi dir="ltr">{{ wk.week }}</bdi></h2>
+  <div class="hgrid">
+    {% for it in wk['items'] %}
+    <div class="hcard script"><div class="hc-top"><b>{{ it.title }}</b><span class="pill">{{ it.seconds }} ث</span></div>
+      <p class="hint">{{ it.pillar }}</p>
+      <div class="onscreen">«{{ it.on_screen }}»</div>
+      <p><b>الخطّاف:</b> {{ it.hook }}</p>
+      <ol>{% for pt in it.points %}<li>{{ pt }}</li>{% endfor %}</ol>
+      <p><b>الختام:</b> {{ it.cta }}</p>
+      <p class="hint">🎥 {{ it.tip }}</p>
+      <button class="del cpy" type="button" data-copy="{{ it.on_screen }}&#10;&#10;{{ it.hook }}&#10;{% for pt in it.points %}- {{ pt }}&#10;{% endfor %}{{ it.cta }}">نسخ السكربت</button>
+    </div>
+    {% endfor %}
+  </div>
+  {% endfor %}
+</section>
 <section id="statsPanel" hidden>
   <div class="pagehead"><div><span class="eyebrow"><i class="pulse"></i>إحصاءات حية</span>
     <h1>تحليلات الأداء وتفاعل الجمهور</h1><p>الوصول والإعجابات والحفظ، ومقارنة القوالب والأنماط والأوقات.</p></div></div>
@@ -566,7 +593,7 @@ input[type=checkbox],input[type=radio]{width:auto;min-height:0}
 <script>
 const tabs=document.querySelectorAll('#tabs button'),posts=document.querySelectorAll('.post'),empty=document.getElementById('empty');
 let curF='upcoming';function matchTools(p){const q=(document.getElementById('qSearch').value||'').trim().toLowerCase(),tp=document.getElementById('qTopic').value,tl=document.getElementById('qTpl').value;return(!q||(p.dataset.q||'').toLowerCase().includes(q))&&(!tp||p.dataset.topic===tp)&&(!tl||p.dataset.tpl===tl)}
-const QF=['all','upcoming','published','draft','failed'],PN={topics:'topicsPanel',addpost:'postPanel',calendar:'calPanel',stats:'statsPanel'};
+const QF=['all','upcoming','published','draft','failed'],PN={topics:'topicsPanel',addpost:'postPanel',calendar:'calPanel',stats:'statsPanel',scripts:'scriptsPanel'};
 function show(f){curF=f;const isQ=QF.includes(f);Object.entries(PN).forEach(([k,id])=>{const el=document.getElementById(id);if(el)el.hidden=f!==k});
 document.getElementById('queueView').hidden=!isQ;
 if(isQ){let n=0;posts.forEach(p=>{const ok=(f==='all'||p.dataset.s===f)&&matchTools(p);p.hidden=!ok;if(ok)n++});empty.hidden=n>0;

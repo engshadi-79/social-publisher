@@ -207,7 +207,7 @@ def _motion_page(renderer, post: dict):
     w, h = TEMPLATES["reel"]
     html = env.get_template("reel/motion.html").render(
         brand=load_brand(), w=w, h=h, fonts=_fonts(), hue=0, theme=MOTION_THEMES[reel_style(post)],   # الثيم يحدد الألوان، فلا إزاحة لونية
-        scenes=specs, starts=starts, durs=durs, total=total)
+        scenes=specs, starts=starts, durs=durs, total=total, series=(post.get("image") or {}).get("series", ""))
     tmp = OUT_DIR / "_tmp"
     tmp.mkdir(parents=True, exist_ok=True)
     page_file = tmp / f"{post['id']}-motion.html"

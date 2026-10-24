@@ -60,6 +60,31 @@ def fetch_trends() -> list[str]:
     return out[:60]
 
 
+# صيغ محتوى بأسماء سلاسل ثابتة (على نهج حسابات المحتوى الناجحة): كل صيغة لها قاعدة كتابة واسم سلسلة يظهر على التصميم
+FORMATS = {
+    "goodbye": {"series": "وداعاً للفوضى", "pillars": ["automation", "ai"],
+                "rule": "- الصيغة «وداعاً لـ…»: العنوان يبدأ بعبارة «وداعاً لـ» ثم عادة يدوية مزعجة يعرفها صاحب العمل، والمنشور يشرح ما يحل محلها."},
+    "versus": {"series": "مين أفضل؟", "pillars": ["automation", "ai"], "only": "infographic",
+               "rule": "- الصيغة «مقارنة»: العنوان بالشكل «الطريقة القديمة ضد الجديدة: من يكسب؟» بأسماء محددة (مثل: إكسل ضد نظام مخصص)."},
+    "trick": {"series": "أتمتة في دقيقة", "pillars": ["automation", "ai"],
+              "rule": "- الصيغة «حيلة في دقيقة»: حيلة واحدة عملية مجانية أو شبه مجانية تُنفَّذ اليوم بخطوات مرقّمة قصيرة."},
+    "dream": {"series": "حلم صاحب العمل", "pillars": ["automation"],
+              "rule": "- الصيغة «حلم كل صاحب عمل»: صف مشهداً مثالياً يتمناه صاحب العمل في يومه، ثم كيف يصبح حقيقة بنظام بسيط."},
+    "qa": {"series": "سين جيم الأنظمة", "pillars": ["ai", "automation", "case"],
+           "rule": "- الصيغة «سؤال وجواب»: العنوان سؤال شائع يطرحه أصحاب الأعمال (لا تدّعِ أن شخصاً محدداً سأله)، والجواب مباشر وصريح."},
+    "backstage": {"series": "خلف الكواليس", "pillars": ["case"],
+                  "rule": "- الصيغة «خلف الكواليس»: قرار تصميمي واحد في نظام حقيقي، ولماذا اتُّخذ، وما البديل الذي رُفض."},
+}
+
+
+def pick_format(pillar: str, style: str, used: list[str]) -> str | None:
+    """الصيغة الأقل استعمالاً مؤخراً لهذا المحور، مع احترام القوالب المقيّدة (المقارنة إنفوجرافك فقط)."""
+    cands = [k for k, f in FORMATS.items() if pillar in f["pillars"] and f.get("only", style) == style]
+    if not cands:
+        return None
+    return max(cands, key=lambda k: (used[::-1].index(k) if k in used else 99, -list(FORMATS).index(k)))
+
+
 PILLAR_RULES = {
     "automation": "- محور «الأتمتة»: ابدأ بالألم ثم الحل. اشرح ما يُؤتمَت دون ذكر تقنيات، واذكر ما يربحه صاحب العمل (وقت، أخطاء، هدوء).",
     "case": "- محور «القصص»: اشرح كيف صُمّم نظام حقيقي ولماذا بهذه الطريقة، بصيغة المتكلم، مستخدماً الحقائق المذكورة في وصف الموضوع حصراً. ممنوع اختلاق عميل أو شخصية أو حوار أو قرار أو نتيجة، وممنوع ذكر أي اسم أو بيانات حساسة. إن لم تكفِ الحقائق فاكتفِ بشرح المشكلة وما يفعله النظام.",
@@ -67,9 +92,11 @@ PILLAR_RULES = {
 }
 
 
-def build_prompt(topic: dict, count: int, brand: dict, recent: list[str], trends: list[str], style: str = "photo", slides_n: int = 7, when_txt: str = "") -> str:
+def build_prompt(topic: dict, count: int, brand: dict, recent: list[str], trends: list[str], style: str = "photo", slides_n: int = 7, when_txt: str = "", fmt: str | None = None) -> str:
     fixed = " ".join(topic.get("hashtags_fixed") or []) or "(لا يوجد)"
     pillar_rules = PILLAR_RULES.get(str(topic.get("pillar") or ""), "")
+    if fmt in FORMATS:
+        pillar_rules = (pillar_rules + "\n" if pillar_rules else "") + FORMATS[fmt]["rule"]
     avoid = "، ".join(recent[-15:]) or "(لا يوجد)"
     trend_txt = "، ".join(trends) if trends else "(غير متاح الآن)"
     if style == "carousel":
@@ -89,6 +116,8 @@ def build_prompt(topic: dict, count: int, brand: dict, recent: list[str], trends
                         '"photo_query" (2 إلى 4 كلمات إنجليزية للبحث عن صورة فوتوغرافية حقيقية تمثّل هذا المشهد: شيء ملموس مرئي).\n'
                         '    المشهد الأول خطّاف يوقف التمرير (سؤال أو مشكلة). الوسطى فكرة واحدة لكل مشهد. الأخير سؤال للمتابع ودعوة للحفظ والتعليق.\n'
                         '  "photo_query": "" (اتركه فارغاً)،\n  "visual_prompt": "" (اتركه فارغاً)،')
+    elif style == "infographic" and fmt == "versus":
+        style_fields = ('  "vs": [اسم الطريقة القديمة، اسم الطريقة الجديدة] (كل اسم حتى 18 حرفاً)،\n  "points": من 4 إلى 5 عناصر، كل عنصر بالشكل «ما في القديمة || ما في الجديدة» (كل طرف حتى 40 حرفاً، الفاصل || إلزامي)،\n  "photo_query": "" (اتركه فارغاً)،\n  "visual_prompt": "" (اتركه فارغاً)،')
     elif style == "infographic":
         style_fields = ('  "points": من 3 إلى 5 نقاط قصيرة ومفيدة تلخّص المنشور كإنفوجرافك (كل نقطة حتى 60 حرفاً، بلا ترقيم)،\n'
                         '  "photo_query": "" (اتركه فارغاً)،\n  "visual_prompt": "" (اتركه فارغاً)،')
@@ -113,7 +142,8 @@ def build_prompt(topic: dict, count: int, brand: dict, recent: list[str], trends
 - اكتب بصيغة المتكلم (أنا مهندس برمجيات أبني أنظمة لأصحاب الأعمال) حين يناسب ذلك، دون ادعاء تجارب أو أرقام أو عملاء لم تُذكر في وصف الموضوع. لا تختلق أرقاماً ولا أسماء ولا نتائج؛ صغ الأثر وصفياً عند غياب الرقم.
 - اختم النص قبل الهاشتاجات بسؤال واحد محدد يدعو لإجابة قصيرة (لا «ما رأيك؟»)، ثم سطر إحالة قصير: «التفاصيل في السيرة 👆». لا تضع أي رابط داخل النص.
 - 3 إلى 5 هاشتاجات فقط، مرتبطة بالموضوع.
-{pillar_rules}- العربية الفصحى المبسّطة. معلومات صحيحة ومفيدة، بلا ادعاءات طبية أو مالية أو سياسية ولا أرقام مختلقة.
+{pillar_rules}
+- العربية الفصحى المبسّطة. معلومات صحيحة ومفيدة، بلا ادعاءات طبية أو مالية أو سياسية ولا أرقام مختلقة.
 - ترند Google الحالي (مواضيع يبحث عنها الناس الآن): {trend_txt}
   استعمل منها كهاشتاج فقط ما يرتبط فعلاً بموضوع المنشور (قد لا يوجد شيء مناسب، وهذا مقبول ولا تُقحم ترنداً لا علاقة له).
   موعد النشر: {when_txt or "غير محدد"}. اختر هاشتاجاً رائجاً مناسباً لهذا اليوم والموضوع (مثل جمعة_مباركة يوم الجمعة، وصباح_الخير في منشورات الصباح، أو مناسبة قائمة) إن وُجد، فهذا ما يجعل الهاشتاج جديداً كل يوم.
@@ -193,6 +223,15 @@ def make_entries(items: list[dict], req: dict, topic: dict, existing_ids: set[st
             img["scenes"] = scenes
             img["title"] = scenes[0]["title"] if scenes else img["title"]
             img["body"] = ""
+        elif req.get("style") == "infographic" and req.get("format") == "versus":
+            pairs = [str(x).strip() for x in (it.get("points") or []) if "||" in str(x)][:5]
+            vs = [str(x).strip()[:24] for x in (it.get("vs") or []) if str(x).strip()][:2]
+            if len(pairs) >= 3 and len(vs) == 2:
+                img["points"] = ["||".join(p.strip()[:46] for p in x.split("||", 1)) for x in pairs]
+                img["vs"] = vs
+            else:                          # جاء النص بلا مقارنة صالحة: يُنشر إنفوجرافك عادياً
+                img["points"] = [x.split("||")[-1].strip()[:88] for x in (it.get("points") or []) if str(x).strip()][:5]
+                req = dict(req, format=None)
         elif req.get("style") == "infographic":
             pts = [str(x).strip() for x in (it.get("points") or []) if str(x).strip()][:5]
             img["points"] = [x[:88] for x in pts]
@@ -206,12 +245,17 @@ def make_entries(items: list[dict], req: dict, topic: dict, existing_ids: set[st
         for part in (img.get("slides") or []) + (img.get("scenes") or []):
             part.pop("photo_query", None)
         # نمط مختلف لكل منشور: يُختار الأقل استعمالاً مؤخراً، فلا يتكرّر التصميم نفسه
-        pool = INFOGRAPHIC_STYLES if entry["template"] == "infographic" else CAROUSEL_STYLES_FLAT if entry["template"] == "carousel" else REEL_MOTION_STYLES if entry["template"] == "reel" else ()
-        if pool:
+        if req.get("format") in FORMATS:
+            img["format"] = req["format"]
+            img["series"] = FORMATS[req["format"]]["series"]
+        pool = tuple(x for x in INFOGRAPHIC_STYLES if x != "versus") if entry["template"] == "infographic" else CAROUSEL_STYLES_FLAT if entry["template"] == "carousel" else REEL_MOTION_STYLES if entry["template"] == "reel" else ()
+        if img.get("format") == "versus":
+            img["style"] = "versus"
+        elif pool:
             pick = max(pool, key=lambda st: (used[::-1].index(st) if st in used else 99, -pool.index(st)))
             img["style"] = pick
             used.append(pick)
-        if entry["template"] in ("infographic", "reel", "carousel"):
+        if entry["template"] in ("infographic", "reel", "carousel") and img.get("format") != "versus":   # ألوان المقارنة دلالية (أحمر/أخضر)
             hue = max(HUES, key=lambda h: (used_h[::-1].index(h) if h in used_h else 99, -HUES.index(h)))
             img["hue"] = hue
             used_h.append(hue)
@@ -243,7 +287,7 @@ def build_entries(req: dict, queue: list[dict]) -> tuple[list[dict], dict, str]:
     topic = load_topic(req)
     recent = [p["image"]["title"] for p in queue if isinstance(p.get("image"), dict) and p["image"].get("title")]
     trends = fetch_trends()
-    text, method = generator.generate_text(build_prompt(topic, count, load_brand(), recent, trends, req.get("style") or "photo", int(req.get("slides") or 7), when_ar(req.get("start"))))
+    text, method = generator.generate_text(build_prompt(topic, count, load_brand(), recent, trends, req.get("style") or "photo", int(req.get("slides") or 7), when_ar(req.get("start")), req.get("format")))
     method += f" | ترند Google: {len(trends)} عنصر" if trends else " | ترند Google غير متاح"
     items = generator.extract_json(text)
     if not isinstance(items, list) or not items:
@@ -312,6 +356,9 @@ def daily(target: str | None = None) -> int:
         return sorted(topics, key=lambda t: (last[t["id"]], topics.index(t)))
 
     def make(t, day, slot, style, slides, extra=None):
+        used_f = [str((p.get("image") or {}).get("format")) for p in load_queue() if (p.get("image") or {}).get("format")]
+        fmt = pick_format(str(t.get("pillar") or ""), style, used_f)
+        extra = dict(extra or {}, format=fmt)
         req = {"id": f"daily-{day}-{t['id']}", "count": 1, "topic_id": t["id"], "style": style,
                "slides": slides, "start": f"{day} {slot}", **(extra or {})}
         for attempt in range(3):              # Gemini المجاني يزدحم (503/429): نعيد بتأخير متزايد
@@ -361,11 +408,72 @@ def daily(target: str | None = None) -> int:
     for i, (t, slot) in enumerate(pairs):
         style = DAILY_STYLES[(ordinal + i) % len(DAILY_STYLES)]
         make(t, day, slot, style, 6 if style == "carousel" else 5)
+    try:
+        weekly_scripts()
+    except Exception as e:  # noqa: BLE001  — السكربتات إضافة، لا توقف التوليد اليومي
+        print("تعذّر توليد سكربتات الأسبوع:", e)
     msg = f"يومي {day}: وُلِّد {len(done)} مسودة" + (f"، وفشل {len(failed)}" if failed else "") + "."
     write_log(id=f"daily-{day}", ok=not failed or bool(done), count=len(done), topic="كل المواضيع", method="daily",
               message=msg + ((" " + " | ".join(failed))[:300] if failed else ""))
     print(msg)
     return 0
+
+
+
+SCRIPTS_PATH = ROOT / "content" / "scripts.json"
+
+
+def weekly_scripts(force: bool = False) -> int:
+    """سكربتان أسبوعياً لتصوّرهما بنفسك (وجهك وصوتك هما ما ترفعه الخوارزمية أكثر). مرة واحدة لكل أسبوع."""
+    from datetime import datetime
+    from queue_io import now_local
+
+    d = now_local().date()
+    iso = d.isocalendar()
+    week = f"{iso[0]}-W{iso[1]:02d}"
+    data = json.loads(SCRIPTS_PATH.read_text(encoding="utf-8")) if SCRIPTS_PATH.exists() else {"weeks": []}
+    if not force and any(w.get("week") == week for w in data.get("weeks", [])):
+        print("سكربتات هذا الأسبوع موجودة")
+        return 0
+    topics = yaml.safe_load(TOPICS_PATH.read_text(encoding="utf-8")).get("topics") if TOPICS_PATH.exists() else []
+    active = [t for t in (topics or []) if isinstance(t, dict) and not t.get("paused")]
+    facts = "\n".join(f"- {t['name']}: {t.get('description', '')}" for t in active)
+    prompt = f"""أنت كاتب سكربتات فيديو قصيرة (ريلز) لمهندس برمجيات عربي يبني أنظمة ومواقع ومتاجر وتطبيقات لأصحاب الأعمال، ويريد جلب زوار لموقعه.
+اكتب سكربتين يصوّرهما بنفسه بالجوال وهو يتكلم للكاميرا، مدة كل منهما 30 إلى 45 ثانية.
+السكربت الأول من محور الأتمتة، والثاني من محور القصص أو الذكاء الاصطناعي العملي.
+المحاور والحقائق المسموح بها:
+{facts}
+قواعد صارمة:
+- عربية فصحى مبسّطة قريبة من الكلام اليومي، جمل قصيرة تُقال بسهولة.
+- أول 3 ثوانٍ خطّاف يوقف التمرير. لا تبدأ بالتحية ولا بالتعريف بالنفس.
+- لا تختلق أرقاماً أو عملاء أو قصصاً أو نتائج؛ استعمل الحقائق المذكورة فقط.
+- ختام واحد: سؤال محدد للتعليق ثم «الرابط في السيرة».
+لكل سكربت هذه الحقول بالضبط:
+  "title": عنوان داخلي قصير،
+  "pillar": اسم المحور،
+  "on_screen": نص الخطّاف الذي يُكتب أعلى الفيديو (حتى 40 حرفاً)،
+  "hook": أول جملة تُقال (حتى 120 حرفاً)،
+  "points": 3 جمل للمحتوى (كل جملة حتى 140 حرفاً)،
+  "cta": جملة الختام،
+  "tip": نصيحة تصوير واحدة عملية (المكان، الإطار، ما يظهر على الشاشة)،
+  "seconds": المدة التقريبية بالثواني.
+أخرج مصفوفة JSON فقط."""
+    text, method = generator.generate_text(prompt)
+    items = generator.extract_json(text)
+    if not isinstance(items, list) or not items:
+        raise generator.GeneratorError("لم تُولَّد سكربتات")
+    keep = []
+    for it in items[:2]:
+        if not isinstance(it, dict) or not str(it.get("hook", "")).strip():
+            continue
+        keep.append({k: (it.get(k) if k == "points" else str(it.get(k, "")).strip()) for k in
+                     ("title", "pillar", "on_screen", "hook", "points", "cta", "tip", "seconds")})
+        keep[-1]["points"] = [str(x).strip() for x in (it.get("points") or []) if str(x).strip()][:3]
+    data.setdefault("weeks", []).insert(0, {"week": week, "created": datetime.now().isoformat(timespec="minutes"), "items": keep})
+    data["weeks"] = data["weeks"][:8]
+    SCRIPTS_PATH.write_text(json.dumps(data, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    print(f"سكربتات {week}: {len(keep)}")
+    return len(keep)
 
 
 def main() -> int:

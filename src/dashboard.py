@@ -14,7 +14,7 @@ from PIL import Image
 
 import accounts as acc
 import imagegen
-from config import ROOT, MEDIA_DIR, OUT_DIR, PLATFORMS, TIMEZONE, TOPICS_PATH
+from config import ROOT, MEDIA_DIR, OUT_DIR, PLATFORMS, SITE_URL, TIMEZONE, TOPICS_PATH
 from queue_io import load_queue, load_state, now_local, parse_when
 from render import Renderer
 
@@ -158,6 +158,14 @@ def load_health():
         return None
 
 
+def load_scripts():
+    f = ROOT / "content" / "scripts.json"
+    try:
+        return (json.loads(f.read_text(encoding="utf-8")).get("weeks") or [])[:3] if f.exists() else []
+    except Exception:  # noqa: BLE001
+        return []
+
+
 def load_gen_log():
     f = ROOT / "content" / "generate_log.json"
     try:
@@ -231,7 +239,7 @@ def main() -> int:
     html = env.get_template("dashboard_template.html").render(
         topics_js=((Path(__file__).parent / "dashboard_topics.js").read_text(encoding="utf-8") + "\n" +
                    (Path(__file__).parent / "dashboard_posts.js").read_text(encoding="utf-8")).replace("__REPO__", os.environ.get("GITHUB_REPOSITORY", "engshadi-79/social-publisher")),
-        gen_log=load_gen_log(), health=load_health(), proxy=args.vercel, posts_json=posts_json, acc_json=acc_json, pages_base="https://" + os.environ.get("GITHUB_REPOSITORY", "engshadi-79/social-publisher").replace("/", ".github.io/", 1) + "/", insights_json=insights_json,
+        gen_log=load_gen_log(), health=load_health(), proxy=args.vercel, posts_json=posts_json, acc_json=acc_json, scripts=load_scripts(), utm=[(LABELS[p], f"{SITE_URL}?utm_source={p}&utm_medium=social&utm_campaign=bio") for p in ("instagram", "facebook", "threads", "linkedin", "telegram")], pages_base="https://" + os.environ.get("GITHUB_REPOSITORY", "engshadi-79/social-publisher").replace("/", ".github.io/", 1) + "/", insights_json=insights_json,
         topics=load_topics(), repo=os.environ.get("GITHUB_REPOSITORY", "engshadi-79/social-publisher"),
         posts=items, counts=counts, next_post=nxt, tz=TIMEZONE,
         updated=now.strftime("%Y-%m-%d %H:%M"))

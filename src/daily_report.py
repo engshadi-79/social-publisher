@@ -29,6 +29,15 @@ def main() -> int:
         when = parse_when(p["publish_at"])
         title = str((p.get("image") or {}).get("title", "")).replace("|", "/")[:70]
         lines.append(f"| {when:%m-%d %H:%M} | {names.get(p['template'], p['template'])} | {title} |")
+    sp = ROOT / "content" / "scripts.json"
+    try:
+        wk = (json.loads(sp.read_text(encoding="utf-8")).get("weeks") or [None])[0]
+        if wk and wk.get("items"):
+            lines += ["", f"**🎬 سكربتات التصوير لهذا الأسبوع ({wk['week']})** — صوّرها بنفسك بالجوال:"]
+            for it in wk["items"]:
+                lines.append(f"- **{it.get('on_screen') or it.get('title')}**: {it.get('hook', '')}")
+    except Exception:  # noqa: BLE001
+        pass
     health = ROOT / "content" / "health.json"
     try:
         h = json.loads(health.read_text(encoding="utf-8"))

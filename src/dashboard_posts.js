@@ -349,3 +349,9 @@ if ($("btnDaily")) $("btnDaily").onclick = async () => { if (!confirm("أولّ�
   if (hrs.length) { const mx = Math.max(...hrs.map((x) => x[1])) || 1; html += '<h3>متوسط التفاعل بحسب ساعة النشر</h3><div class="bars2">' + hrs.map(([h, v]) => '<div class="bar2"><span dir="ltr">' + h + '</span><i><b style="width:' + Math.round(v / mx * 100) + '%"></b></i><span>' + v.toFixed(1) + "</span></div>").join("") + "</div>"; }
   body.insertAdjacentHTML("afterbegin", html);
 })();
+
+// ---------- نسخ السكربتات والروابط ----------
+document.addEventListener("click", async (e) => {
+  const b = e.target.closest(".cpy"); if (!b) return;
+  try { await navigator.clipboard.writeText(b.dataset.copy || ""); toast("نُسخ ✓", true); } catch (x) { toast("تعذّر النسخ، انسخ يدوياً.", false); }
+});

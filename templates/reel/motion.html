@@ -51,7 +51,7 @@ body{ font-family:"BrandFont","Cairo","Segoe UI",Tahoma,sans-serif; color:var(--
   <div id="ring"></div>
   <div id="blob"></div>
   <div class="bars" id="bars">{% for s in scenes %}<i><b></b></i>{% endfor %}</div>
-  <div class="top"><span id="ctr">01/{{ '%02d' % scenes|length }}</span><span class="name">{{ brand.name }}</span></div>
+  <div class="top"><span><span id="ctr">01/{{ '%02d' % scenes|length }}</span>{% if series %}<span style="margin-left:18px;background:rgba(255,255,255,.16);border:2px solid rgba(255,255,255,.35);border-radius:99px;padding:2px 16px;direction:rtl;display:inline-block">{{ series }}</span>{% endif %}</span><span class="name">{{ brand.name }}</span></div>
   {% for s in scenes %}
   <div class="num" data-sc="{{ loop.index0 }}">{{ '%02d' % loop.index }}</div>
   <div class="scene" data-sc="{{ loop.index0 }}">

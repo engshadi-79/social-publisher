@@ -1,0 +1,34 @@
+{% extends "_base.html" %}
+{# «مقارنة»: الطريقة القديمة ✗ ضد الجديدة ✓ في عمودين. النقاط بالشكل «القديم || الجديد». #}
+{% block style %}
+.canvas { background: radial-gradient(800px 600px at 100% 0%, rgba(16,185,129,.22), transparent 60%), radial-gradient(700px 600px at 0% 100%, rgba(239,68,68,.18), transparent 60%), #0b1326; }
+.overlay { display: none; }
+.frame { padding: 80px 64px 58px; }
+.text { --base: 44px; --m: 0 0 auto; }
+.title { font-size: 1.9em; line-height: 1.24; }
+.body { opacity: .8; font-size: .82em; }
+.vs { margin-top: 1em; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.col { border-radius: 26px; padding: .55em .6em .7em; }
+.col.old { background: rgba(239,68,68,.10); border: 3px solid rgba(239,68,68,.45); }
+.col.new { background: rgba(16,185,129,.12); border: 3px solid rgba(16,185,129,.55); }
+.head { display: flex; align-items: center; gap: .45em; font-weight: 800; font-size: .9em; padding: .2em .3em .5em; border-bottom: 2px solid rgba(255,255,255,.12); margin-bottom: .35em; }
+.mark { width: 1.45em; height: 1.45em; border-radius: 50%; display: grid; place-items: center; font-size: .85em; font-weight: 800; color: #fff; flex: 0 0 auto; }
+.old .mark { background: #ef4444; } .new .mark { background: #10b981; }
+.row { font-size: .7em; line-height: 1.45; font-weight: 600; padding: .5em .35em; border-bottom: 1px dashed rgba(255,255,255,.12); }
+.row:last-child { border-bottom: 0; }
+.old .row { color: #fecaca; } .new .row { color: #d1fae5; }
+.footer { border-top: 3px solid rgba(255,255,255,.14); }
+{% endblock %}
+{% block content %}
+<div class="text"><div class="inner">
+  <div class="title">{{ title }}</div>
+  {% if body %}<div class="body">{{ body }}</div>{% endif %}
+  {% set pairs = [] %}
+  <div class="vs">
+    <div class="col old"><div class="head"><span class="mark">✗</span><span>{{ (vs or ["الطريقة القديمة", "الطريقة الجديدة"])[0] }}</span></div>
+      {% for p in points %}{% set pr = p.split("||") %}<div class="row">{{ pr[0]|trim }}</div>{% endfor %}</div>
+    <div class="col new"><div class="head"><span class="mark">✓</span><span>{{ (vs or ["الطريقة القديمة", "الطريقة الجديدة"])[1] }}</span></div>
+      {% for p in points %}{% set pr = p.split("||") %}<div class="row">{{ (pr[1] if pr|length > 1 else "")|trim }}</div>{% endfor %}</div>
+  </div>
+</div></div>
+{% endblock %}

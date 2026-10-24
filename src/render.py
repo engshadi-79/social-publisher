@@ -65,6 +65,7 @@ class Renderer:
             title=post["image"]["title"], body=post["image"].get("body", ""),
             points=[str(x) for x in (post["image"].get("points") or [])],
             bg=bg.as_uri() if bg and bg.exists() else None, hue=post_hue(post),
+            vs=post["image"].get("vs"), series=post["image"].get("series", ""),
             logo=logo.as_uri() if brand.get("logo") and logo.is_file() else None,
         )
         return self._shoot(html, post["id"], w, h, out_png)
@@ -83,7 +84,7 @@ class Renderer:
         outs = []
         for spec in slide_specs(post):
             photo = photos.get(spec["index"])
-            html = tpl.render(brand=brand, w=w, h=h, fonts=_fonts(),
+            html = tpl.render(brand=brand, w=w, h=h, fonts=_fonts(), series=post["image"].get("series", ""),
                               photo=photo.as_uri() if photo else None, hue=post_hue(post), **spec)
             outs.append(self._shoot(html, f"{post['id']}-s{spec['index']}", w, h, out_dir / f"{post['id']}-s{spec['index']}.png"))
         return outs

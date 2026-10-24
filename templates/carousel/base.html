@@ -31,6 +31,7 @@ ul{ list-style:none }
 </head>
 <body>
 {% block slide %}{% endblock %}
+{% if series and index == 1 %}<div style="position:fixed;top:28px;inset-inline-end:40px;z-index:99;display:inline-flex;align-items:center;gap:10px;background:rgba(15,23,42,.78);color:#fff;border-radius:99px;padding:6px 18px 6px 14px;font:800 24px BrandFont,Cairo,sans-serif"><i style="width:12px;height:12px;border-radius:50%;background:#f59e0b"></i>{{ series }}</div>{% endif %}
 <script>
 (async () => {
   await document.fonts.ready;
