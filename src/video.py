@@ -80,6 +80,8 @@ def render_poster(renderer, post: dict, out_png: Path, scene: int = 1) -> Path:
     specs = scene_specs(post)
     if not specs:
         raise VideoError("لا مشاهد في هذا الريل")
+    if is_motion(post):
+        return render_motion_poster(renderer, post, out_png, scene)
     photos, _ = imagegen.ensure_slide_photos(post, key="scenes")
     env = Environment(loader=FileSystemLoader(str(TEMPLATES_DIR)), autoescape=True)
     w, h = TEMPLATES["reel"]
@@ -113,6 +115,8 @@ def render_reel(renderer, post: dict, out_dir: Path, photos: dict[int, Path] | N
     from queue_io import load_brand
     from render import _fonts, post_hue, reel_template
 
+    if is_motion(post):
+        return render_motion_reel(renderer, post, out_dir)
     if photos is None:                    # يجلبها بنفسه كما يفعل الكاروسيل
         photos, warns = imagegen.ensure_slide_photos(post, key="scenes")
         for w_ in warns:                  # لا نُسقطها بصمت: مشهد بلا صورة يجب أن يُرى
@@ -155,5 +159,102 @@ def render_reel(renderer, post: dict, out_dir: Path, photos: dict[int, Path] | N
 
     out_mp4 = out_dir / f"{post['id']}.mp4"
     _encode(frames, out_mp4)
+    shutil.rmtree(frames, ignore_errors=True)
+    return out_mp4
+
+
+# ================= محرّك «موشن»: صفحة واحدة لكل الفيديو + موسيقى مركّبة =================
+BEAT = 0.5                    # 120 نبضة/دقيقة: المشاهد تبدأ وتنتهي على النبض
+CAPTURE_FPS = 48              # نلتقط ضعف معدّل الإخراج ثم ندمج كل إطارين = تمويه حركة طبيعي
+OUT_FPS = 24
+MOTION_THEMES = {
+    "motion": {"a1": "#6366f1", "a2": "#8b5cf6", "bg1": "#070b16", "bg2": "#1b1f4b", "ink": "#ffffff", "kick": "#f59e0b",
+               "cols": ["#6366f1", "#8b5cf6", "#10b981", "#f59e0b", "#ec4899", "#06b6d4", "#6366f1", "#a855f7"]},
+    "motion-sunset": {"a1": "#f97316", "a2": "#ec4899", "bg1": "#170914", "bg2": "#4a1d2e", "ink": "#ffffff", "kick": "#6366f1",
+                      "cols": ["#f97316", "#ec4899", "#f59e0b", "#ef4444", "#a855f7", "#fb7185", "#f97316", "#facc15"]},
+    "motion-mint": {"a1": "#10b981", "a2": "#06b6d4", "bg1": "#04161a", "bg2": "#0f3b3a", "ink": "#ffffff", "kick": "#f43f5e",
+                    "cols": ["#10b981", "#06b6d4", "#22d3ee", "#84cc16", "#14b8a6", "#38bdf8", "#10b981", "#a3e635"]},
+}
+
+
+def is_motion(post: dict) -> bool:
+    from render import reel_style
+    return reel_style(post) in MOTION_THEMES
+
+
+def motion_timing(post: dict) -> tuple[list[float], list[float], float]:
+    """مدد المشاهد مقرّبة إلى أقرب نبضة (5 نبضات على الأقل)، ونبضة أخيرة يعود فيها الشكل لهيئته الأولى (حلقة)."""
+    durs = [max(5, round(s["duration"] / BEAT)) * BEAT for s in scene_specs(post)]
+    starts, t = [], 0.0
+    for d in durs:
+        starts.append(t)
+        t += d
+    return starts, durs, t + BEAT
+
+
+def _motion_page(renderer, post: dict):
+    from jinja2 import Environment, FileSystemLoader
+
+    from config import TEMPLATES_DIR
+    from queue_io import load_brand
+    from render import _fonts, post_hue, reel_style
+
+    specs = scene_specs(post)
+    if not (MIN_SCENES <= len(specs) <= MAX_SCENES):
+        raise VideoError(f"الريل يحتاج من {MIN_SCENES} إلى {MAX_SCENES} مشاهد (وجدت {len(specs)})")
+    starts, durs, total = motion_timing(post)
+    env = Environment(loader=FileSystemLoader(str(TEMPLATES_DIR)), autoescape=True)
+    w, h = TEMPLATES["reel"]
+    html = env.get_template("reel/motion.html").render(
+        brand=load_brand(), w=w, h=h, fonts=_fonts(), hue=0, theme=MOTION_THEMES[reel_style(post)],   # الثيم يحدد الألوان، فلا إزاحة لونية
+        scenes=specs, starts=starts, durs=durs, total=total)
+    tmp = OUT_DIR / "_tmp"
+    tmp.mkdir(parents=True, exist_ok=True)
+    page_file = tmp / f"{post['id']}-motion.html"
+    page_file.write_text(html, encoding="utf-8")
+    page = renderer._browser.new_page(viewport={"width": w, "height": h}, device_scale_factor=1)
+    page.goto(page_file.as_uri())
+    page.wait_for_function("window.__ready === true", timeout=30000)
+    return page, w, h, starts, durs, total
+
+
+def render_motion_poster(renderer, post: dict, out_png: Path, scene: int = 1) -> Path:
+    page, w, h, starts, durs, _ = _motion_page(renderer, post)
+    try:
+        k = max(0, min(scene - 1, len(starts) - 1))
+        page.evaluate("t => window.seek(t)", starts[k] + min(durs[k] - 0.5, 1.8))
+        out_png.parent.mkdir(parents=True, exist_ok=True)
+        page.screenshot(path=str(out_png), clip={"x": 0, "y": 0, "width": w, "height": h})
+    finally:
+        page.close()
+    return out_png
+
+
+def render_motion_reel(renderer, post: dict, out_dir: Path) -> Path:
+    import audio
+
+    frames = OUT_DIR / "_frames" / post["id"]
+    if frames.exists():
+        shutil.rmtree(frames)
+    frames.mkdir(parents=True, exist_ok=True)
+    page, w, h, starts, durs, total = _motion_page(renderer, post)
+    try:
+        count = int(round(total * CAPTURE_FPS))
+        for f in range(count):
+            page.evaluate("t => window.seek(t)", f / CAPTURE_FPS)
+            page.screenshot(path=str(frames / f"{f + 1:05d}.jpg"), type="jpeg", quality=FRAME_QUALITY)
+    finally:
+        page.close()
+    wav = audio.make_track(frames / "track.wav", total, starts)
+    out_mp4 = out_dir / f"{post['id']}.mp4"
+    out_mp4.parent.mkdir(parents=True, exist_ok=True)
+    cmd = [ffmpeg_bin(), "-y", "-loglevel", "error",
+           "-framerate", str(CAPTURE_FPS), "-i", str(frames / "%05d.jpg"), "-i", str(wav),
+           "-vf", f"tmix=frames=2,fps={OUT_FPS},scale=in_range=full:out_range=tv,format=yuv420p",
+           "-c:v", "libx264", "-preset", "medium", "-crf", "20", "-color_range", "tv",
+           "-c:a", "aac", "-b:a", "128k", "-shortest", "-movflags", "+faststart", str(out_mp4)]
+    p = subprocess.run(cmd, capture_output=True, text=True)
+    if p.returncode or not out_mp4.exists():
+        raise VideoError(f"فشل ffmpeg: {(p.stderr or '')[:300]}")
     shutil.rmtree(frames, ignore_errors=True)
     return out_mp4

@@ -17,7 +17,7 @@ import yaml
 import generator
 from config import ROOT, QUEUE_PATH
 from queue_io import fatal, load_queue, load_brand, parse_when, validate
-from config import TOPICS_PATH, INFOGRAPHIC_STYLES, CAROUSEL_STYLES_FLAT, REEL_STYLES, HUES
+from config import TOPICS_PATH, INFOGRAPHIC_STYLES, CAROUSEL_STYLES_FLAT, REEL_MOTION_STYLES, HUES
 
 REQUEST = ROOT / "content" / "generate_request.yaml"
 LOG = ROOT / "content" / "generate_log.json"
@@ -206,7 +206,7 @@ def make_entries(items: list[dict], req: dict, topic: dict, existing_ids: set[st
         for part in (img.get("slides") or []) + (img.get("scenes") or []):
             part.pop("photo_query", None)
         # نمط مختلف لكل منشور: يُختار الأقل استعمالاً مؤخراً، فلا يتكرّر التصميم نفسه
-        pool = INFOGRAPHIC_STYLES if entry["template"] == "infographic" else CAROUSEL_STYLES_FLAT if entry["template"] == "carousel" else REEL_STYLES if entry["template"] == "reel" else ()
+        pool = INFOGRAPHIC_STYLES if entry["template"] == "infographic" else CAROUSEL_STYLES_FLAT if entry["template"] == "carousel" else REEL_MOTION_STYLES if entry["template"] == "reel" else ()
         if pool:
             pick = max(pool, key=lambda st: (used[::-1].index(st) if st in used else 99, -pool.index(st)))
             img["style"] = pick

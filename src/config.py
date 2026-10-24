@@ -49,4 +49,5 @@ INFOGRAPHIC_STYLES = ("cards", "bento", "timeline", "bold", "glass", "steps",
 # إزاحات لونية (hue-rotate بالدرجات): كل نمط × كل إزاحة = تصميم مختلف المظهر
 HUES = (0, 35, 70, 140, 190, 250, 290, 325)
 # أنماط الريل: geo أشكال هندسية · bold جريء · split شقّان · card بطاقة · terminal طرفية · neon نيون · paper ورقي · mesh شبكة ألوان
-REEL_STYLES = ("geo", "bold", "split", "card", "terminal", "neon", "paper", "mesh")
+REEL_MOTION_STYLES = ("motion", "motion-sunset", "motion-mint")   # المحرّك الجديد: خط زمني واحد + موسيقى
+REEL_STYLES = REEL_MOTION_STYLES + ("geo", "bold", "split", "card", "terminal", "neon", "paper", "mesh")

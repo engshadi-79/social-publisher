@@ -1,0 +1,148 @@
+{# محرّك «موشن» للريل: صفحة واحدة لكل الفيديو، ودالة seek(t) واحدة تحسب كل شيء من الزمن فقط.
+   مبادئ مأخوذة من أفضل وصفات Opus 5.5 للفيديو بالكود:
+   - شكل واحد لا ينقطع: عنصر واحد يتحوّل حجمه وزواياه ولونه من مشهد لآخر بنوابض مغلقة الصيغة (ارتداد بسيط).
+   - شبكة 120 نبضة/دقيقة: المشاهد تبدأ على النبض، وشيء ما يحدث في كل نبضة.
+   - النص يدخل بعد بدء تحوّل الحاوية ويخرج قبل التحوّل التالي، مع تمويه قصير، فلا يتداخل نصّان أبداً.
+   - لا انتقالات CSS، لا مؤقّتات، لا حالة محمولة بين الإطارات؛ والإطار الأخير يساوي الأول (حلقة). #}
+<!doctype html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="utf-8">
+<style>
+{% for f in fonts %}
+@font-face { font-family: "BrandFont"; src: url("{{ f.uri }}"); font-weight: {{ f.weight }}; font-style: normal; }
+{% endfor %}
+:root{ --a1:{{ theme.a1 }}; --a2:{{ theme.a2 }}; --bg1:{{ theme.bg1 }}; --bg2:{{ theme.bg2 }}; --ink:{{ theme.ink }}; --kick:{{ theme.kick }} }
+*{ box-sizing:border-box; margin:0; padding:0 }
+html,body{ width:{{ w }}px; height:{{ h }}px; overflow:hidden; background:var(--bg1) }
+body{ font-family:"BrandFont","Cairo","Segoe UI",Tahoma,sans-serif; color:var(--ink) }
+.stage{ position:relative; width:{{ w }}px; height:{{ h }}px; overflow:hidden; background:radial-gradient(1200px 900px at 85% 10%, var(--bg2), var(--bg1) 70%) }
+#halo{ position:absolute; width:1600px; height:1600px; left:-260px; top:160px; border-radius:50%;
+       background:conic-gradient(from 0deg, transparent, rgba(255,255,255,.06), transparent 40%, rgba(255,255,255,.05), transparent 75%) }
+#grid{ position:absolute; inset:-120px; background:
+  linear-gradient(rgba(255,255,255,.045) 2px, transparent 2px) 0 0/90px 90px,
+  linear-gradient(90deg, rgba(255,255,255,.045) 2px, transparent 2px) 0 0/90px 90px }
+.pt{ position:absolute; border-radius:50%; background:rgba(255,255,255,.55) }
+#blob{ position:absolute; left:0; top:0; transform-origin:center; will-change:transform,width,height;
+       box-shadow:0 40px 120px -20px var(--a1), inset 0 2px 0 rgba(255,255,255,.35) }
+#blob::after{ content:""; position:absolute; inset:0; border-radius:inherit; background:linear-gradient(160deg, rgba(255,255,255,.28), transparent 45%) }
+#ring{ position:absolute; border:5px solid rgba(255,255,255,.35); border-radius:50% }
+.bars{ position:absolute; top:46px; inset-inline:46px; display:flex; gap:10px; z-index:6 }
+.bars i{ flex:1; height:7px; border-radius:99px; background:rgba(255,255,255,.22); overflow:hidden; position:relative }
+.bars i b{ position:absolute; inset:0 auto 0 0; width:0; background:#fff }
+.top{ position:absolute; top:86px; inset-inline:46px; display:flex; justify-content:space-between; align-items:center; font-size:30px; font-weight:700; direction:ltr; z-index:6; opacity:.92 }
+.top .name{ direction:rtl }
+.scene{ position:absolute; inset-inline:76px; bottom:300px; z-index:5 }
+.kicker{ display:inline-block; background:var(--kick); color:#fff; border-radius:12px; padding:.28em .9em; font-size:36px; font-weight:800; margin-bottom:28px }
+.title{ font-size:92px; font-weight:800; line-height:1.18; text-shadow:0 10px 40px rgba(0,0,0,.45) }
+.body{ margin-top:28px; font-size:42px; line-height:1.65; font-weight:600; opacity:.95; text-shadow:0 4px 24px rgba(0,0,0,.4) }
+.num{ position:absolute; top:150px; inset-inline-end:40px; font-size:300px; font-weight:800; line-height:1; direction:ltr; color:transparent; -webkit-text-stroke:4px rgba(255,255,255,.22); z-index:3 }
+.beat{ position:absolute; bottom:200px; inset-inline-start:76px; display:flex; gap:14px; z-index:6; direction:ltr }
+.beat i{ width:16px; height:16px; border-radius:50%; background:#fff; opacity:.35 }
+.foot{ position:absolute; bottom:70px; inset-inline:70px; display:flex; justify-content:space-between; align-items:center; font-size:30px; font-weight:700; direction:ltr; z-index:6; opacity:.92 }
+.foot .who{ direction:rtl; border:3px solid currentColor; border-radius:99px; padding:.26em .9em }
+{% if hue %}#halo,#grid,#blob,#ring,.pt{ filter:hue-rotate({{ hue }}deg) }{% endif %}
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div id="halo"></div><div id="grid"></div>
+  {% for i in range(18) %}<i class="pt" data-i="{{ i }}"></i>{% endfor %}
+  <div id="ring"></div>
+  <div id="blob"></div>
+  <div class="bars" id="bars">{% for s in scenes %}<i><b></b></i>{% endfor %}</div>
+  <div class="top"><span id="ctr">01/{{ '%02d' % scenes|length }}</span><span class="name">{{ brand.name }}</span></div>
+  {% for s in scenes %}
+  <div class="num" data-sc="{{ loop.index0 }}">{{ '%02d' % loop.index }}</div>
+  <div class="scene" data-sc="{{ loop.index0 }}">
+    {% if s.kicker %}<div class="kicker tx" data-d="0.15">{{ s.kicker }}</div>{% endif %}
+    <div class="title tx" data-d="0.3">{{ s.title }}</div>
+    {% if s.body %}<div class="body tx" data-d="0.55">{{ s.body }}</div>{% endif %}
+  </div>
+  {% endfor %}
+  <div class="beat" id="beat"><i></i><i></i><i></i><i></i></div>
+  <div class="foot"><span>{{ brand.handle }}</span><span class="who" id="who">تابع ←</span></div>
+</div>
+<script>
+const W = {{ w }}, H = {{ h }}, BEAT = 0.5;              // 120 نبضة/دقيقة
+const STARTS = {{ starts|tojson }}, DURS = {{ durs|tojson }}, TOTAL = {{ total }};
+const N = STARTS.length, LOOP_AT = TOTAL - BEAT;          // آخر نبضة: يعود الشكل إلى هيئة البداية
+// هيئات الشكل الواحد (x, y, w, h, نصف القطر، الدوران) — تتبادل بين المشاهد ثم تعود للأولى
+const G = [
+  [280, 360, 520, 520, 260, 0], [70, 520, 940, 640, 72, 0], [430, 260, 580, 860, 56, 0],
+  [90, 250, 360, 360, 180, 0], [60, 240, 960, 700, 64, 0], [300, 470, 480, 480, 70, 45],
+  [120, 420, 840, 420, 210, 0], [560, 280, 420, 420, 210, 0]];
+const COLS = {{ theme.cols|tojson }};
+const spring = (tau, w = 10.5, z = 0.72) => {             // نابض مغلق الصيغة بارتداد صغير
+  if (tau <= 0) return 0;
+  const wd = w * Math.sqrt(1 - z * z);
+  return 1 - Math.exp(-z * w * tau) * (Math.cos(wd * tau) + (z * w / wd) * Math.sin(wd * tau));
+};
+const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+const geomAt = (k) => G[k % G.length];
+const hex = (c) => [parseInt(c.slice(1, 3), 16), parseInt(c.slice(3, 5), 16), parseInt(c.slice(5, 7), 16)];
+// قيمة متغيّر هدفه يتبدّل عدة مرات: مجموع نابض لكل تبدّل
+function morph(t, pick) {
+  let v = pick(0).slice();
+  for (let k = 1; k <= N; k++) {
+    const at = k < N ? STARTS[k] - 0.1 : LOOP_AT, a = pick(k - 1), b = pick(k < N ? k : 0), s = spring(t - at);
+    for (let j = 0; j < v.length; j++) v[j] += (b[j] - a[j]) * s;
+  }
+  return v;
+}
+const blob = document.getElementById('blob'), ring = document.getElementById('ring');
+const scenes = [...document.querySelectorAll('.scene')], nums = [...document.querySelectorAll('.num')];
+const bars = [...document.querySelectorAll('#bars i b')], beats = [...document.querySelectorAll('#beat i')];
+const pts = [...document.querySelectorAll('.pt')].map((el, i) => {
+  const r = (n) => { const x = Math.sin((i + 1) * 9301 + n * 49297) * 233280; return x - Math.floor(x); };   // عشوائية ثابتة
+  return { el, x: r(1) * W, y: r(2) * H, s: 6 + r(3) * 12, v: 30 + r(4) * 70 };
+});
+const sceneAt = (t) => { let k = 0; for (let i = 0; i < N; i++) if (t >= STARTS[i]) k = i; return k; };
+
+window.seek = (t) => {
+  t = clamp(t, 0, TOTAL);
+  const k = sceneAt(t), local = t - STARTS[k], ph = (t % BEAT) / BEAT;
+  const hit = Math.exp(-ph * 7);                            // نبضة: قفزة سريعة ثم هدوء
+  // الشكل الواحد
+  const [x, y, w, h, r, rot] = morph(t, geomAt);
+  const c = morph(t, (i) => hex(COLS[i % COLS.length]));
+  const sc = 1 + 0.025 * hit;
+  blob.style.left = x + 'px'; blob.style.top = y + 'px'; blob.style.width = w + 'px'; blob.style.height = h + 'px';
+  blob.style.borderRadius = r + 'px';
+  blob.style.transform = `rotate(${rot.toFixed(2)}deg) scale(${sc.toFixed(4)})`;
+  blob.style.background = `linear-gradient(140deg, rgb(${c.map(Math.round)}), var(--a2))`;
+  const rr = 220 + 520 * ((t / BEAT) % 4) / 4;              // حلقة تتّسع كل أربع نبضات
+  ring.style.width = ring.style.height = rr + 'px';
+  ring.style.left = (x + w / 2 - rr / 2) + 'px'; ring.style.top = (y + h / 2 - rr / 2) + 'px';
+  ring.style.opacity = (0.5 * (1 - ((t / BEAT) % 4) / 4)).toFixed(3);
+  document.getElementById('halo').style.transform = `rotate(${(t * 9).toFixed(2)}deg)`;
+  document.getElementById('grid').style.transform = `translateY(${(-(t * 22) % 90).toFixed(2)}px)`;
+  pts.forEach((p) => { const yy = ((p.y - t * p.v) % H + H) % H; p.el.style.width = p.el.style.height = p.s + 'px';
+    p.el.style.transform = `translate(${p.x.toFixed(1)}px, ${yy.toFixed(1)}px)`; p.el.style.opacity = (0.25 + 0.35 * hit).toFixed(3); });
+  // النبض المرئي: نقطة تضيء في كل نبضة
+  const bi = Math.floor(t / BEAT) % 4;
+  beats.forEach((b, i) => { b.style.opacity = i === bi ? (0.4 + 0.6 * hit).toFixed(3) : '0.25'; b.style.transform = `scale(${i === bi ? (1 + 0.6 * hit).toFixed(3) : 1})`; });
+  // النصوص: تدخل بعد بدء التحوّل، وتخرج قبل التحوّل التالي، مع تمويه قصير
+  scenes.forEach((el, i) => {
+    const start = STARTS[i], end = i + 1 < N ? STARTS[i + 1] - 0.1 : LOOP_AT;
+    const on = t >= start - 0.05 && t <= end;
+    el.style.visibility = on ? 'visible' : 'hidden';
+    if (!on) return;
+    [...el.querySelectorAll('.tx')].forEach((tx) => {
+      const a = spring(t - start - parseFloat(tx.dataset.d), 11, 0.8), out = clamp((t - (end - 0.3)) / 0.3, 0, 1);
+      const vis = clamp(a, 0, 1) * (1 - out);
+      tx.style.opacity = vis.toFixed(3);
+      tx.style.filter = `blur(${((1 - clamp(a, 0, 1)) * 14 + out * 10).toFixed(2)}px)`;
+      tx.style.transform = `translateY(${((1 - a) * 70 - out * 40).toFixed(2)}px)`;
+    });
+  });
+  nums.forEach((el, i) => { const a = i === k ? spring(local - 0.05, 9, 0.75) : 0; const out = i === k ? clamp((t - ((i + 1 < N ? STARTS[i + 1] : LOOP_AT) - 0.35)) / 0.3, 0, 1) : 1;
+    el.style.opacity = (clamp(a, 0, 1) * (1 - out)).toFixed(3); el.style.transform = `translateX(${((1 - a) * -80).toFixed(1)}px)`; });
+  bars.forEach((b, i) => { b.style.width = i < k ? '100%' : i === k ? (clamp(local / DURS[k], 0, 1) * 100).toFixed(2) + '%' : '0%'; });
+  document.getElementById('ctr').textContent = String(k + 1).padStart(2, '0') + '/' + String(N).padStart(2, '0');
+  document.getElementById('who').textContent = k < N - 1 ? 'تابع ←' : 'احفظ ✓';
+};
+window.ready = (async () => { await document.fonts.ready; window.seek(0); window.__ready = true; })();
+</script>
+</body>
+</html>
