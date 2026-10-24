@@ -82,9 +82,4 @@ jobs:
           python dashboard.py --vercel
           cd ../vercel-site
           npm install --silent
-          # نشر بلا ربط النطاق ثم ترقية ذرّية: فلا يشير النطاق الإنتاجي إلى نشر قيد البناء (كان يعطي 404 مؤقتاً بعد كل حفظ)
-          OUT=$(npx --yes vercel@latest deploy --prod --skip-domain --yes --token "$VERCEL_TOKEN" 2>&1) || { echo "$OUT"; exit 1; }
-          echo "$OUT"
-          URL=$(echo "$OUT" | grep -oE 'https://social-dashboard-[a-z0-9]{9}-[a-z0-9-]+\.vercel\.app' | head -1)
-          if [ -z "$URL" ]; then echo "تعذّر استخراج رابط النشر"; exit 1; fi
-          npx --yes vercel@latest promote "$URL" --yes --token "$VERCEL_TOKEN"
+          npx --yes vercel@latest deploy --prod --yes --token "$VERCEL_TOKEN"
