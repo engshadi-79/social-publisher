@@ -60,8 +60,16 @@ def fetch_trends() -> list[str]:
     return out[:60]
 
 
+PILLAR_RULES = {
+    "automation": "- محور «الأتمتة»: ابدأ بالألم ثم الحل. اشرح ما يُؤتمَت دون ذكر تقنيات، واذكر ما يربحه صاحب العمل (وقت، أخطاء، هدوء).",
+    "case": "- محور «القصص»: سرد بصيغة المتكلم: المشكلة ← ما بنيتُه ولماذا ← الأثر. استخدم فقط المشاريع المذكورة في وصف الموضوع، وبلا اختلاق.",
+    "ai": "- محور «الذكاء الاصطناعي»: أداة أو طريقة واحدة قابلة للتجربة اليوم، وما الخطأ الشائع فيها، وكيف يتحقق المستخدم من نتيجتها.",
+}
+
+
 def build_prompt(topic: dict, count: int, brand: dict, recent: list[str], trends: list[str], style: str = "photo", slides_n: int = 7, when_txt: str = "") -> str:
     fixed = " ".join(topic.get("hashtags_fixed") or []) or "(لا يوجد)"
+    pillar_rules = PILLAR_RULES.get(str(topic.get("pillar") or ""), "")
     avoid = "، ".join(recent[-15:]) or "(لا يوجد)"
     trend_txt = "، ".join(trends) if trends else "(غير متاح الآن)"
     if style == "carousel":
@@ -100,7 +108,12 @@ def build_prompt(topic: dict, count: int, brand: dict, recent: list[str], trends
 عناوين سبق نشرها (لا تكررها): {avoid}
 
 قواعد صارمة:
-- العربية الفصحى المبسّطة. معلومات صحيحة ومفيدة، بلا ادعاءات طبية أو مالية أو سياسية ولا أرقام مختلقة.
+- ابدأ text_long بخطّاف قوي في السطر الأول: ألم يعرفه صاحب العمل، أو رقم من الموضوع نفسه، أو سؤال يستفزّ التفكير. ممنوع الافتتاحيات العامة مثل «في عالم اليوم» أو «هل تعلم أن».
+- كل منشور يحمل مثالاً واقعياً محدداً أو مشهداً من يوم عمل حقيقي (من يفعل ماذا ومتى). ممنوع النصائح العامة المكررة التي تصلح لأي حساب.
+- اكتب بصيغة المتكلم (أنا مهندس برمجيات أبني أنظمة لأصحاب الأعمال) حين يناسب ذلك، دون ادعاء تجارب أو أرقام أو عملاء لم تُذكر في وصف الموضوع. لا تختلق أرقاماً ولا أسماء ولا نتائج؛ صغ الأثر وصفياً عند غياب الرقم.
+- اختم النص قبل الهاشتاجات بسؤال واحد محدد يدعو لإجابة قصيرة (لا «ما رأيك؟»)، ثم سطر إحالة قصير: «التفاصيل في السيرة 👆». لا تضع أي رابط داخل النص.
+- 3 إلى 5 هاشتاجات فقط، مرتبطة بالموضوع.
+{pillar_rules}- العربية الفصحى المبسّطة. معلومات صحيحة ومفيدة، بلا ادعاءات طبية أو مالية أو سياسية ولا أرقام مختلقة.
 - ترند Google الحالي (مواضيع يبحث عنها الناس الآن): {trend_txt}
   استعمل منها كهاشتاج فقط ما يرتبط فعلاً بموضوع المنشور (قد لا يوجد شيء مناسب، وهذا مقبول ولا تُقحم ترنداً لا علاقة له).
   موعد النشر: {when_txt or "غير محدد"}. اختر هاشتاجاً رائجاً مناسباً لهذا اليوم والموضوع (مثل جمعة_مباركة يوم الجمعة، وصباح_الخير في منشورات الصباح، أو مناسبة قائمة) إن وُجد، فهذا ما يجعل الهاشتاج جديداً كل يوم.
@@ -258,11 +271,12 @@ def append_entries(entries: list[dict]) -> None:
 
 DAILY_STYLES = ["infographic", "carousel"]            # الريل له موعد يومي خاص به (REEL_SLOT) فلا يدخل هنا
 # أوقات الذروة لجمهور عربي (بتوقيت الجهة): صباح قبل العمل، استراحة الظهيرة، وذروة المساء
-SLOTS = ["08:00", "13:00", "21:00"]
+SLOTS = ["08:00", "21:00"]                           # منشوران يومياً: صباح قبل العمل وذروة المساء
 PER_DAY = len(SLOTS)
-REEL_SLOT = "18:00"                                    # ريل واحد يومياً على كل المنصات، قبل ذروة المساء
+REEL_SLOT = "18:00"                                    # ريل أسبوعي على كل المنصات، قبل ذروة المساء
+REEL_WEEKDAY = 3                                       # الخميس (الاثنين=0)
 REEL_MIN_SCENES = 7                                    # لا يقل الريل عن 7 مشاهد (صور متحرّكة)
-REEL_AHEAD_DAYS = 3                                    # يضمن وجود ريل جاهز للأيام الثلاثة القادمة
+REEL_AHEAD_DAYS = 14                                   # يضمن وجود ريل لكل خميس خلال أسبوعين قادمين
 
 
 def free_slots(queue: list[dict], day: str) -> list[str]:
@@ -284,7 +298,7 @@ def daily(target: str | None = None) -> int:
     from queue_io import now_local
 
     topics = yaml.safe_load(TOPICS_PATH.read_text(encoding="utf-8")).get("topics") if TOPICS_PATH.exists() else []
-    topics = [t for t in (topics or []) if isinstance(t, dict) and t.get("id")]
+    topics = [t for t in (topics or []) if isinstance(t, dict) and t.get("id") and not t.get("paused")]
     if not topics:
         print("لا مواضيع")
         return 0
@@ -320,7 +334,7 @@ def daily(target: str | None = None) -> int:
     # 1) الريلات: يوم واحد بعد آخر لأيام قادمة، من مواضيع غير صباحية
     for k in range(REEL_AHEAD_DAYS):
         rday = target or (start + timedelta(days=k)).strftime("%Y-%m-%d")
-        if reel_free(load_queue(), rday):
+        if datetime.strptime(rday, "%Y-%m-%d").weekday() == REEL_WEEKDAY and reel_free(load_queue(), rday):
             pool = [t for t in order_topics(load_queue()) if t.get("time") != "morning"] or topics
             make(pool[0], rday, REEL_SLOT, "reel", 8, {"min_scenes": REEL_MIN_SCENES})
         if target:
