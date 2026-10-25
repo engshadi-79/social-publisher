@@ -3041,3 +3041,51 @@
 
 
       #صباح_الخير #أتمتة_الأعمال #الذكاء_الاصطناعي #ريادة_الأعمال'
+- id: 2026-10-27-morning
+  approved: false
+  publish_at: 2026-10-27 09:00
+  template: reel
+  topic: morning-greetings
+  image:
+    title: مع كل فجر يعلو، تتجدد في روحك أمنية نقية
+    style: morning
+    seed: 0
+    scenes:
+    - title: مع كل فجر يعلو، تتجدد في روحك أمنية نقية
+      seconds: 5
+      photo_query: mountain sunrise
+      video_url: https://cdn.pixabay.com/video/2024/07/25/223034_large.mp4
+      thumb: https://cdn.pixabay.com/video/2024/07/25/223034_large.jpg
+    - title: كن خفيفاً كالندى، وابدأ يومك بروح منشرحة
+      seconds: 5
+      photo_query: dew drops flower
+      video_url: https://cdn.pixabay.com/video/2023/07/20/172493-847499846_large.mp4
+      thumb: https://cdn.pixabay.com/video/2023/07/20/172493-847499846_large.jpg
+    - title: كتب الله لقلبك يوماً مشرقاً يحمل كل خير
+      seconds: 5.5
+      photo_query: breakfast sunlight
+      body: صباح الخير والبدايات المبهجة
+      video_url: https://cdn.pixabay.com/video/2025/01/19/253423_large.mp4
+      thumb: https://cdn.pixabay.com/video/2025/01/19/253423_large.jpg
+  platforms:
+    facebook: 'صباح يتنفس هدوءاً ونوراً يلامس أرواحنا بكل رقة ☕️✨
+
+      ما الطقس الصباحي البسيط الذي يمنحك شعوراً بالراحة والبهجة؟
+
+
+      #صباح_الخير #صباحيات #تفاؤل #أمل #بدايات_جديدة'
+    instagram: 'مع ضوء الصباح وفنجان القهوة، تتجدد الأمنيات اللطيفة 🌿☕️
+
+      بماذا تبدأ أولى خطواتك في هذا النهار الجميل؟ شاركنا تفاصيلك.
+
+      .
+
+      #صباح_الخير #صباحيات #تفاؤل #أمل #روقان_صباحي'
+    threads: 'صباح هادئ يليق بقلوبكم الطيبة ☀️
+
+      نسمات رقيقة ودفء لطيف يبعثان في الروح سكينة لا توصف.
+
+      ما هو الشيء البسيط الذي صنع ابتسامتك هذا الصباح؟ ☕️🌿
+
+
+      #صباح_الخير #صباحيات #تفاؤل #أمل #إيجابية'
