@@ -1,8 +1,8 @@
 {
-  "id": "daily-2026-10-30",
+  "id": "daily-2026-10-31",
   "ok": true,
   "count": 2,
   "topic": "كل المواضيع",
   "method": "daily",
-  "message": "يومي 2026-10-30: وُلِّد 2 مسودة."
+  "message": "يومي 2026-10-31: وُلِّد 2 مسودة، وفشل 1. أتمتة العمل اليدوي لأصحاب الأعمال: Expecting ',' delimiter: line 68 column 5 (char 2607)"
 }
