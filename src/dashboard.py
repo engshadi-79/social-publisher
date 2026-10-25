@@ -264,9 +264,19 @@ def main() -> int:
         print("اللوحة بلا تشفير (محمية على الخادم)" if args.vercel else "تنبيه: DASHBOARD_PASSWORD غير مضبوط، اللوحة مفتوحة لكل من معه الرابط")
     redirect = os.environ.get("DASHBOARD_URL", "")
     if args.publish and redirect:           # اللوحة صارت على Vercel: صفحة GitHub القديمة تحوّل إليها ولا تحمل أي محتوى
+        # الصفحة نفسها عنوان العودة لتفويض Threads (setup_threads.py): إن وصلها ?code= تعرضه للنسخ ولا تحوّل
         html = ('<!doctype html><html dir="rtl" lang="ar"><head><meta charset="utf-8"><meta name="robots" content="noindex">'
-                f'<meta http-equiv="refresh" content="0;url={redirect}"><title>لوحة التحكم</title></head>'
-                f'<body style="font-family:sans-serif;text-align:center;padding:40px"><a href="{redirect}">انتقل إلى لوحة التحكم</a></body></html>')
+                '<meta name="viewport" content="width=device-width,initial-scale=1"><title>لوحة التحكم</title></head>'
+                '<body style="font-family:sans-serif;text-align:center;padding:40px;line-height:1.8">'
+                f'<div id="go"><a href="{redirect}">انتقل إلى لوحة التحكم</a></div>'
+                '<div id="code" hidden><h2>كود التفويض جاهز ✅</h2><p>انسخه والصقه في نافذة PowerShell التي تنتظره:</p>'
+                '<textarea id="c" readonly style="width:min(92vw,560px);height:90px;font:16px monospace;direction:ltr"></textarea>'
+                '<p><button id="b" style="font-size:18px;padding:8px 22px">نسخ</button></p></div>'
+                '<script>var m=/[?&]code=([^&#]+)/.exec(location.search);'
+                'if(m){document.getElementById("go").hidden=true;document.getElementById("code").hidden=false;'
+                'var t=document.getElementById("c");t.value=decodeURIComponent(m[1]);t.select();'
+                'document.getElementById("b").onclick=function(){t.select();try{navigator.clipboard.writeText(t.value)}catch(e){document.execCommand("copy")}this.textContent="نُسخ ✓"}}'
+                f'else location.replace("{redirect}");</script></body></html>')
     (args.out / "index.html").write_text(html, encoding="utf-8")
     if args.vercel:        # صفحة 404 تعيد التحميل تلقائياً: بعد كل حفظ يُنشر الموقع من جديد وقد تتأخر الملفات لحظات
         (args.out / "404.html").write_text('<!doctype html><html dir="rtl" lang="ar"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><meta http-equiv="refresh" content="4;url=/"><title>جارٍ التحديث</title><style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b1018;color:#e6eaf2;font-family:Segoe UI,Tahoma,sans-serif;text-align:center}p{color:#9aa4b5}.s{width:34px;height:34px;border:4px solid #243044;border-top-color:#2dd4bf;border-radius:50%;margin:0 auto 14px;animation:r 1s linear infinite}@keyframes r{to{transform:rotate(360deg)}}</style></head><body><div><div class="s"></div><h2>جارٍ تحديث اللوحة…</h2><p>تُنشر نسخة جديدة بعد حفظك. ستُعاد الصفحة تلقائياً خلال ثوانٍ.</p></div></body></html>', encoding="utf-8")
