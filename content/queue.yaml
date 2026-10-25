@@ -2922,7 +2922,7 @@
 
       #جمعة_مباركة #أتمتة_الأعمال #إدارة_المشاريع #تطوير_الشركات'
 - id: 2026-10-26-morning
-  approved: false
+  approved: true
   publish_at: 2026-10-26 09:00
   template: reel
   topic: morning-greetings
