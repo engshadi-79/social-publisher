@@ -166,6 +166,15 @@ def load_scripts():
         return []
 
 
+def load_settings() -> dict:
+    """إعدادات تكتبها اللوحة (content/settings.json)، مثل النشر التلقائي لريل الصباح."""
+    f = ROOT / "content" / "settings.json"
+    try:
+        return json.loads(f.read_text(encoding="utf-8")) if f.exists() else {}
+    except Exception:  # noqa: BLE001
+        return {}
+
+
 def load_gen_log():
     f = ROOT / "content" / "generate_log.json"
     try:
@@ -221,6 +230,10 @@ def main() -> int:
             it["slide_count"] = len(fulls)
             it["tok"] = img_token(it["id"])
             it["reel_scenes"] = len((post.get("image") or {}).get("scenes") or []) if post["template"] == "reel" else 0
+            if post["template"] == "reel":      # فيديو المعاينة (يُبنى عند الطلب) باسم يحمل بصمة المحتوى
+                import video
+                it["vname"] = video.preview_name(post)
+            it["morning"] = str((post.get("image") or {}).get("style") or "") == "morning"
 
     acc_json = json.dumps([{"id": a.id, "platform": a.platform, "label": a.label, "default": a.default}
                            for a in acc.load_accounts().values()], ensure_ascii=False).replace("</", "<\\/")
@@ -238,8 +251,9 @@ def main() -> int:
     env = Environment(loader=FileSystemLoader(str(Path(__file__).parent)), autoescape=True)
     html = env.get_template("dashboard_template.html").render(
         topics_js=((Path(__file__).parent / "dashboard_topics.js").read_text(encoding="utf-8") + "\n" +
-                   (Path(__file__).parent / "dashboard_posts.js").read_text(encoding="utf-8")).replace("__REPO__", os.environ.get("GITHUB_REPOSITORY", "engshadi-79/social-publisher")),
-        gen_log=load_gen_log(), health=load_health(), proxy=args.vercel, posts_json=posts_json, acc_json=acc_json, scripts=load_scripts(), utm=[(LABELS[p], f"{SITE_URL}?utm_source={p}&utm_medium=social&utm_campaign=bio") for p in ("instagram", "facebook", "threads", "linkedin", "telegram")], pages_base="https://" + os.environ.get("GITHUB_REPOSITORY", "engshadi-79/social-publisher").replace("/", ".github.io/", 1) + "/", insights_json=insights_json,
+                   (Path(__file__).parent / "dashboard_posts.js").read_text(encoding="utf-8") + "\n" +
+                   (Path(__file__).parent / "dashboard_extra.js").read_text(encoding="utf-8")).replace("__REPO__", os.environ.get("GITHUB_REPOSITORY", "engshadi-79/social-publisher")),
+        gen_log=load_gen_log(), health=load_health(), settings=load_settings(), settings_json=json.dumps(load_settings(), ensure_ascii=False).replace("</", "<\\/"), proxy=args.vercel, posts_json=posts_json, acc_json=acc_json, scripts=load_scripts(), utm=[(LABELS[p], f"{SITE_URL}?utm_source={p}&utm_medium=social&utm_campaign=bio") for p in ("instagram", "facebook", "threads", "linkedin", "telegram")], pages_base="https://" + os.environ.get("GITHUB_REPOSITORY", "engshadi-79/social-publisher").replace("/", ".github.io/", 1) + "/", insights_json=insights_json,
         topics=load_topics(), repo=os.environ.get("GITHUB_REPOSITORY", "engshadi-79/social-publisher"),
         posts=items, counts=counts, next_post=nxt, tz=TIMEZONE,
         updated=now.strftime("%Y-%m-%d %H:%M"))

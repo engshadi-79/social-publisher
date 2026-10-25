@@ -43,6 +43,9 @@ export default async function middleware(request) {
   const url = new URL(request.url);
   const expected = token(pw);
 
+  // عدّاد الزيارات يستقبل نبضات موقع المهندس من أي زائر: بلا جلسة، ولا يكشف شيئاً (يكتب أرقاماً فقط)
+  if (url.pathname === '/api/hit') return next();
+
   if (url.pathname === '/login' && request.method === 'POST') {
     const form = await request.formData();
     if (safeEq(form.get('password') || '', pw)) {

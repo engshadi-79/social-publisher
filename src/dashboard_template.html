@@ -6,7 +6,7 @@
 <title>لوحة النشر</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=IBM+Plex+Sans:wght@500;600&display=swap">
-<script>window.GH_PROXY={{ "true" if proxy else "false" }};</script>
+<script>window.GH_PROXY={{ "true" if proxy else "false" }};window.PAGES_BASE="{{ pages_base }}";</script>
 <style>
 :root{--bg:#f4f7fa;--card:#fff;--ink:#0b1f3a;--mute:#5d6b7c;--line:#e2e8ef;--teal:#0f9d8f;--ok:#0f9d58;--warn:#b86e00;--bad:#c5372c;--draft:#6b778a;--chip:#eef3f8}
 @media (prefers-color-scheme:dark){:root{--bg:#0d1520;--card:#15202e;--ink:#e8eef5;--mute:#93a1b3;--line:#243245;--teal:#2dd4bf;--ok:#4ade80;--warn:#fbbf24;--bad:#f87171;--draft:#93a1b3;--chip:#1c2a3b}}
@@ -255,6 +255,20 @@ input[type=checkbox],input[type=radio]{width:auto;min-height:0}
   .acts button{flex:1 1 auto;justify-content:center}.acts .act{flex:1 1 100%;margin:0}.acts button.del[data-act=del]{margin-inline-start:0}
   .pagehead h1{font-size:1.35rem}
 }
+/* v5: شريط التحديث، مفتاح النشر التلقائي، السحب في التقويم، الزوار */
+#syncbar{position:fixed;top:72px;inset-inline:0;margin:0 auto;width:max-content;max-width:92vw;z-index:70;display:flex;align-items:center;gap:12px;padding:9px 16px;border-radius:999px;background:var(--s3);border:1px solid var(--line);box-shadow:0 10px 30px rgba(0,0,0,.45);font-size:.86rem}
+#syncbar[hidden]{display:none!important}#syncbar.ok{border-color:rgba(16,185,129,.6)}#syncbar.no{border-color:rgba(239,68,68,.6)}
+#syncbar .spin{width:14px;height:14px;border:2px solid var(--line);border-top-color:#6366f1;border-radius:50%;animation:sp 1s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
+#syncbar button{font:inherit;font-weight:700;border:0;border-radius:999px;padding:5px 12px;background:#10b981;color:#04211e;cursor:pointer}
+.autosw{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border:1px solid var(--line);border-radius:999px;font-size:.84rem;cursor:pointer;background:var(--s2)}
+.autosw input{accent-color:#f59e0b;width:16px;height:16px}
+.mchip{display:inline-block;font-size:.72rem;font-weight:700;padding:2px 9px;border-radius:999px;background:rgba(245,158,11,.16);color:#fbbf24;border:1px solid rgba(245,158,11,.35);margin-inline-start:6px}
+.cchip[draggable=true]{cursor:grab}.cchip.dragging{opacity:.45}.cday.over{outline:2px dashed #6366f1;outline-offset:2px;background:rgba(99,102,241,.08)}
+.vbars{display:grid;gap:8px;margin:10px 0 4px}.vbar{display:grid;grid-template-columns:90px 1fr 70px;align-items:center;gap:10px;font-size:.85rem}
+.vbar i{height:12px;border-radius:6px;background:var(--s2);overflow:hidden}.vbar i b{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#6366f1,#22d3ee)}
+.vdays{display:flex;align-items:flex-end;gap:4px;height:90px;margin-top:12px;direction:ltr}.vdays span{flex:1;background:#6366f1;border-radius:4px 4px 0 0;min-height:2px;position:relative}
+.vdays span:hover::after{content:attr(data-t);position:absolute;bottom:100%;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:.72rem;background:var(--s3);padding:2px 6px;border-radius:6px}
+.vsteps{margin:8px 0 0;padding-inline-start:20px;line-height:1.9}
 </style>
 </head>
 <body>
@@ -371,6 +385,7 @@ input[type=checkbox],input[type=radio]{width:auto;min-height:0}
   
   <select id="qTopic"><option value="">كل المواضيع</option>{% for t in topics %}<option value="{{ t.id }}">{{ t.name }}</option>{% endfor %}</select>
   <select id="qTpl"><option value="">كل القوالب</option><option value="infographic">إنفوجرافك</option><option value="carousel">كاروسيل</option><option value="reel">ريل</option><option value="split">صورة</option><option value="tip">نصيحة</option><option value="quote">اقتباس</option></select>
+  <label class="autosw" title="ريل الصباح اليومي (9:00)"><input type="checkbox" id="autoMorning"{% if settings.auto_approve_morning %} checked{% endif %}> ☀️ ريل الصباح يُنشر تلقائياً بلا مراجعة</label>
   <button class="act" id="bulkApprove" hidden>✅ وافق على كل المسودات (<span id="bulkN">0</span>)</button>
   <div class="msg" id="bulkMsg"></div>
 </div>
@@ -379,7 +394,7 @@ input[type=checkbox],input[type=radio]{width:auto;min-height:0}
 <article class="post" data-s="{{ p.group }}" data-tpl="{{ p.template }}" data-topic="{{ p.topic }}" data-q="{{ p.title }}">
   <div class="imgwrap"><img loading="lazy" src="images/thumb-{{ p.id }}{{ p.tok }}.jpg" {% if p.reel_scenes and p.group == "published" %}data-video="{{ pages_base }}images/{{ p.id }}.mp4" {% endif %}data-full="images/full-{{ p.id }}{{ p.tok }}{% if p.slide_count > 1 %}-s1{% endif %}.jpg"{% if p.slides_json %} data-slides='{{ p.slides_json }}'{% endif %} alt="{{ p.title }}" title="اضغط لعرض الصورة كاملة">{% if p.slide_count > 1 and not p.reel_scenes %}<span class="scount"><svg class="i"><use href="#i-layers"/></svg> {{ p.slide_count }} شرائح</span>{% endif %}{% if p.reel_scenes %}<span class="scount"><svg class="i"><use href="#i-play"/></svg> فيديو · {{ p.reel_scenes }} مشاهد</span>{% endif %}</div>
   <div class="body">
-    <span class="badge b-{{ p.badge }}">{{ p.badge_txt }}</span>
+    <span class="badge b-{{ p.badge }}">{{ p.badge_txt }}</span>{% if p.morning %}<span class="mchip">☀️ ريل الصباح</span>{% endif %}
     <div class="title">{{ p.title }}</div>
     <div class="line">{{ p.line }}</div>
     <div class="plats">
@@ -398,6 +413,8 @@ input[type=checkbox],input[type=radio]{width:auto;min-height:0}
       <button class="del" data-act="del" data-id="{{ p.id }}"><svg class="i"><use href="#i-trash"/></svg> حذف</button>
       {% elif p.group == "failed" %}<button class="act" data-act="retry" data-id="{{ p.id }}"><svg class="i"><use href="#i-repeat"/></svg> إعادة المحاولة</button>
       <button class="del" data-act="del" data-id="{{ p.id }}"><svg class="i"><use href="#i-trash"/></svg> حذف</button>{% endif %}
+      {% if p.vname and p.group != "published" %}<button class="del" data-act="watch" data-id="{{ p.id }}" data-vname="{{ p.vname }}" style="color:#a5b4fc;border-color:rgba(99,102,241,.5)"><svg class="i"><use href="#i-play"/></svg> شاهد الفيديو</button>{% endif %}
+      {% if p.group in ("draft", "upcoming") %}<button class="del" data-act="regen" data-id="{{ p.id }}" style="color:#fbbf24;border-color:rgba(245,158,11,.45)"><svg class="i"><use href="#i-refresh"/></svg> ولّد بديلاً</button>{% endif %}
       <button class="del" data-act="repub" data-id="{{ p.id }}" style="color:var(--ink);border-color:var(--line)"><svg class="i"><use href="#i-repeat"/></svg> إعادة نشر</button>
       <span class="actmsg msg"></span>
     </div>
@@ -495,10 +512,15 @@ input[type=checkbox],input[type=radio]{width:auto;min-height:0}
   <p class="hint" id="statsNote"></p>
   <div id="statsBody"></div>
   </div>
+  <div class="panel" id="visitsPanel">
+  <h2>زوار موقعك من كل منصة</h2>
+  <p class="hint" id="visitsNote">جارٍ التحميل…</p>
+  <div id="visitsBody"></div>
+  </div>
 </section>
 <section id="calPanel" hidden>
   <div class="pagehead"><div><span class="eyebrow"><i class="pulse"></i>{{ tz }}</span>
-    <h1>تقويم النشر والمواعيد الأسبوعية</h1><p>مواعيد ثابتة: 08:00 و21:00 للمنشورات، و18:00 يوم الخميس للريل الأسبوعي.</p></div></div>
+    <h1>تقويم النشر والمواعيد الأسبوعية</h1><p>مواعيد ثابتة: 08:00 و21:00 للمنشورات، و09:00 يومياً لريل الصباح، و18:00 يوم الخميس للريل الأسبوعي.</p></div></div>
   <div class="panel">
     <h2>التقويم الأسبوعي</h2>
     <div class="calbar"><button class="del" id="calPrev" style="color:var(--ink);border-color:var(--line)">→ الأسبوع السابق</button>
@@ -506,7 +528,7 @@ input[type=checkbox],input[type=radio]{width:auto;min-height:0}
       <button class="del" id="calNext" style="color:var(--ink);border-color:var(--line)">الأسبوع التالي ←</button>
       <button class="del" id="calToday" style="color:var(--teal);border-color:var(--teal)">هذا الأسبوع</button></div>
     <div class="cgrid" id="calGrid"></div>
-    <p class="hint">اضغط على منشور مسودة أو مجدول لتعديله. الأيام الفارغة مكتوب عليها «فراغ».</p>
+    <p class="hint">اسحب منشوراً (مسودة أو مجدول) إلى يوم آخر لتغيير موعده بالساعة نفسها، أو اضغطه لتعديله. الأيام الفارغة مكتوب عليها «فراغ».</p>
     <label>توزيع المسودات تلقائياً: منشور واحد كل يوم فارغ بدءاً من الغد، في الساعة</label>
     <select id="calHour"><option value="12:30">12:30 ظهراً</option><option value="18:00">6:00 مساءً</option><option value="20:00" selected>8:00 مساءً</option><option value="21:00">9:00 مساءً</option></select>
     <button class="act" id="calDistribute">🗓️ وزّع المسودات</button>
@@ -587,9 +609,11 @@ input[type=checkbox],input[type=radio]{width:auto;min-height:0}
   
 
 </div>
+<div id="syncbar" role="status" aria-live="polite" hidden></div>
 <script type="application/json" id="accdata">{{ acc_json|safe }}</script>
 <script type="application/json" id="insdata">{{ insights_json|safe }}</script>
 <script type="application/json" id="postdata">{{ posts_json|safe }}</script>
+<script type="application/json" id="setdata">{{ settings_json|safe }}</script>
 <script>
 const tabs=document.querySelectorAll('#tabs button'),posts=document.querySelectorAll('.post'),empty=document.getElementById('empty');
 let curF='upcoming';function matchTools(p){const q=(document.getElementById('qSearch').value||'').trim().toLowerCase(),tp=document.getElementById('qTopic').value,tl=document.getElementById('qTpl').value;return(!q||(p.dataset.q||'').toLowerCase().includes(q))&&(!tp||p.dataset.topic===tp)&&(!tl||p.dataset.tpl===tl)}

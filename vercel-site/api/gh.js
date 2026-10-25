@@ -1,10 +1,11 @@
 // وسيط GitHub للوحة: يحمل المفتاح على الخادم (GITHUB_PAT)، فلا يُلصق في أي متصفح.
 // الدخول محمي مرتين: middleware.js يمنع غير المسجَّلين، وهنا نتحقق من الكوكي أيضاً.
-// يسمح فقط بما تحتاجه اللوحة: ملفات content/** ، وتشغيل سير عمل النشر/اللوحة/التوليد.
+// يسمح فقط بما تحتاجه اللوحة: ملفات content/** ، وتشغيل سير عمل النشر/اللوحة/التوليد/معاينة الريل، وقراءة حالة تشغيلها.
 const { createHmac, timingSafeEqual } = require('node:crypto');
 
 const REPO = process.env.GITHUB_REPO || 'engshadi-79/social-publisher';
-const WORKFLOWS = /^actions\/workflows\/(publish|dashboard|generate|health|daily)\.yml\/dispatches$/;
+const WORKFLOWS = /^actions\/workflows\/(publish|dashboard|generate|health|daily|reel-preview)\.yml\/dispatches$/;
+const RUNS = /^actions\/workflows\/(dashboard|reel-preview|generate)\.yml\/runs$/;   // متابعة التحديث بعد الحفظ (قراءة فقط)
 const CONTENT = /^contents\/content\/[A-Za-z0-9._\-\/]+$/;
 
 const sessionToken = (pw) => createHmac('sha256', pw).update('social-dashboard-session-v1').digest('hex');
@@ -24,7 +25,8 @@ module.exports = async (req, res) => {
   const path = url.searchParams.get('p') || '';
   const method = req.method;
   const ok = (method === 'POST' && WORKFLOWS.test(path)) ||
-             (['GET', 'PUT', 'DELETE'].includes(method) && CONTENT.test(path.split('?')[0]) && !path.includes('..'));
+             (['GET', 'PUT', 'DELETE'].includes(method) && CONTENT.test(path.split('?')[0]) && !path.includes('..')) ||
+             (method === 'GET' && RUNS.test(path.split('?')[0]));
   if (!ok) return res.status(403).json({ error: 'forbidden' });
 
   let body;

@@ -390,7 +390,7 @@ def build_morning(day: str, queue: list[dict]) -> dict:
             platforms[name] = clip(str(item[name]).strip(), limit)
     if not platforms:
         raise generator.GeneratorError("ريل الصباح بلا نصوص للمنصات")
-    entry = {"id": f"{day}-morning", "approved": False, "publish_at": f"{day} {MORNING_SLOT}", "template": "reel",
+    entry = {"id": f"{day}-morning", "approved": bool(load_settings().get("auto_approve_morning")), "publish_at": f"{day} {MORNING_SLOT}", "template": "reel",
              "topic": MORNING_TOPIC,
              "image": {"title": scenes[0]["title"], "style": "morning", "seed": ordinal % 97, "scenes": scenes},
              "platforms": platforms}
@@ -562,6 +562,59 @@ def weekly_scripts(force: bool = False) -> int:
     return len(keep)
 
 
+def load_settings() -> dict:
+    """إعدادات تكتبها اللوحة في content/settings.json (مثل النشر التلقائي لريل الصباح)."""
+    f = ROOT / "content" / "settings.json"
+    try:
+        return json.loads(f.read_text(encoding="utf-8")) if f.exists() else {}
+    except Exception:  # noqa: BLE001
+        return {}
+
+
+def remove_entry(post_id: str) -> None:
+    """يحذف منشوراً من queue.yaml نصّياً (يبقى تنسيق بقية الملف كما هو) مع صوره المحفوظة."""
+    lines = QUEUE_PATH.read_text(encoding="utf-8").split("\n")
+    ids = [i for i, ln in enumerate(lines) if ln.startswith("- id:")]
+    idof = lambda ln: ln[len("- id:"):].strip().strip("'\"")  # noqa: E731
+    start = next((i for i in ids if idof(lines[i]) == post_id), None)
+    if start is None:
+        raise generator.GeneratorError(f"لم أجد المنشور {post_id} في الطابور")
+    end = next((i for i in ids if i > start), len(lines))
+    QUEUE_PATH.write_text("\n".join(lines[:start] + lines[end:]), encoding="utf-8")
+    for f in (ROOT / "content" / "media").glob(f"{post_id}-*"):
+        f.unlink()
+
+
+def regenerate(req: dict) -> str:
+    """«ولّد بديلاً» من اللوحة: منشور جديد في الموعد نفسه وبالقالب نفسه، ويُحذف القديم."""
+    old_id = str(req["replace"])
+    queue = load_queue()
+    old = next((p for p in queue if p["id"] == old_id), None)
+    if not old:
+        raise generator.GeneratorError(f"لم أجد المنشور {old_id}")
+    when = parse_when(old["publish_at"])
+    rest = [p for p in queue if p["id"] != old_id]
+    img = old.get("image") or {}
+    if str(img.get("style") or "") == "morning":
+        entry = build_morning(when.strftime("%Y-%m-%d"), rest)
+        entry["publish_at"] = when.strftime("%Y-%m-%d %H:%M")
+        entries, name = [entry], "ريل الصباح"
+    else:
+        style = old["template"] if old["template"] in ("carousel", "reel", "infographic") else "infographic"
+        n = len(img.get("slides") or img.get("scenes") or []) or (6 if style == "carousel" else 8 if style == "reel" else 5)
+        sub = {"id": f"{req.get('id') or 'regen'}", "count": 1, "topic_id": old.get("topic"), "style": style,
+               "slides": n, "start": when.strftime("%Y-%m-%d %H:%M"),
+               "format": img.get("format")}
+        if style == "reel":
+            sub["min_scenes"] = min(n, REEL_MIN_SCENES)
+        entries, topic, _ = build_entries(sub, rest)
+        entries = entries[:1]
+        name = topic["name"]
+    remove_entry(old_id)
+    append_entries(entries)
+    return f"وُلِّد بديل لـ«{img.get('title') or old_id}» ({name}) → {entries[0]['id']}"
+
+
 def main() -> int:
     sys.stdout.reconfigure(encoding="utf-8")
     if "--daily" in sys.argv:
@@ -571,9 +624,19 @@ def main() -> int:
         print("لا يوجد طلب توليد")
         return 0
     req = yaml.safe_load(REQUEST.read_text(encoding="utf-8")) or {}
-    if req.get("style") not in ("carousel", "reel", "infographic"):
+    if not req.get("replace") and req.get("style") not in ("carousel", "reel", "infographic"):
         req["style"] = "infographic"          # لا منشورات بصور فوتوغرافية بعد الآن
     rid = str(req.get("id", ""))
+    if req.get("replace"):
+        try:
+            msg = regenerate(req)
+            write_log(id=rid, ok=True, count=1, topic=str(req["replace"]), method="regen", message=msg)
+            print(msg)
+        except Exception as e:  # noqa: BLE001
+            write_log(id=rid, ok=False, count=0, topic=str(req["replace"]), message=f"فشل توليد البديل: {str(e)[:400]}")
+            print("فشل:", e)
+        REQUEST.unlink(missing_ok=True)
+        return 0
     try:
         entries, topic, method = build_entries(req, load_queue())
         append_entries(entries)

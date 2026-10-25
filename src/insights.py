@@ -40,7 +40,14 @@ def metrics_of(d: dict) -> dict:
 def facebook(pid, c):
     tok = c["token"]
     try:
-        d = get(f"{G}/{pid}", fields="reactions.summary(true).limit(0),comments.summary(true).limit(0),shares", access_token=tok)
+        try:
+            d = get(f"{G}/{pid}", fields="reactions.summary(true).limit(0),comments.summary(true).limit(0),shares", access_token=tok)
+        except Exception as e:  # noqa: BLE001
+            if "nonexisting field" not in str(e):
+                raise
+            # الريلات منشورات «فيديو»: لا حقل reactions فيها، بل likes
+            d = get(f"{G}/{pid}", fields="likes.summary(true).limit(0),comments.summary(true).limit(0)", access_token=tok)
+            d["reactions"] = d.get("likes") or {}
         out = {"likes": d.get("reactions", {}).get("summary", {}).get("total_count"),
                "comments": d.get("comments", {}).get("summary", {}).get("total_count"),
                "shares": (d.get("shares") or {}).get("count", 0)}

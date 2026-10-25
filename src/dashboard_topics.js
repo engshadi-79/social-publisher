@@ -50,7 +50,8 @@ function scenesToText(scenes) {
 }
 function scenesYaml(scenes) {
   return "    scenes:\n" + scenes.map((s) => "      - kicker: " + q(s.kicker || "") + "\n        title: " + q(s.title) + "\n        body: " + q(s.body || "") +
-    "\n        seconds: " + (Math.min(8, Math.max(1.5, s.seconds || 3.4))) + (s.photo_query ? "\n        photo_query: " + q(s.photo_query) : "")).join("\n") + "\n";
+    "\n        seconds: " + (Math.min(8, Math.max(1.5, s.seconds || 3.4))) + (s.photo_query ? "\n        photo_query: " + q(s.photo_query) : "") +
+    (s.video_url ? "\n        video_url: " + q(s.video_url) : "") + (s.thumb ? "\n        thumb: " + q(s.thumb) : "")).join("\n") + "\n";
 }
 const scenesError = (sc) => (sc.length < 3 || sc.length > 8) ? "الريل يحتاج من 3 إلى 8 مشاهد." : (sc.some((s) => !s.title) ? "لكل مشهد عنوان («# العنوان»)." : (sc.some((s) => s.title.length > 70) ? "عنوان المشهد أطول من 70 حرفاً." : (sc.some((s) => s.body.length > 150) ? "نص المشهد أطول من 150 حرفاً." : "")));
 const slidesError = (sl) => (sl.length < 3 || sl.length > 10) ? "الكاروسيل يحتاج من 3 إلى 10 شرائح." : (sl.some((s) => !s.title) ? "لكل شريحة عنوان («# العنوان»)." : "");
@@ -159,6 +160,7 @@ async function edit(fn, msg, file) {
   const f = await gh("contents/" + file);
   const text = fn(b64d(f.content));
   await gh("contents/" + file, { method: "PUT", body: JSON.stringify({ message: msg, content: b64e(text), sha: f.sha }) });
+  if (window.onSaved) window.onSaved();
 }
 
 const $ = (id) => document.getElementById(id);
@@ -247,6 +249,7 @@ async function putRequest(text, msg) {
   try { sha = (await gh("contents/content/generate_request.yaml")).sha; } catch (e) { sha = undefined; }
   await gh("contents/content/generate_request.yaml", { method: "PUT",
     body: JSON.stringify({ message: msg, content: b64e(text), sha }) });
+  if (window.onSaved) window.onSaved("generate");
 }
 $("gGo").onclick = async () => {
   const m = $("gMsg");

@@ -9,6 +9,7 @@ on:
       - content/queue.yaml
       - content/topics.yaml
       - content/generate_log.json
+      - content/settings.json
       - brand/**
       - templates/**
       - src/dashboard*

@@ -1,0 +1,52 @@
+name: reel-preview
+# يبني فيديو ريل واحد قبل الموافقة ويرفعه إلى gh-pages (تطلبه اللوحة بزرّ «شاهد الفيديو»).
+on:
+  workflow_dispatch:
+    inputs:
+      id:
+        description: "معرّف الريل في الطابور"
+        required: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: reel-preview-${{ inputs.id }}
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Cache Playwright browsers
+        id: pw
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: pw-${{ hashFiles('requirements.txt') }}
+      - run: playwright install --with-deps chromium
+        if: steps.pw.outputs.cache-hit != 'true'
+      - run: playwright install-deps chromium
+        if: steps.pw.outputs.cache-hit == 'true'
+      - name: Ensure ffmpeg
+        run: command -v ffmpeg >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg; }
+      - name: Build and upload preview
+        working-directory: src
+        env:
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+          POST_ID: ${{ inputs.id }}
+        run: |
+          git config --global user.name "publisher-bot"
+          git config --global user.email "publisher-bot@users.noreply.github.com"
+          # gh-pages قد يتقدّم أثناء البناء بسبب النشر: نعيد الرفع مرة إن رُفض
+          python reel_preview.py "$POST_ID" || { sleep 20; python reel_preview.py "$POST_ID"; }

@@ -12,7 +12,7 @@ import requests
 
 REPO = "engshadi-79/social-publisher"
 REDIRECT = "https://engshadi-79.github.io/social-publisher/"
-SCOPES = "threads_basic,threads_content_publish"
+SCOPES = "threads_basic,threads_content_publish,threads_manage_insights"   # الأخير لقراءة المشاهدات والإعجابات
 
 
 def secret(name, value):

@@ -59,7 +59,7 @@ async function deleteChangedPhotos(id, oldList, newList, oldBase, newBase) {
 // ---------- نمط التصميم ولونه ----------
 const STYLES = {
   infographic: { cards: "بطاقات", bento: "بنتو", timeline: "خط زمني", bold: "جريء", glass: "زجاجي", steps: "درج", neon: "نيون", checklist: "قائمة تحقق", bignum: "الرقم الكبير", blueprint: "مخطط", pills: "كبسولات", columns: "شريط جانبي" },
-  reel: { motion: "موشن نيلي (بموسيقى)", "motion-sunset": "موشن غروب (بموسيقى)", "motion-mint": "موشن نعناعي (بموسيقى)", geo: "أشكال هندسية", bold: "جريء", split: "شقّان", card: "بطاقة", terminal: "طرفية", neon: "نيون", paper: "ورقي", mesh: "شبكة ألوان" },
+  reel: { morning: "ريل الصباح (لقطات حقيقية)", motion: "موشن نيلي (بموسيقى)", "motion-sunset": "موشن غروب (بموسيقى)", "motion-mint": "موشن نعناعي (بموسيقى)", geo: "أشكال هندسية", bold: "جريء", split: "شقّان", card: "بطاقة", terminal: "طرفية", neon: "نيون", paper: "ورقي", mesh: "شبكة ألوان" },
   carousel: { blueprint: "مخطط", editorial: "مجلة", terminal: "طرفية", poster: "ملصق", sticky: "ورقة ملصقة", duo: "لوحان", neon: "نيون", paper: "ورقي", gradient: "تدرج" },
 };
 const HUES = [0, 35, 70, 140, 190, 250, 290, 325];
@@ -108,6 +108,8 @@ $("eSave").onclick = async () => {
   if (err) { say(m, err, false); return; }
   const oi = old.image || {};
   const img = { style: $("eStyle").value || undefined, hue: eHue != null && (tpl === "infographic" || tpl === "reel" || tpl === "carousel") ? eHue : undefined, title: multi ? eSlides[0].title : v("eTitle"), body: multi ? "" : v("eBody"), seed: oi.seed != null ? oi.seed : 1 };
+  if (tpl === "reel") eSlides.forEach((sc, i) => { const o = (oi.scenes || [])[i] || {};
+    if (o.video_url && (o.photo_query || "") === (sc.photo_query || "")) { sc.video_url = o.video_url; if (o.thumb) sc.thumb = o.thumb; } });
   if (tpl === "carousel") img.slides = eSlides; else if (tpl === "reel") { img.scenes = eSlides; if (v("eQuery")) img.photo_query = v("eQuery"); } else if (tpl === "infographic") img.points = points; else { img.photo_query = v("eQuery"); if (v("eVP")) img.visual_prompt = v("eVP"); }
   let targets;
   try { targets = readTargets("eAcc", Object.keys(platforms)); } catch (e4) { say(m, e4.message, false); return; }
@@ -177,8 +179,8 @@ function renderCal() {
   for (let i = 0; i < 7; i++) {
     const d = new Date(weekStart); d.setDate(d.getDate() + i); const key = ymd(d);
     const list = Object.values(POSTS).filter((p) => (p.publish_at || "").startsWith(key)).sort((a, b) => a.publish_at.localeCompare(b.publish_at));
-    html += '<div class="cday' + (key === todayKey ? " today" : "") + '"><div class="cdh">' + DAYS_AR[d.getDay()] + " " + d.getDate() + "</div>" +
-      (list.length ? list.map((p) => '<button class="cchip g-' + p.group + '" data-cal="' + p.id + '"><b dir="ltr">' + p.publish_at.slice(11) + "</b> " +
+    html += '<div class="cday' + (key === todayKey ? " today" : "") + '" data-day="' + key + '"><div class="cdh">' + DAYS_AR[d.getDay()] + " " + d.getDate() + "</div>" +
+      (list.length ? list.map((p) => '<button class="cchip g-' + p.group + '" data-cal="' + p.id + '"' + (p.group === "draft" || p.group === "upcoming" ? ' draggable="true"' : "") + '><b dir="ltr">' + p.publish_at.slice(11) + "</b> " +
         (p.image && p.image.title ? p.image.title.replace(/</g, "&lt;") : p.id) + "</button>").join("") : '<div class="cempty">فراغ</div>') + "</div>";
   }
   $("calGrid").innerHTML = html;

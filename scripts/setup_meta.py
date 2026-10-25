@@ -2,6 +2,12 @@
 ويكتبها مباشرة في أسرار GitHub. لا يطبع أي توكن ولا يحفظه في ملف.
 
 الاستعمال:  python scripts/setup_meta.py
+
+صلاحيات التوكن في Graph API Explorer (ضع علامة على كلٍّ منها قبل Generate Access Token):
+  النشر:      pages_show_list, pages_manage_posts, pages_read_engagement, business_management,
+              instagram_basic, instagram_content_publish
+  الإحصاءات:  read_insights, pages_read_user_content, instagram_manage_insights
+بدون صلاحيتَي read_insights و pages_read_user_content تبقى أرقام فيسبوك فارغة في اللوحة.
 """
 import getpass
 import subprocess

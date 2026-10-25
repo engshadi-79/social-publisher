@@ -109,8 +109,9 @@ def render_poster(renderer, post: dict, out_png: Path, scene: int = 1) -> Path:
     return out_png
 
 
-def render_reel(renderer, post: dict, out_dir: Path, photos: dict[int, Path] | None = None) -> Path:
-    """يرسم كل المشاهد إطاراً إطاراً ثم يرمّزها فيديو واحداً."""
+def render_reel(renderer, post: dict, out_dir: Path, photos: dict[int, Path] | None = None,
+                use_preview: bool = True) -> Path:
+    """يرسم كل المشاهد إطاراً إطاراً ثم يرمّزها فيديو واحداً (أو يأخذ فيديو المعاينة المبني لنفس المحتوى)."""
     import imagegen
     from jinja2 import Environment, FileSystemLoader
 
@@ -118,6 +119,10 @@ def render_reel(renderer, post: dict, out_dir: Path, photos: dict[int, Path] | N
     from queue_io import load_brand
     from render import _fonts, post_hue, reel_template
 
+    if use_preview:
+        ready = fetch_preview(post, out_dir)
+        if ready:
+            return ready
     import morning
     if morning.is_morning(post):
         return morning.render_reel(renderer, post, out_dir)
@@ -181,6 +186,42 @@ MOTION_THEMES = {
     "motion-mint": {"a1": "#10b981", "a2": "#06b6d4", "bg1": "#04161a", "bg2": "#0f3b3a", "ink": "#ffffff", "kick": "#f43f5e",
                     "cols": ["#10b981", "#06b6d4", "#22d3ee", "#84cc16", "#14b8a6", "#38bdf8", "#10b981", "#a3e635"]},
 }
+
+
+def preview_key(post: dict) -> str:
+    """بصمة محتوى الريل: تتغيّر مع أي تعديل في المشاهد أو النمط، فلا يُعرض فيديو قديم بعد التعديل."""
+    import hashlib
+    import json
+    blob = json.dumps(post.get("image") or {}, sort_keys=True, ensure_ascii=False, default=str)
+    return hashlib.sha1(blob.encode("utf-8")).hexdigest()[:10]
+
+
+def preview_name(post: dict) -> str:
+    """اسم فيديو المعاينة على gh-pages/images (تبنيه reel-preview.yml عند الطلب من اللوحة)."""
+    return f"preview-{post['id']}-{preview_key(post)}.mp4"
+
+
+def fetch_preview(post: dict, out_dir: Path) -> Path | None:
+    """إن بُني فيديو معاينة لنفس المحتوى فهو ما رآه صاحبه ووافق عليه: يُنشر كما هو بلا إعادة بناء."""
+    import os
+
+    import requests
+    repo = os.environ.get("GITHUB_REPOSITORY")
+    if not repo:
+        return None
+    owner, name = repo.split("/")
+    url = f"https://{owner}.github.io/{name}/images/{preview_name(post)}"
+    try:
+        r = requests.get(url, timeout=120)
+        if r.status_code != 200 or len(r.content) < 50000:
+            return None
+    except requests.RequestException:
+        return None
+    out = out_dir / f"{post['id']}.mp4"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    out.write_bytes(r.content)
+    print(f"[{post['id']}] استُعمل فيديو المعاينة المعتمد ({len(r.content) // 1024} KB)")
+    return out
 
 
 def is_motion(post: dict) -> bool:
