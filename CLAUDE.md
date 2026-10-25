@@ -200,8 +200,8 @@ query; it never generates the frames. Never describe it to the owner as AI-gener
 - `publish.yml` installs ffmpeg if the runner lacks it.
 
 **Daily morning reel** (exception to the above, at the owner's request): every day at 09:00, `image.style: morning`,
-3 optimistic phrases over real footage (coffee, roses, sunrise, nature). `src/morning.py`: Pexels portrait videos when
-`PEXELS_API_KEY` is set (URL stored per scene as `video_url` at generation time), otherwise real photos with a slow
+3 optimistic phrases over real footage (coffee, roses, sunrise, nature). `src/morning.py`: Pexels portrait videos, else Pixabay (highest resolution, center-cropped), when
+`PEXELS_API_KEY` or `PIXABAY_API_KEY` is set (URL stored per scene as `video_url` at generation time), otherwise real photos with a slow
 Ken Burns move. Text is rendered by Playwright as transparent layers and composited by ffmpeg (ffmpeg's drawtext does
 not shape Arabic). Topic `morning-greetings` is excluded from the normal topic rotation.
 

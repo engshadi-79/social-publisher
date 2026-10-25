@@ -40,7 +40,37 @@ def is_morning(post: dict) -> bool:
 
 
 def find_video(query: str, pick: int) -> dict | None:
-    """مقطع عمودي من Pexels: {video_url, thumb}. None إن لم يكن هناك مفتاح أو نتيجة."""
+    """مقطع حقيقي: {video_url, thumb}. Pexels أولاً ثم Pixabay، وNone إن لم يوجد مفتاح أو نتيجة."""
+    for fn in (_pexels_video, _pixabay_video):
+        try:
+            found = fn(query, pick)
+        except requests.RequestException as e:
+            print(f"تعذّر البحث في {fn.__name__}: {e}")
+            found = None
+        if found:
+            return found
+    return None
+
+
+def _pixabay_video(query: str, pick: int) -> dict | None:
+    """Pixabay: أغلب مقاطعه أفقية، فنأخذ الأعلى دقة (4K إن وُجد) ليبقى القصّ العمودي حادّاً."""
+    key = os.environ.get("PIXABAY_API_KEY")
+    if not key:
+        return None
+    r = requests.get("https://pixabay.com/api/videos/", timeout=30, params={
+        "key": key, "q": query, "video_type": "film", "safesearch": "true", "per_page": 20, "order": "popular"})
+    r.raise_for_status()
+    hits = [h for h in r.json().get("hits", []) if 5 <= (h.get("duration") or 0) <= 60]
+    for i in range(len(hits)):
+        vids = hits[(pick + i) % len(hits)].get("videos") or {}
+        for size in ("large", "medium"):
+            v = vids.get(size) or {}
+            if v.get("url") and min(v.get("width") or 0, v.get("height") or 0) >= 1080:
+                return {"video_url": v["url"], "thumb": v.get("thumbnail") or ""}
+    return None
+
+
+def _pexels_video(query: str, pick: int) -> dict | None:
     key = os.environ.get("PEXELS_API_KEY")
     if not key:
         return None

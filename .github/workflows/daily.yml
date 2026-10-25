@@ -37,6 +37,7 @@ jobs:
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
           TARGET_DATE: ${{ inputs.date }}
         run: python generate.py --daily $TARGET_DATE
       - name: Commit drafts and refresh dashboard
