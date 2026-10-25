@@ -34,10 +34,22 @@ def secret(name, value):
     print(f"✓ {name}")
 
 
+def ask_hidden(prompt: str, allowed: str, expect: str) -> str:
+    """يقرأ قيمة مخفية وينظّفها مما قد يضيفه اللصق (مسافات، أسطر، رموز تحكّم)، ويعرض طولها فقط."""
+    import re
+    raw = getpass.getpass(prompt)
+    val = re.sub(r"\x1b\[20[01]~", "", raw)            # علامات «اللصق المحاط» في بعض الطرفيات
+    val = re.sub(f"[^{allowed}]", "", val)
+    print(f"   وصلني {len(val)} حرفاً ({expect})" + ("، وحذفتُ رموزاً زائدة" if len(val) != len(raw.strip()) else ""))
+    return val
+
+
 def main():
     app_id = input("App ID: ").strip()
-    app_secret = getpass.getpass("App Secret (مخفي): ").strip()
-    short = getpass.getpass("التوكن القصير من Graph API Explorer (مخفي): ").strip()
+    app_secret = ask_hidden("App Secret (مخفي، زر الفأرة الأيمن ثم Enter): ", "0-9a-fA-F", "المتوقع 32")
+    if len(app_secret) != 32:
+        sys.exit("المفتاح السري يجب أن يكون 32 حرفاً. انسخه من: App settings ← Basic ← App secret ← عرض، ثم أعد التشغيل.")
+    short = ask_hidden("التوكن من Graph API Explorer (مخفي، زر الفأرة الأيمن ثم Enter): ", "A-Za-z0-9", "عادةً أكثر من 150")
 
     long_user = get("oauth/access_token", grant_type="fb_exchange_token", client_id=app_id,
                     client_secret=app_secret, fb_exchange_token=short)["access_token"]
