@@ -22,7 +22,8 @@ def _noise(n: int) -> float:
     return (x - math.floor(x)) * 2 - 1
 
 
-def make_track(path: Path, duration: float, scene_starts: list[float] | None = None) -> Path:
+def make_track(path: Path, duration: float, scene_starts: list[float] | None = None, calm: bool = False) -> Path:
+    """calm=True لريلات الصباح: بلا طبل ولا صنج ولا «ووش»، تآلفات أبطأ ونغمات جرس ناعمة."""
     n_total = int(duration * RATE)
     starts = [s for s in (scene_starts or []) if s > 0.2]
     out = bytearray()
@@ -32,8 +33,21 @@ def make_track(path: Path, duration: float, scene_starts: list[float] | None = N
         t = n / RATE
         beat_pos = t / BEAT
         bt = (beat_pos % 1) * BEAT                     # الزمن منذ آخر نبضة
-        bar = int(beat_pos // 4)
+        bar = int(beat_pos // (8 if calm else 4))
         chord = CHORDS[bar % len(CHORDS)]
+        if calm:
+            # تآلف يتنفّس ببطء + جرس يعزف نغمات التآلف واحدة كل نبضتين
+            bar_t = (beat_pos % 8) * BEAT
+            swell = min(1.0, bar_t / 1.2) * (0.7 + 0.3 * math.cos(bar_t * 0.8))
+            pad = sum(math.sin(2 * math.pi * f * t) + 0.6 * math.sin(2 * math.pi * f * 1.004 * t) for f in chord) * 0.05 * swell
+            nt = (beat_pos % 2) * BEAT
+            note = chord[int(beat_pos // 2) % 3] * 2
+            bell = (math.sin(2 * math.pi * note * t) + 0.3 * math.sin(4 * math.pi * note * t)) * math.exp(-nt * 2.2) * 0.07
+            low = math.sin(2 * math.pi * chord[0] / 2 * t) * 0.06 * swell
+            v = pad + bell + low
+            samples.append(v)
+            peak = max(peak, abs(v))
+            continue
         # طبل: موجة جيبية يهبط ترددها مع تلاشٍ سريع
         kick = math.sin(2 * math.pi * (45 + 90 * math.exp(-bt * 30)) * bt) * math.exp(-bt * 9) * 0.55
         # صنج بين النبضات
@@ -55,7 +69,7 @@ def make_track(path: Path, duration: float, scene_starts: list[float] | None = N
         v = kick + hat + bass + pad + whoosh
         samples.append(v)
         peak = max(peak, abs(v))
-    fade = int(0.25 * RATE)
+    fade = int((1.2 if calm else 0.25) * RATE)
     scale = 0.85 / (peak or 1)
     for i, v in enumerate(samples):
         g = min(1.0, i / fade, (n_total - i) / fade)

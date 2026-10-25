@@ -104,7 +104,7 @@ def validate(queue: list[dict]) -> list[str]:
                         errors.append(f"{tag} الشريحة {n}: العنوان أو النص أطول من المسموح")
                     elif len(s_.get("points") or []) > 5:
                         errors.append(f"{tag} الشريحة {n}: أكثر من 5 نقاط")
-        elif p.get("template") == "reel" and str(img.get("style", "") or "").strip() and str(img["style"]).strip().lower() not in REEL_STYLES:
+        elif p.get("template") == "reel" and str(img.get("style", "") or "").strip() and str(img["style"]).strip().lower() not in REEL_STYLES + ("morning",):
             errors.append(f"{tag} نمط ريل غير معروف: {img['style']} (المتاح: {', '.join(REEL_STYLES)})")
         elif p.get("template") == "reel":
             sc = img.get("scenes")

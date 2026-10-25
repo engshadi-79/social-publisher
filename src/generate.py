@@ -332,6 +332,74 @@ def reel_free(queue: list[dict], day: str) -> bool:
     return not any(str(p["publish_at"])[:10] == day and str(p["publish_at"])[11:16] == REEL_SLOT for p in queue)
 
 
+MORNING_SLOT = "09:00"                                 # ريل صباحي يومي: عبارات تفاؤل فوق لقطات حقيقية
+MORNING_TOPIC = "morning-greetings"
+MORNING_SCENES = 3
+
+
+def morning_free(queue: list[dict], day: str) -> bool:
+    return not any(str(p["publish_at"])[:10] == day and str(p["publish_at"])[11:16] == MORNING_SLOT for p in queue)
+
+
+def build_morning(day: str, queue: list[dict]) -> dict:
+    """مسودة ريل الصباح ليوم واحد: 3 عبارات تفاؤل، لكلٍّ لقطة (قهوة، ورود، شروق...) بالتناوب."""
+    from datetime import datetime
+
+    import morning
+
+    ordinal = datetime.strptime(day, "%Y-%m-%d").toordinal()
+    qs = [morning.QUERIES[(ordinal * MORNING_SCENES + k) % len(morning.QUERIES)] for k in range(MORNING_SCENES)]
+    recent = [str(sc.get("title", "")) for p in queue if p.get("topic") == MORNING_TOPIC
+              for sc in ((p.get("image") or {}).get("scenes") or [])][-45:]
+    prompt = (
+        f"اكتب ريلاً صباحياً قصيراً بالعربية الفصحى السهلة ليوم {when_ar(day + ' ' + MORNING_SLOT)}.\n"
+        f"الريل {MORNING_SCENES} مشاهد، خلفية كل مشهد لقطة حقيقية بالترتيب: " + "، ".join(qs) + ".\n"
+        "لكل مشهد عبارة صباحية جميلة مليئة بالتفاؤل والأمل والطمأنينة تناسب لقطتها، كأنها تهمس للقارئ مع فنجان قهوته.\n"
+        "قواعد: كل عبارة جملة واحدة أصيلة لا مقتبسة (من 25 إلى 60 حرفاً)، بلا أسماء ولا أرقام ولا وعظ ثقيل ولا مبالغة،"
+        " بلا رموز تعبيرية داخل العبارة، والعبارة الأخيرة تحمل دعاءً أو أمنية لطيفة ليوم جميل.\n"
+        "body: سطر قصير اختياري (حتى 40 حرفاً) للمشهد الأخير فقط، واتركه فارغاً لغيره.\n"
+        + ("لا تكرّر هذه العبارات السابقة ولا معناها القريب: " + " | ".join(recent) + "\n" if recent else "")
+        + "ثم اكتب نص المنشور لكل منصة: سطر أول دافئ، ثم سؤال لطيف يدعو للتعليق (مثل: بماذا تبدأ صباحك؟)،"
+        " مع رموز تعبيرية قليلة، وبلا روابط. أضف 4 إلى 6 هاشتاقات صباحية عربية رائجة في آخر كل نص"
+        " (مثل #صباح_الخير #صباحيات #تفاؤل #أمل). ثريدز حتى 400 حرف.\n"
+        "أرجع JSON فقط: مصفوفة فيها كائن واحد بالشكل "
+        '[{"scenes": [{"title": "...", "body": ""}], "facebook": "...", "instagram": "...", "threads": "..."}]'
+    )
+    text, _ = generator.generate_text(prompt)
+    item = (generator.extract_json(text) or [{}])[0]
+    raw = [sc for sc in (item.get("scenes") or []) if str((sc or {}).get("title", "")).strip()][:MORNING_SCENES]
+    if len(raw) < MORNING_SCENES:
+        raise generator.GeneratorError(f"ريل الصباح: وصل {len(raw)} مشاهد من {MORNING_SCENES}")
+    scenes = []
+    for k, sc in enumerate(raw):
+        one = {"title": clip(str(sc["title"]).strip(), 70), "seconds": 5.5 if k == len(raw) - 1 else 5,
+               "photo_query": qs[k]}
+        if k == len(raw) - 1 and str(sc.get("body") or "").strip():
+            one["body"] = clip(str(sc["body"]).strip(), 60)
+        try:                                  # مقطع فيديو حقيقي إن وُجد مفتاح Pexels، وإلا تبقى الصورة المتحرّكة
+            vid = morning.find_video(qs[k], ordinal + k)
+        except Exception as e:  # noqa: BLE001
+            print("تعذّر البحث عن مقطع:", e)
+            vid = None
+        if vid:
+            one.update(vid)
+        scenes.append(one)
+    platforms = {}
+    for name, limit in (("facebook", 2000), ("instagram", 2200), ("threads", 500)):
+        if str(item.get(name) or "").strip():
+            platforms[name] = clip(str(item[name]).strip(), limit)
+    if not platforms:
+        raise generator.GeneratorError("ريل الصباح بلا نصوص للمنصات")
+    entry = {"id": f"{day}-morning", "approved": False, "publish_at": f"{day} {MORNING_SLOT}", "template": "reel",
+             "topic": MORNING_TOPIC,
+             "image": {"title": scenes[0]["title"], "style": "morning", "seed": ordinal % 97, "scenes": scenes},
+             "platforms": platforms}
+    errors = fatal(validate(queue + [entry]))
+    if errors:
+        raise generator.GeneratorError("فشل التحقق: " + "؛ ".join(errors)[:300])
+    return entry
+
+
 def daily(target: str | None = None) -> int:
     """كل يوم: 3 منشورات (8:00 و13:00 و21:00) وريل واحد (18:00) من 7 مشاهد على الأقل، كلها مسودات تنتظر موافقتك.
 
@@ -342,7 +410,8 @@ def daily(target: str | None = None) -> int:
     from queue_io import now_local
 
     topics = yaml.safe_load(TOPICS_PATH.read_text(encoding="utf-8")).get("topics") if TOPICS_PATH.exists() else []
-    topics = [t for t in (topics or []) if isinstance(t, dict) and t.get("id") and not t.get("paused")]
+    topics = [t for t in (topics or []) if isinstance(t, dict) and t.get("id") and not t.get("paused")
+              and t["id"] != MORNING_TOPIC]
     if not topics:
         print("لا مواضيع")
         return 0
@@ -386,6 +455,23 @@ def daily(target: str | None = None) -> int:
             make(pool[0], rday, REEL_SLOT, "reel", 8, {"min_scenes": REEL_MIN_SCENES})
         if target:
             break
+
+    # 1ب) ريل الصباح: كل يوم 9:00، عبارات تفاؤل فوق لقطات حقيقية
+    mday = target or start.strftime("%Y-%m-%d")
+    if morning_free(load_queue(), mday):
+        for attempt in range(3):
+            try:
+                append_entries([build_morning(mday, load_queue())])
+                done.append("ريل الصباح")
+                print(f"✓ ريل الصباح {mday} {MORNING_SLOT}")
+                break
+            except Exception as e:  # noqa: BLE001
+                if attempt == 2:
+                    failed.append(f"ريل الصباح: {str(e)[:120]}")
+                    print("✗ ريل الصباح:", e)
+                else:
+                    time.sleep(45 * (attempt + 1))
+        time.sleep(8)
 
     # 2) المنشورات الثابتة
     queue = load_queue()

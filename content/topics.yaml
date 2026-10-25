@@ -308,3 +308,10 @@ topics:
     tone: "مشرقة وملهمة ومتفائلة"
     hashtags_fixed: []
     paused: true
+  - id: "morning-greetings"
+    name: "ريل الصباح: عبارات تفاؤل وأمل"
+    kind: "morning"
+    description: "ريل يومي الساعة 9 صباحاً: ثلاث عبارات صباحية مليئة بالتفاؤل فوق لقطات حقيقية (قهوة، ورود، شروق، طبيعة). يولّده build_morning في src/generate.py، ولا يدخل في دوران المواضيع العادية."
+    audience: "كل المتابعين"
+    tone: "دافئة ومطمئنة وبسيطة"
+    hashtags_fixed: ["#صباح_الخير"]

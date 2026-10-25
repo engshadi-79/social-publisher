@@ -77,6 +77,9 @@ def render_poster(renderer, post: dict, out_png: Path, scene: int = 1) -> Path:
     from queue_io import load_brand
     from render import _fonts, post_hue, reel_template
 
+    import morning
+    if morning.is_morning(post):          # ريل الصباح: لقطات حقيقية لا رسوم
+        return morning.render_poster(renderer, post, out_png, scene)
     specs = scene_specs(post)
     if not specs:
         raise VideoError("لا مشاهد في هذا الريل")
@@ -115,6 +118,9 @@ def render_reel(renderer, post: dict, out_dir: Path, photos: dict[int, Path] | N
     from queue_io import load_brand
     from render import _fonts, post_hue, reel_template
 
+    import morning
+    if morning.is_morning(post):
+        return morning.render_reel(renderer, post, out_dir)
     if is_motion(post):
         return render_motion_reel(renderer, post, out_dir)
     if photos is None:                    # يجلبها بنفسه كما يفعل الكاروسيل

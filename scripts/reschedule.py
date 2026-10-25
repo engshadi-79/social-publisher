@@ -16,7 +16,7 @@ sys.path.insert(0, str(ROOT / "src"))
 sys.stdout.reconfigure(encoding="utf-8")
 
 from config import QUEUE_PATH, STATE_PATH  # noqa: E402
-from generate import REEL_SLOT, SLOTS  # noqa: E402
+from generate import MORNING_SLOT, REEL_SLOT, SLOTS  # noqa: E402
 from queue_io import load_queue, now_local, parse_when  # noqa: E402
 
 
@@ -25,7 +25,7 @@ def main() -> int:
     queue = load_queue()
     state = json.loads(STATE_PATH.read_text(encoding="utf-8")) if STATE_PATH.exists() else {}
     pending = [p for p in queue if not any(v.get("status") == "published" for v in state.get(p["id"], {}).values())
-               and str(p["publish_at"])[11:16] != REEL_SLOT]      # ريلات 18:00 لها موعد ثابت
+               and str(p["publish_at"])[11:16] not in (REEL_SLOT, MORNING_SLOT)]   # الريلات لها مواعيد ثابتة
     pending.sort(key=lambda p: (not p["approved"], parse_when(p["publish_at"])))   # المعتمد أولاً
     now = now_local()
     plan: dict[str, str] = {}
