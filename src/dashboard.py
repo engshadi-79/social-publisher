@@ -243,6 +243,7 @@ def main() -> int:
         e = json.loads(json.dumps(p, default=lambda o: o.strftime("%Y-%m-%d %H:%M") if hasattr(o, "strftime") else str(o)))
         e["publish_at"] = parse_when(p["publish_at"]).strftime("%Y-%m-%d %H:%M")
         e["group"] = group_of.get(p["id"], "draft")
+        e["tok"] = img_token(p["id"])          # الصفحة الرئيسية تعرض الصور المصغّرة من JS
         raw[p["id"]] = e
     ins_f = ROOT / "content" / "insights.json"
     insights_json = (ins_f.read_text(encoding="utf-8") if ins_f.exists() else "{}").replace("</", "<\\/")
@@ -252,8 +253,9 @@ def main() -> int:
     html = env.get_template("dashboard_template.html").render(
         topics_js=((Path(__file__).parent / "dashboard_topics.js").read_text(encoding="utf-8") + "\n" +
                    (Path(__file__).parent / "dashboard_posts.js").read_text(encoding="utf-8") + "\n" +
-                   (Path(__file__).parent / "dashboard_extra.js").read_text(encoding="utf-8")).replace("__REPO__", os.environ.get("GITHUB_REPOSITORY", "engshadi-79/social-publisher")),
-        gen_log=load_gen_log(), health=load_health(), settings=load_settings(), settings_json=json.dumps(load_settings(), ensure_ascii=False).replace("</", "<\\/"), proxy=args.vercel, posts_json=posts_json, acc_json=acc_json, scripts=load_scripts(), utm=[(LABELS[p], f"{SITE_URL}?utm_source={p}&utm_medium=social&utm_campaign=bio") for p in ("instagram", "facebook", "threads", "linkedin", "telegram")], pages_base="https://" + os.environ.get("GITHUB_REPOSITORY", "engshadi-79/social-publisher").replace("/", ".github.io/", 1) + "/", insights_json=insights_json,
+                   (Path(__file__).parent / "dashboard_extra.js").read_text(encoding="utf-8") + "\n" +
+                   (Path(__file__).parent / "dashboard_home.js").read_text(encoding="utf-8")).replace("__REPO__", os.environ.get("GITHUB_REPOSITORY", "engshadi-79/social-publisher")),
+        gen_log=load_gen_log(), health=load_health(), health_json=json.dumps(load_health() or {}, ensure_ascii=False).replace("</", "<\\/"), settings=load_settings(), settings_json=json.dumps(load_settings(), ensure_ascii=False).replace("</", "<\\/"), proxy=args.vercel, posts_json=posts_json, acc_json=acc_json, scripts=load_scripts(), utm=[(LABELS[p], f"{SITE_URL}?utm_source={p}&utm_medium=social&utm_campaign=bio") for p in ("instagram", "facebook", "threads", "linkedin", "telegram")], pages_base="https://" + os.environ.get("GITHUB_REPOSITORY", "engshadi-79/social-publisher").replace("/", ".github.io/", 1) + "/", insights_json=insights_json,
         topics=load_topics(), repo=os.environ.get("GITHUB_REPOSITORY", "engshadi-79/social-publisher"),
         posts=items, counts=counts, next_post=nxt, tz=TIMEZONE,
         updated=now.strftime("%Y-%m-%d %H:%M"))
