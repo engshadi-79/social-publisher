@@ -747,8 +747,11 @@
     },
     "threads": {
       "attempts": 1,
-      "error": "PublishError: threads create: HTTP 400 Invalid parameter",
-      "status": "retry"
+      "error": null,
+      "status": "published",
+      "platform_post_id": "18358196500223611",
+      "account": "ثريدز — engshadi2011",
+      "published_at": "2026-10-26T14:13:44+00:00"
     },
     "linkedin": {
       "attempts": 0,
@@ -757,6 +760,40 @@
       "error": null,
       "account": "لينكدإن — المهندس شادي",
       "published_at": "2026-10-26T07:02:24+00:00"
+    }
+  },
+  "2026-10-26-g1": {
+    "facebook": {
+      "attempts": 0,
+      "status": "published",
+      "platform_post_id": "197449247358013_1618238203649168",
+      "error": null,
+      "account": "فيسبوك — المهندس شادي",
+      "published_at": "2026-10-26T14:12:11+00:00"
+    },
+    "instagram": {
+      "attempts": 0,
+      "status": "published",
+      "platform_post_id": "18195961999392950",
+      "error": null,
+      "account": "إنستغرام — engshadi2011",
+      "published_at": "2026-10-26T14:12:24+00:00"
+    },
+    "threads": {
+      "attempts": 0,
+      "status": "published",
+      "platform_post_id": "18129281114476783",
+      "error": null,
+      "account": "ثريدز — engshadi2011",
+      "published_at": "2026-10-26T14:12:41+00:00"
+    },
+    "linkedin": {
+      "attempts": 0,
+      "status": "published",
+      "platform_post_id": "urn:li:share:7520487598323027968",
+      "error": null,
+      "account": "لينكدإن — المهندس شادي",
+      "published_at": "2026-10-26T14:12:47+00:00"
     }
   }
 }
