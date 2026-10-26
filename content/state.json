@@ -727,5 +727,36 @@
       "account": "لينكدإن — المهندس شادي",
       "published_at": "2026-10-25T23:13:28+00:00"
     }
+  },
+  "2026-10-26-g3": {
+    "facebook": {
+      "attempts": 0,
+      "status": "published",
+      "platform_post_id": "197449247358013_1617912117015110",
+      "error": null,
+      "account": "فيسبوك — المهندس شادي",
+      "published_at": "2026-10-26T07:00:27+00:00"
+    },
+    "instagram": {
+      "attempts": 0,
+      "status": "published",
+      "platform_post_id": "18608035354071437",
+      "error": null,
+      "account": "إنستغرام — engshadi2011",
+      "published_at": "2026-10-26T07:01:31+00:00"
+    },
+    "threads": {
+      "attempts": 1,
+      "error": "PublishError: threads create: HTTP 400 Invalid parameter",
+      "status": "retry"
+    },
+    "linkedin": {
+      "attempts": 0,
+      "status": "published",
+      "platform_post_id": "urn:li:share:7520379284457205760",
+      "error": null,
+      "account": "لينكدإن — المهندس شادي",
+      "published_at": "2026-10-26T07:02:24+00:00"
+    }
   }
 }
