@@ -1,7 +1,8 @@
 {
-  "id": "rmvqarkuz",
-  "ok": false,
-  "count": 0,
-  "topic": "2026-10-31-g2",
-  "message": "فشل توليد البديل: Gemini gemini-3.8-flash: gemini-3.8-flash (interactions) HTTP 503: gemini-3.8-flash is currently experiencing high demand, spikes in demand are usually temporary. Please try again later. | Gemini gemini-3.8-flash (generateContent): gemini-3.8-flash HTTP 503: This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later. | Gemini 3.6: gemini-3.6-fl"
+  "id": "daily-2026-11-02",
+  "ok": true,
+  "count": 3,
+  "topic": "كل المواضيع",
+  "method": "daily",
+  "message": "يومي 2026-11-02: وُلِّد 3 مسودة."
 }
