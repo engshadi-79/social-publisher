@@ -761,7 +761,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--purple)}
 </section>
 <section id="calPanel" hidden>
   <div class="pagehead"><div><span class="eyebrow"><i class="pulse"></i>{{ tz }}</span>
-    <h1>تقويم النشر والمواعيد الأسبوعية</h1><p>مواعيد ثابتة: 08:00 و21:00 للمنشورات، و09:00 يومياً لريل الصباح، و18:00 يوم الخميس للريل الأسبوعي.</p></div></div>
+    <h1>تقويم النشر والمواعيد الأسبوعية</h1><p>مواعيد ثابتة: منشور واحد يومياً 21:00، وريل الصباح 09:00، والريل الأسبوعي الخميس 18:00 (بدل منشور ذلك اليوم).</p></div></div>
   <div class="panel">
     <h2>التقويم الأسبوعي</h2>
     <div class="calbar"><button class="del" id="calPrev" style="color:var(--ink);border-color:var(--line)">→ الأسبوع السابق</button>
@@ -771,7 +771,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--purple)}
     <div class="cgrid" id="calGrid"></div>
     <p class="hint">اسحب منشوراً (مسودة أو مجدول) إلى يوم آخر لتغيير موعده بالساعة نفسها، أو اضغطه لتعديله. الأيام الفارغة مكتوب عليها «فراغ».</p>
     <label>توزيع المسودات تلقائياً: منشور واحد كل يوم فارغ بدءاً من الغد، في الساعة</label>
-    <select id="calHour"><option value="12:30">12:30 ظهراً</option><option value="18:00">6:00 مساءً</option><option value="20:00" selected>8:00 مساءً</option><option value="21:00">9:00 مساءً</option></select>
+    <select id="calHour"><option value="12:30">12:30 ظهراً</option><option value="18:00">6:00 مساءً</option><option value="20:00">8:00 مساءً</option><option value="21:00" selected>9:00 مساءً</option></select>
     <button class="act" id="calDistribute">🗓️ وزّع المسودات</button>
     <div class="msg" id="calMsg"></div>
     <p class="hint">أوقات الذروة تقريبية عامة للجمهور العربي (المساء وبعد الظهر)؛ عدّلها حسب جمهورك.</p>

@@ -315,7 +315,7 @@ def append_entries(entries: list[dict]) -> None:
 
 DAILY_STYLES = ["infographic", "carousel"]            # الريل له موعد يومي خاص به (REEL_SLOT) فلا يدخل هنا
 # أوقات الذروة لجمهور عربي (بتوقيت الجهة): صباح قبل العمل، استراحة الظهيرة، وذروة المساء
-SLOTS = ["08:00", "21:00"]                           # منشوران يومياً: صباح قبل العمل وذروة المساء
+SLOTS = ["21:00"]                                    # منشور محتوى واحد يومياً في ذروة المساء (2026-10-28: كثرة النشر شتّتت الوصول)
 PER_DAY = len(SLOTS)
 REEL_SLOT = "18:00"                                    # ريل أسبوعي على كل المنصات، قبل ذروة المساء
 REEL_WEEKDAY = 3                                       # الخميس (الاثنين=0)
@@ -324,6 +324,9 @@ REEL_AHEAD_DAYS = 14                                   # يضمن وجود ري�
 
 
 def free_slots(queue: list[dict], day: str) -> list[str]:
+    from datetime import datetime
+    if datetime.strptime(day, "%Y-%m-%d").weekday() == REEL_WEEKDAY:
+        return []                                      # يوم الريل الأسبوعي: الريل هو منشور اليوم
     taken = {str(p["publish_at"])[11:16] for p in queue if str(p["publish_at"])[:10] == day}
     return [s for s in SLOTS if s not in taken]
 

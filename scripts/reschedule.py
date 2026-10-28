@@ -1,4 +1,5 @@
-"""يعيد جدولة المنشورات التي لم تُنشر بعد على أوقات الذروة (3 يومياً) بترتيب مواعيدها الحالي.
+"""يعيد جدولة المنشورات التي لم تُنشر بعد على مواعيد SLOTS (منشور واحد يومياً) بترتيب مواعيدها الحالي.
+يتخطّى يوم الريل الأسبوعي، ولا يمسّ ريل الصباح ولا الريل الأسبوعي.
 
     python scripts/reschedule.py          # يعرض الخطة فقط
     python scripts/reschedule.py --apply  # يكتبها في content/queue.yaml
@@ -16,7 +17,7 @@ sys.path.insert(0, str(ROOT / "src"))
 sys.stdout.reconfigure(encoding="utf-8")
 
 from config import QUEUE_PATH, STATE_PATH  # noqa: E402
-from generate import MORNING_SLOT, REEL_SLOT, SLOTS  # noqa: E402
+from generate import MORNING_SLOT, REEL_SLOT, REEL_WEEKDAY, SLOTS  # noqa: E402
 from queue_io import load_queue, now_local, parse_when  # noqa: E402
 
 
@@ -34,7 +35,7 @@ def main() -> int:
         while True:
             slot = SLOTS[k % len(SLOTS)]
             when = f"{day:%Y-%m-%d} {slot}"
-            if parse_when(when) > now + timedelta(minutes=45):
+            if parse_when(when) > now + timedelta(minutes=45) and day.weekday() != REEL_WEEKDAY:
                 break
             k += 1
             if k % len(SLOTS) == 0:
