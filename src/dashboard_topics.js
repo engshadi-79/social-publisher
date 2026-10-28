@@ -30,15 +30,16 @@ function slidesYaml(slides) {
   return "    slides:\n" + slides.map((s) => "      - kicker: " + q(s.kicker || "") + "\n        title: " + q(s.title) + "\n        body: " + q(s.body || "") +
     (s.points && s.points.length ? "\n        points:\n" + s.points.map((x) => "          - " + q(x)).join("\n") : "")).join("\n") + "\n";
 }
-// مشاهد الريل: نفس صيغة الشرائح مع سطرين إضافيين: «~ 3.5» للثواني و«? كلمات» للصورة
+// مشاهد الريل: نفس صيغة الشرائح مع أسطر إضافية: «~ 3.5» للثواني، «? كلمات» للصورة، «! رابط» للقطة موقع
 function parseScenes(text) {
   return text.split(/^\s*---\s*$/m).map((blk) => {
-    const sc = { kicker: "", title: "", body: "", seconds: 3.4, photo_query: "" }, body = [];
+    const sc = { kicker: "", title: "", body: "", seconds: 3.4, photo_query: "", shot: "" }, body = [];
     blk.split("\n").map((l) => l.trim()).filter(Boolean).forEach((l) => {
       if (l.startsWith("# ")) sc.title = l.slice(2).trim();
       else if (l.startsWith("@ ")) sc.kicker = l.slice(2).trim();
       else if (l.startsWith("~ ")) sc.seconds = parseFloat(l.slice(2)) || 3.4;
       else if (l.startsWith("? ")) sc.photo_query = l.slice(2).trim();
+      else if (l.startsWith("! ")) sc.shot = l.slice(2).trim();
       else body.push(l);
     });
     sc.body = body.join(" "); return sc;
@@ -46,12 +47,12 @@ function parseScenes(text) {
 }
 function scenesToText(scenes) {
   return (scenes || []).map((s) => [s.title ? "# " + s.title : "", s.kicker ? "@ " + s.kicker : "", s.body || "",
-    s.seconds ? "~ " + s.seconds : "", s.photo_query ? "? " + s.photo_query : ""].filter(Boolean).join("\n")).join("\n---\n");
+    s.seconds ? "~ " + s.seconds : "", s.photo_query ? "? " + s.photo_query : "", s.shot ? "! " + s.shot : ""].filter(Boolean).join("\n")).join("\n---\n");
 }
 function scenesYaml(scenes) {
   return "    scenes:\n" + scenes.map((s) => "      - kicker: " + q(s.kicker || "") + "\n        title: " + q(s.title) + "\n        body: " + q(s.body || "") +
     "\n        seconds: " + (Math.min(8, Math.max(1.5, s.seconds || 3.4))) + (s.photo_query ? "\n        photo_query: " + q(s.photo_query) : "") +
-    (s.video_url ? "\n        video_url: " + q(s.video_url) : "") + (s.thumb ? "\n        thumb: " + q(s.thumb) : "")).join("\n") + "\n";
+    (s.shot ? "\n        shot: " + q(s.shot) : "") + (s.video_url ? "\n        video_url: " + q(s.video_url) : "") + (s.thumb ? "\n        thumb: " + q(s.thumb) : "")).join("\n") + "\n";
 }
 const scenesError = (sc) => (sc.length < 3 || sc.length > 8) ? "الريل يحتاج من 3 إلى 8 مشاهد." : (sc.some((s) => !s.title) ? "لكل مشهد عنوان («# العنوان»)." : (sc.some((s) => s.title.length > 70) ? "عنوان المشهد أطول من 70 حرفاً." : (sc.some((s) => s.body.length > 150) ? "نص المشهد أطول من 150 حرفاً." : "")));
 const slidesError = (sl) => (sl.length < 3 || sl.length > 10) ? "الكاروسيل يحتاج من 3 إلى 10 شرائح." : (sl.some((s) => !s.title) ? "لكل شريحة عنوان («# العنوان»)." : "");

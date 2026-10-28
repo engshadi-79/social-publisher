@@ -17,7 +17,7 @@ sys.path.insert(0, str(ROOT / "src"))
 sys.stdout.reconfigure(encoding="utf-8")
 
 from config import QUEUE_PATH, STATE_PATH  # noqa: E402
-from generate import MORNING_SLOT, REEL_SLOT, REEL_WEEKDAY, SLOTS  # noqa: E402
+from generate import AUTO_REELS, MORNING_SLOT, REEL_SLOT, REEL_WEEKDAY, SLOTS  # noqa: E402
 from queue_io import load_queue, now_local, parse_when  # noqa: E402
 
 
@@ -35,7 +35,7 @@ def main() -> int:
         while True:
             slot = SLOTS[k % len(SLOTS)]
             when = f"{day:%Y-%m-%d} {slot}"
-            if parse_when(when) > now + timedelta(minutes=45) and day.weekday() != REEL_WEEKDAY:
+            if parse_when(when) > now + timedelta(minutes=45) and not (AUTO_REELS and day.weekday() == REEL_WEEKDAY):
                 break
             k += 1
             if k % len(SLOTS) == 0:

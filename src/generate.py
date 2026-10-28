@@ -324,11 +324,12 @@ REEL_SLOT = "18:00"                                    # ريل أسبوعي ع�
 REEL_WEEKDAY = 3                                       # الخميس (الاثنين=0)
 REEL_MIN_SCENES = 7                                    # لا يقل الريل عن 7 مشاهد (صور متحرّكة)
 REEL_AHEAD_DAYS = 14                                   # يضمن وجود ريل لكل خميس خلال أسبوعين قادمين
+AUTO_REELS = False                                     # 2026-10-28: المالك يجهّز الريلات بنفسه (موضوع، لقطات مواقع، صوت)؛ لا ريل أسبوعي تلقائي
 
 
 def free_slots(queue: list[dict], day: str) -> list[str]:
     from datetime import datetime
-    if datetime.strptime(day, "%Y-%m-%d").weekday() == REEL_WEEKDAY:
+    if AUTO_REELS and datetime.strptime(day, "%Y-%m-%d").weekday() == REEL_WEEKDAY:
         return []                                      # يوم الريل الأسبوعي: الريل هو منشور اليوم
     taken = {str(p["publish_at"])[11:16] for p in queue if str(p["publish_at"])[:10] == day}
     return [s for s in SLOTS if s not in taken]
@@ -454,7 +455,7 @@ def daily(target: str | None = None) -> int:
 
     start = (now_local() + timedelta(days=1)).date()
     # 1) الريلات: يوم واحد بعد آخر لأيام قادمة، من مواضيع غير صباحية
-    for k in range(REEL_AHEAD_DAYS):
+    for k in range(REEL_AHEAD_DAYS if AUTO_REELS else 0):
         rday = target or (start + timedelta(days=k)).strftime("%Y-%m-%d")
         if datetime.strptime(rday, "%Y-%m-%d").weekday() == REEL_WEEKDAY and reel_free(load_queue(), rday):
             pool = [t for t in order_topics(load_queue()) if t.get("time") != "morning"] or topics

@@ -252,6 +252,13 @@ def _motion_page(renderer, post: dict):
     if not (MIN_SCENES <= len(specs) <= MAX_SCENES):
         raise VideoError(f"الريل يحتاج من {MIN_SCENES} إلى {MAX_SCENES} مشاهد (وجدت {len(specs)})")
     starts, durs, total = motion_timing(post)
+    import shots                                        # لقطات المواقع لمشاهد فيها رابط
+    caps = shots.ensure(renderer, post)
+    from urllib.parse import urlparse
+    raw = (post.get("image") or {}).get("scenes") or []
+    for sp in specs:
+        sp["shot"] = caps[sp["index"]].as_uri() if sp["index"] in caps else ""
+        sp["shot_host"] = urlparse(str((raw[sp["index"] - 1] or {}).get("shot") or "")).netloc
     env = Environment(loader=FileSystemLoader(str(TEMPLATES_DIR)), autoescape=True)
     w, h = TEMPLATES["reel"]
     html = env.get_template(reel_template(post)).render(

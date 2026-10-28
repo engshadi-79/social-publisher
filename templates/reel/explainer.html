@@ -65,6 +65,8 @@ body{ font-family:"BrandFont","Cairo","Segoe UI",Tahoma,sans-serif; color:#fff }
   box-shadow:0 30px 60px -20px rgba(255,122,26,.35) }
 .mini .ic{ display:grid; place-items:center; height:120px; border-radius:18px; margin-bottom:20px; background:rgba(255,122,26,.12); border:2px solid rgba(255,122,26,.3) }
 .mini .ic svg{ width:70px; height:70px; stroke:var(--or2); fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round }
+.shotwin{ top:560px } .shotwin .page{ padding:0; height:1000px; min-height:0; overflow:hidden; background:#fff }
+.shotimg{ display:block; width:100%; height:auto; will-change:transform }
 #cursor{ position:absolute; left:0; top:0; width:64px; height:64px; z-index:20; filter:drop-shadow(0 6px 10px rgba(0,0,0,.6)) }
 .foot{ position:absolute; bottom:78px; inset-inline:0; text-align:center; font-size:30px; font-weight:700; color:#cfd0d6; z-index:9 }
 .foot b{ color:var(--or2) }
@@ -93,13 +95,19 @@ body{ font-family:"BrandFont","Cairo","Segoe UI",Tahoma,sans-serif; color:#fff }
   {% for s in scenes %}
   {% set i = loop.index0 %}
   {% set words = s.title.split(' ') %}
-  {% set lay = 'hook' if i == 0 else ('recap' if i == last else ['win', 'ed', 'card'][(i - 1) % 3]) %}
+  {% set lay = 'shot' if s.shot else ('hook' if i == 0 else ('recap' if i == last else ['win', 'ed', 'card'][(i - 1) % 3])) %}
   <div class="scene" data-sc="{{ i }}" data-lay="{{ lay }}">
     <div class="head tx" data-d="0.1">
       <div class="title">{% if words|length > 1 %}{{ words[:-1]|join(' ') }} <em>{{ words[-1] }}</em>{% else %}<em>{{ s.title }}</em>{% endif %}</div>
       {% if lay == 'hook' and s.body %}<div class="sub">{{ s.body }}</div>{% endif %}
     </div>
-    {% if lay == 'hook' %}
+    {% if lay == 'shot' %}
+    <div class="win shotwin obj" data-d="0.35">
+      <div class="bar"><i></i><i></i><i></i><span class="url">{{ s.shot_host }}</span></div>
+      <div class="page"><img class="shotimg" src="{{ s.shot }}" alt=""></div>
+    </div>
+    {% if s.body and i != 0 %}<div class="head tx" data-d="0.7" style="top:auto;bottom:170px"><div class="sub">{{ s.body }}</div></div>{% endif %}
+    {% elif lay == 'hook' %}
     <div class="win ed code obj" data-d="0.35" style="top:720px">
       <div class="bar"><i></i><i></i><i></i><span class="tab">automation.js</span></div>
       <div class="page">
@@ -213,6 +221,12 @@ window.seek = (t) => {
       if (!caretSet && n < full.length) { const c = document.createElement('i'); c.className = 'caret'; c.style.opacity = (Math.floor(t * 2.5) % 2) ? '1' : '0.15'; sp.after(c); caretSet = true; }
     });
     if (!caretSet && lines.length) { const lastLn = lines[lines.length - 1]; const c = document.createElement('i'); c.className = 'caret'; c.style.opacity = (Math.floor(t * 2.5) % 2) ? '1' : '0.15'; lastLn.after(c); }
+    // لقطة الموقع: تتمرّر ببطء كأن أحداً يتصفّحها
+    const im = el.querySelector('.shotimg');
+    if (im && im.naturalHeight) {
+      const viewH = im.parentElement.clientHeight, full = im.clientHeight, room = Math.max(0, full - viewH);
+      im.style.transform = `translateY(${(-room * ease((local - 0.9) / Math.max(1, DURS[i] - 1.6))).toFixed(1)}px)`;
+    }
     // الخط الزمني: ينمو ويُظهر العقد والبطاقات بالتتابع
     const rail = el.querySelector('.rail b');
     if (rail) {
@@ -246,7 +260,7 @@ window.seek = (t) => {
     cursor.style.opacity = (clamp((local - 0.4) / 0.3, 0, 1) * (1 - leave)).toFixed(3);
   }
 };
-window.ready = (async () => { await document.fonts.ready; window.seek(0); window.__ready = true; })();
+window.ready = (async () => { await document.fonts.ready; await Promise.all([...document.images].map((im) => im.decode().catch(() => {}))); window.seek(0); window.__ready = true; })();
 </script>
 </body>
 </html>
