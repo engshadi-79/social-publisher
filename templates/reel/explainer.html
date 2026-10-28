@@ -58,7 +58,7 @@ body{ font-family:"BrandFont","Cairo","Segoe UI",Tahoma,sans-serif; color:#fff }
 .tl{ position:absolute; left:70px; right:70px; top:700px; height:720px; direction:ltr }
 .tl .rail{ position:absolute; inset-inline:30px; bottom:120px; height:6px; border-radius:6px; background:rgba(255,255,255,.12) }
 .tl .rail b{ position:absolute; top:0; bottom:0; right:0; width:0; border-radius:6px; background:linear-gradient(270deg, var(--or), var(--or2)) }
-.node{ position:absolute; bottom:72px; width:100px; height:100px; margin-left:-50px; border-radius:50%; display:grid; place-items:center;
+.node{ position:absolute; bottom:72px; width:90px; height:90px; margin-left:-45px; border-radius:50%; display:grid; place-items:center;
   font-size:44px; font-weight:800; background:var(--bg); border:5px solid var(--or); color:#fff }
 .mini{ position:absolute; bottom:210px; width:220px; margin-left:-110px; min-height:340px; direction:rtl; border-radius:26px; padding:24px 22px;
   background:linear-gradient(170deg, #25262d, #15161a); border:2px solid rgba(255,122,26,.4); font-size:30px; font-weight:700; line-height:1.45;
@@ -140,7 +140,7 @@ body{ font-family:"BrandFont","Cairo","Segoe UI",Tahoma,sans-serif; color:#fff }
       {% set mids = scenes[1:last] %}
       {% for m in mids %}
       {% set pos = 100 - (loop.index0 + 0.5) * 100 / mids|length %}
-      <div class="mini" data-k="{{ loop.index0 }}" style="left:{{ pos }}%"><div class="ic">{{ icon((m.kicker or m.title) if icon(m.kicker or m.title)|string != icon("")|string else m.body) }}</div>{{ m.kicker or m.title }}</div>
+      {% set cw = [220, (900 / mids|length) - 14]|min %}<div class="mini" data-k="{{ loop.index0 }}" style="left:{{ pos }}%;width:{{ cw }}px;margin-left:-{{ cw / 2 }}px;font-size:{{ 30 if mids|length <= 4 else 24 }}px;padding:{{ 24 if mids|length <= 4 else 14 }}px"><div class="ic">{{ icon((m.kicker or m.title) if icon(m.kicker or m.title)|string != icon("")|string else m.body) }}</div>{{ m.kicker or m.title }}</div>
       <div class="node" data-k="{{ loop.index0 }}" style="left:{{ pos }}%">{{ loop.index }}</div>
       {% endfor %}
     </div>

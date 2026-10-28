@@ -1917,7 +1917,7 @@
       title: كم ساعة تقضيها يومياً في نقل البيانات يدوياً؟
       body: احفظ المقطع وتواصل معنا لتأتمتة عملياتك.
       seconds: 3.5
-    style: "motion"
+    style: "explainer"
     hue: 250
     seed: 1
   platforms:
@@ -2234,7 +2234,7 @@
       title: هل يعتمد نظامك الحالي على الإنترنت بشكل كامل؟
       body: احفظ المقطع وشاركه مع من يبحث عن تصميم أنظمة مستقرة.
       seconds: 3.5
-    style: "motion-sunset"
+    style: "explainer"
     hue: 290
     seed: 1
   platforms:

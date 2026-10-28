@@ -111,10 +111,11 @@ def build_prompt(topic: dict, count: int, brand: dict, recent: list[str], trends
     elif style == "reel":
         n = max(3, min(int(slides_n or 5), 8))
         style_fields = (f'  "scenes": مصفوفة من {n} مشاهد لفيديو عمودي قصير (ريل)، كل مشهد كائن فيه: '
-                        '"kicker" (كلمة أو كلمتان فوق العنوان مثل: المشكلة، الفكرة، الخطوة)، "title" (جملة قوية حتى 60 حرفاً تُقرأ في ثلاث ثوانٍ)، '
-                        '"body" (جملة قصيرة حتى 120 حرفاً، أو فارغ)، "seconds" (رقم بين 2.5 و4)، '
+                        '"kicker" (اسم النصيحة في كلمة أو كلمتين يصلح عنواناً لبطاقة، مثل: متابعة الطلبات، الفواتير، التذكيرات)، "title" (جملة قوية حتى 45 حرفاً، كلمتها الأخيرة هي الأهم لأنها تُلوَّن)، '
+                        '"body" (جملة توضيح عملية حتى 110 حرفاً بلغة صاحب العمل)، "seconds" (رقم بين 4 و5.5)، '
                         '"photo_query" (2 إلى 4 كلمات إنجليزية للبحث عن صورة فوتوغرافية حقيقية تمثّل هذا المشهد: شيء ملموس مرئي).\n'
-                        '    المشهد الأول خطّاف يوقف التمرير (سؤال أو مشكلة). الوسطى فكرة واحدة لكل مشهد. الأخير سؤال للمتابع ودعوة للحفظ والتعليق.\n'
+                        '    البنية إلزامية (أسلوب حسابات الشرح): المشهد الأول سؤال أو مشكلة توقف التمرير، و"body" فيه وعد بعدد النصائح (مثل: «4 أشياء لازم تأتمتها اليوم»). '
+                        'المشاهد الوسطى نصيحة واحدة لكل مشهد بالترتيب، لكل منها "kicker" مختلف. المشهد الأخير خلاصة تجمع النصائح بعنوان قصير، و"body" فيه سؤال للمتابع يدعو للتعليق.\n'
                         '  "photo_query": "" (اتركه فارغاً)،\n  "visual_prompt": "" (اتركه فارغاً)،')
     elif style == "infographic" and fmt == "versus":
         style_fields = ('  "vs": [اسم الطريقة القديمة، اسم الطريقة الجديدة] (كل اسم حتى 18 حرفاً)،\n  "points": من 4 إلى 5 عناصر، كل عنصر بالشكل «ما في القديمة || ما في الجديدة» (كل طرف حتى 40 حرفاً، الفاصل || إلزامي)،\n  "photo_query": "" (اتركه فارغاً)،\n  "visual_prompt": "" (اتركه فارغاً)،')
@@ -251,6 +252,8 @@ def make_entries(items: list[dict], req: dict, topic: dict, existing_ids: set[st
         pool = tuple(x for x in INFOGRAPHIC_STYLES if x != "versus") if entry["template"] == "infographic" else CAROUSEL_STYLES_FLAT if entry["template"] == "carousel" else REEL_MOTION_STYLES if entry["template"] == "reel" else ()
         if img.get("format") == "versus":
             img["style"] = "versus"
+        elif entry["template"] == "reel":
+            img["style"] = "explainer"                 # اعتمده المالك نمطاً وحيداً للريلات (2026-10-28)
         elif pool:
             pick = max(pool, key=lambda st: (used[::-1].index(st) if st in used else 99, -pool.index(st)))
             img["style"] = pick
