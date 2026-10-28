@@ -3157,7 +3157,7 @@
 
       #إدارة_الأعمال #مشاريع_صغيرة #أتمتة_العمليات #ريادة_الأعمال'
 - id: 2026-11-01-g1
-  approved: false
+  approved: true
   publish_at: 2026-11-01 08:00
   template: carousel
   topic: pillar-ai-business
