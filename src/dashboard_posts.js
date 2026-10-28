@@ -59,7 +59,7 @@ async function deleteChangedPhotos(id, oldList, newList, oldBase, newBase) {
 // ---------- نمط التصميم ولونه ----------
 const STYLES = {
   infographic: { cards: "بطاقات", bento: "بنتو", timeline: "خط زمني", bold: "جريء", glass: "زجاجي", steps: "درج", neon: "نيون", checklist: "قائمة تحقق", bignum: "الرقم الكبير", blueprint: "مخطط", pills: "كبسولات", columns: "شريط جانبي" },
-  reel: { morning: "ريل الصباح (لقطات حقيقية)", motion: "موشن نيلي (بموسيقى)", "motion-sunset": "موشن غروب (بموسيقى)", "motion-mint": "موشن نعناعي (بموسيقى)", geo: "أشكال هندسية", bold: "جريء", split: "شقّان", card: "بطاقة", terminal: "طرفية", neon: "نيون", paper: "ورقي", mesh: "شبكة ألوان" },
+  reel: { explainer: "شرح بأسلوب متقن", morning: "ريل الصباح (لقطات حقيقية)", motion: "موشن نيلي (بموسيقى)", "motion-sunset": "موشن غروب (بموسيقى)", "motion-mint": "موشن نعناعي (بموسيقى)", geo: "أشكال هندسية", bold: "جريء", split: "شقّان", card: "بطاقة", terminal: "طرفية", neon: "نيون", paper: "ورقي", mesh: "شبكة ألوان" },
   carousel: { blueprint: "مخطط", editorial: "مجلة", terminal: "طرفية", poster: "ملصق", sticky: "ورقة ملصقة", duo: "لوحان", neon: "نيون", paper: "ورقي", gradient: "تدرج" },
 };
 const HUES = [0, 35, 70, 140, 190, 250, 290, 325];

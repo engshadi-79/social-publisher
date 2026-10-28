@@ -121,6 +121,8 @@ def reel_style(post: dict) -> str:
 
 def reel_template(post: dict) -> str:
     st = reel_style(post)
+    if st == "explainer":
+        return "reel/explainer.html"
     if st.startswith("motion"):
         return "reel/motion.html"
     return "reel/scene.html" if st == "geo" else f"reel/styles/{st}.html"

@@ -183,6 +183,8 @@ MOTION_THEMES = {
                "cols": ["#6366f1", "#8b5cf6", "#10b981", "#f59e0b", "#ec4899", "#06b6d4", "#6366f1", "#a855f7"]},
     "motion-sunset": {"a1": "#f97316", "a2": "#ec4899", "bg1": "#170914", "bg2": "#4a1d2e", "ink": "#ffffff", "kick": "#6366f1",
                       "cols": ["#f97316", "#ec4899", "#f59e0b", "#ef4444", "#a855f7", "#fb7185", "#f97316", "#facc15"]},
+    "explainer": {"a1": "#ff7a1a", "a2": "#ffb347", "bg1": "#0f1013", "bg2": "#1c1d22", "ink": "#ffffff", "kick": "#ff7a1a",
+                  "cols": ["#ff7a1a"]},
     "motion-mint": {"a1": "#10b981", "a2": "#06b6d4", "bg1": "#04161a", "bg2": "#0f3b3a", "ink": "#ffffff", "kick": "#f43f5e",
                     "cols": ["#10b981", "#06b6d4", "#22d3ee", "#84cc16", "#14b8a6", "#38bdf8", "#10b981", "#a3e635"]},
 }
@@ -244,7 +246,7 @@ def _motion_page(renderer, post: dict):
 
     from config import TEMPLATES_DIR
     from queue_io import load_brand
-    from render import _fonts, post_hue, reel_style
+    from render import _fonts, post_hue, reel_style, reel_template
 
     specs = scene_specs(post)
     if not (MIN_SCENES <= len(specs) <= MAX_SCENES):
@@ -252,7 +254,7 @@ def _motion_page(renderer, post: dict):
     starts, durs, total = motion_timing(post)
     env = Environment(loader=FileSystemLoader(str(TEMPLATES_DIR)), autoescape=True)
     w, h = TEMPLATES["reel"]
-    html = env.get_template("reel/motion.html").render(
+    html = env.get_template(reel_template(post)).render(
         brand=load_brand(), w=w, h=h, fonts=_fonts(), hue=0, theme=MOTION_THEMES[reel_style(post)],   # الثيم يحدد الألوان، فلا إزاحة لونية
         scenes=specs, starts=starts, durs=durs, total=total, series=(post.get("image") or {}).get("series", ""))
     tmp = OUT_DIR / "_tmp"

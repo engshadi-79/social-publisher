@@ -1,0 +1,230 @@
+{# ريل «شرح» بأسلوب حسابات الشرح التقني (مثل «متقن»): خلفية فحمية، لون برتقالي واحد،
+   عنوان كبير كلمته الأخيرة ملوّنة، ونافذة متصفّح أو محرّر يكتب، أو بطاقة متوهّجة، ومؤشر فأرة يتحرّك وينقر،
+   وخط زمني مرقّم يلخّص النقاط في المشهد الأخير.
+   نفس محرّك «موشن»: صفحة واحدة ودالة seek(t) تحسب كل شيء من الزمن فقط (لا انتقالات CSS ولا مؤقّتات). #}
+<!doctype html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="utf-8">
+<style>
+{% for f in fonts %}
+@font-face { font-family: "BrandFont"; src: url("{{ f.uri }}"); font-weight: {{ f.weight }}; font-style: normal; }
+{% endfor %}
+:root{ --or:#ff7a1a; --or2:#ffb347; --bg:#0f1013; --panel:#17181d; --line:rgba(255,255,255,.09); --mute:#9a9ca6 }
+*{ box-sizing:border-box; margin:0; padding:0 }
+html,body{ width:{{ w }}px; height:{{ h }}px; overflow:hidden; background:var(--bg) }
+body{ font-family:"BrandFont","Cairo","Segoe UI",Tahoma,sans-serif; color:#fff }
+.stage{ position:relative; width:{{ w }}px; height:{{ h }}px; overflow:hidden;
+  background:radial-gradient(900px 700px at 50% -8%, rgba(255,122,26,.16), transparent 62%), radial-gradient(700px 600px at 50% 112%, rgba(255,122,26,.09), transparent 60%), var(--bg) }
+.star{ position:absolute; width:4px; height:4px; border-radius:50%; background:#fff }
+#wave{ position:absolute; inset:0; opacity:.5 }
+.dots{ position:absolute; top:70px; inset-inline:0; display:flex; justify-content:center; gap:14px; z-index:9; direction:ltr }
+.dots i{ width:14px; height:14px; border-radius:99px; background:rgba(255,255,255,.25) }
+.scene{ position:absolute; inset:0; z-index:5 }
+.head{ position:absolute; top:150px; inset-inline:70px; text-align:center }
+.title{ font-size:82px; font-weight:800; line-height:1.25; letter-spacing:-.5px; text-shadow:0 8px 40px rgba(0,0,0,.5) }
+.title em{ font-style:normal; background:linear-gradient(90deg, var(--or), var(--or2)); -webkit-background-clip:text; background-clip:text; color:transparent }
+.sub{ margin-top:22px; font-size:38px; font-weight:600; color:#d6d7de; line-height:1.6 }
+/* نافذة متصفّح */
+.win{ position:absolute; left:80px; right:80px; top:600px; border-radius:30px; background:var(--panel); border:2px solid var(--line);
+  box-shadow:0 60px 120px -40px rgba(0,0,0,.8), 0 0 0 1px rgba(255,122,26,.08); overflow:hidden; transform-origin:50% 0 }
+.bar{ height:70px; display:flex; align-items:center; gap:14px; padding:0 26px; background:#1d1e24; border-bottom:2px solid var(--line); direction:ltr }
+.bar i{ width:18px; height:18px; border-radius:50%; background:#3a3b42 } .bar i:first-child{ background:var(--or) }
+.bar .tab{ margin-left:18px; font-size:26px; color:#cfd0d6; background:#26272e; padding:6px 22px; border-radius:12px; font-family:Consolas,monospace }
+.url{ margin-left:auto; font-size:22px; color:var(--mute); font-family:Consolas,monospace }
+.page{ padding:56px 60px 64px; min-height:860px }
+.pnum{ display:inline-grid; place-items:center; width:130px; height:130px; border-radius:34px; font-size:68px; font-weight:800;
+  background:linear-gradient(140deg, var(--or), var(--or2)); color:#1a0d00; box-shadow:0 20px 50px -14px rgba(255,122,26,.7) }
+.ptitle{ margin-top:40px; font-size:64px; font-weight:800; line-height:1.35 }
+.pbody{ margin-top:26px; font-size:44px; line-height:1.7; color:#c9cad2; font-weight:500 }
+.btn{ display:inline-block; margin-top:56px; padding:22px 54px; border-radius:20px; border:2px solid rgba(255,122,26,.6); color:var(--or2); font-size:38px; font-weight:700; position:relative; overflow:hidden }
+.btn .rip{ position:absolute; left:50%; top:50%; width:20px; height:20px; border-radius:50%; background:rgba(255,179,71,.45); transform:translate(-50%,-50%) scale(0) }
+/* محرّر */
+.ed .page{ padding:44px 0 60px; min-height:820px }
+.ed.code .page{ direction:ltr }
+.ln{ display:flex; gap:28px; padding:8px 48px; font-size:42px; line-height:1.55; min-height:70px }
+.ln b{ width:44px; flex:0 0 auto; text-align:left; color:#55565e; font-weight:500; direction:ltr; font-family:Consolas,monospace }
+.ln span{ color:#e9e9ee; white-space:pre-wrap } .ln span.k{ color:var(--or2) } .ln span.c{ color:#7d808c }
+.caret{ display:inline-block; width:5px; height:44px; background:var(--or); vertical-align:middle; margin-inline-start:4px }
+/* بطاقة متوهّجة */
+.card3d{ position:absolute; left:150px; right:150px; top:620px; height:920px; border-radius:46px; padding:70px 60px;
+  background:linear-gradient(160deg, #23242b, #121317); border:2px solid rgba(255,122,26,.45);
+  box-shadow:0 0 0 1px rgba(255,122,26,.15), 0 40px 140px -30px rgba(255,122,26,.55), inset 0 2px 0 rgba(255,255,255,.08); transform-origin:50% 50% }
+.card3d .glow{ position:absolute; inset:auto 60px -60px; height:120px; border-radius:50%; background:radial-gradient(closest-side, rgba(255,122,26,.75), transparent); filter:blur(18px) }
+.card3d .cn{ font-size:150px; font-weight:800; line-height:1; color:transparent; -webkit-text-stroke:4px var(--or); direction:ltr; text-align:right }
+.card3d .ct{ margin-top:60px; font-size:68px; font-weight:800; line-height:1.3 }
+.card3d .cb{ margin-top:30px; font-size:44px; line-height:1.65; color:#c9cad2 }
+/* خط زمني */
+.tl{ position:absolute; left:70px; right:70px; top:700px; height:720px; direction:ltr }
+.tl .rail{ position:absolute; inset-inline:30px; bottom:120px; height:6px; border-radius:6px; background:rgba(255,255,255,.12) }
+.tl .rail b{ position:absolute; top:0; bottom:0; right:0; width:0; border-radius:6px; background:linear-gradient(270deg, var(--or), var(--or2)) }
+.node{ position:absolute; bottom:72px; width:100px; height:100px; margin-left:-50px; border-radius:50%; display:grid; place-items:center;
+  font-size:44px; font-weight:800; background:var(--bg); border:5px solid var(--or); color:#fff }
+.mini{ position:absolute; bottom:210px; width:220px; margin-left:-110px; min-height:340px; direction:rtl; border-radius:26px; padding:24px 22px;
+  background:linear-gradient(170deg, #25262d, #15161a); border:2px solid rgba(255,122,26,.4); font-size:30px; font-weight:700; line-height:1.45;
+  box-shadow:0 30px 60px -20px rgba(255,122,26,.35) }
+.mini::before{ content:""; display:block; height:110px; border-radius:16px; margin-bottom:18px; background:radial-gradient(circle at 30% 30%, rgba(255,179,71,.9), rgba(255,122,26,.4) 40%, transparent 70%), #1d1e24 }
+#cursor{ position:absolute; left:0; top:0; width:64px; height:64px; z-index:20; filter:drop-shadow(0 6px 10px rgba(0,0,0,.6)) }
+.foot{ position:absolute; bottom:78px; inset-inline:0; text-align:center; font-size:30px; font-weight:700; color:#cfd0d6; z-index:9 }
+.foot b{ color:var(--or2) }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <svg id="wave" viewBox="0 0 {{ w }} {{ h }}" preserveAspectRatio="none"><path id="wv1" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="3"/><path id="wv2" fill="none" stroke="rgba(255,122,26,.12)" stroke-width="3"/></svg>
+  {% for i in range(26) %}<i class="star" data-i="{{ i }}"></i>{% endfor %}
+  <div class="dots" id="dots">{% for s in scenes %}<i></i>{% endfor %}</div>
+  {% set last = scenes|length - 1 %}
+  {% for s in scenes %}
+  {% set i = loop.index0 %}
+  {% set words = s.title.split(' ') %}
+  {% set lay = 'hook' if i == 0 else ('recap' if i == last else ['win', 'ed', 'card'][(i - 1) % 3]) %}
+  <div class="scene" data-sc="{{ i }}" data-lay="{{ lay }}">
+    <div class="head tx" data-d="0.1">
+      <div class="title">{% if words|length > 1 %}{{ words[:-1]|join(' ') }} <em>{{ words[-1] }}</em>{% else %}<em>{{ s.title }}</em>{% endif %}</div>
+      {% if lay == 'hook' and s.body %}<div class="sub">{{ s.body }}</div>{% endif %}
+    </div>
+    {% if lay == 'hook' %}
+    <div class="win ed code obj" data-d="0.35" style="top:720px">
+      <div class="bar"><i></i><i></i><i></i><span class="tab">automation.js</span></div>
+      <div class="page">
+        {% for code in ['// ' ~ (s.kicker or 'كل يوم نفس الشغل اليدوي…'), 'when (order.new) {', '  sendInvoice(order)', '  notify(customer)', '}', '// والنتيجة: وقتك لك'] %}
+        <div class="ln"><b>{{ loop.index }}</b><span class="{{ 'c' if code.startswith('//') else 'k' }}" data-type="{{ code }}" dir="{{ 'rtl' if code.startswith('//') else 'ltr' }}"></span></div>
+        {% endfor %}
+      </div>
+    </div>
+    {% elif lay == 'win' %}
+    <div class="win obj" data-d="0.35">
+      <div class="bar"><i></i><i></i><i></i><span class="tab">{{ '%02d' % i }}</span><span class="url">almohandis.app/{{ i }}</span></div>
+      <div class="page">
+        <span class="pnum">{{ i }}</span>
+        {% if s.kicker %}<div class="ptitle">{{ s.kicker }}</div>{% endif %}
+        <div class="pbody">{{ s.body or s.title }}</div>
+        <span class="btn">جرّبها الآن<i class="rip"></i></span>
+      </div>
+    </div>
+    {% elif lay == 'ed' %}
+    <div class="win ed obj" data-d="0.35">
+      <div class="bar"><i></i><i></i><i></i><span class="tab">step-{{ i }}.md</span></div>
+      <div class="page">
+        {% set body = (s.body or s.title) %}
+        {% set chunks = body|wordwrap(30, true, '\n')|string %}
+        <div class="ln"><b>1</b><span class="k" data-type="# {{ s.kicker or ('الخطوة ' ~ i) }}"></span></div>
+        {% for row in chunks.split('\n') %}<div class="ln"><b>{{ loop.index + 1 }}</b><span data-type="{{ row }}"></span></div>{% endfor %}
+      </div>
+    </div>
+    {% elif lay == 'card' %}
+    <div class="card3d obj" data-d="0.35"><div class="glow"></div>
+      <div class="cn">{{ '%02d' % i }}</div>
+      <div class="ct">{{ s.kicker or s.title }}</div>
+      {% if s.body %}<div class="cb">{{ s.body }}</div>{% endif %}
+    </div>
+    {% else %}
+    <div class="tl obj" data-d="0.3">
+      <div class="rail"><b></b></div>
+      {% set mids = scenes[1:last] %}
+      {% for m in mids %}
+      {% set pos = 100 - (loop.index0 + 0.5) * 100 / mids|length %}
+      <div class="mini" data-k="{{ loop.index0 }}" style="left:{{ pos }}%">{{ m.kicker or m.title }}</div>
+      <div class="node" data-k="{{ loop.index0 }}" style="left:{{ pos }}%">{{ loop.index }}</div>
+      {% endfor %}
+    </div>
+    {% if s.body %}<div class="head tx" data-d="0.6" style="top:1480px"><div class="sub">{{ s.body }}</div></div>{% endif %}
+    {% endif %}
+  </div>
+  {% endfor %}
+  <svg id="cursor" viewBox="0 0 24 24"><path d="M4 2 L4 19 L8.5 14.8 L11.6 21.5 L14.4 20.3 L11.3 13.7 L17.5 13.4 Z" fill="#fff" stroke="#111" stroke-width="1.3" stroke-linejoin="round"/></svg>
+  <div class="foot">{{ brand.name }} · <b>{{ brand.handle }}</b>{% if series %} · {{ series }}{% endif %}</div>
+</div>
+<script>
+const W = {{ w }}, H = {{ h }}, BEAT = 0.5;
+const STARTS = {{ starts|tojson }}, DURS = {{ durs|tojson }}, TOTAL = {{ total }};
+const N = STARTS.length, LOOP_AT = TOTAL - BEAT;
+const spring = (tau, w = 10.5, z = 0.72) => {
+  if (tau <= 0) return 0;
+  const wd = w * Math.sqrt(1 - z * z);
+  return 1 - Math.exp(-z * w * tau) * (Math.cos(wd * tau) + (z * w / wd) * Math.sin(wd * tau));
+};
+const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+const ease = (x) => { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); };
+const scenes = [...document.querySelectorAll('.scene')], dots = [...document.querySelectorAll('#dots i')];
+const cursor = document.getElementById('cursor');
+const stars = [...document.querySelectorAll('.star')].map((el, i) => {
+  const r = (n) => { const x = Math.sin((i + 1) * 9301 + n * 49297) * 233280; return x - Math.floor(x); };
+  return { el, x: r(1) * W, y: r(2) * H * 0.75, s: 2 + r(3) * 4, ph: r(4) * 6 };
+});
+// مسار المؤشر لكل تخطيط: نقاط (x, y) نسبية داخل المسرح، والنقرة في آخر نقطة
+const PATH = { hook: [[820, 1500], [560, 1080], [600, 1140]], win: [[860, 1650], [420, 1300], [470, 1330]],
+               ed: [[880, 1580], [700, 1100], [740, 1120]], card: [[900, 1700], [560, 1180], [540, 1200]], recap: [[880, 1640], [300, 1160], [330, 1180]] };
+const sceneAt = (t) => { let k = 0; for (let i = 0; i < N; i++) if (t >= STARTS[i]) k = i; return k; };
+
+function wave(t) {
+  const mk = (amp, f, y0, sp) => { let d = ''; for (let x = 0; x <= W; x += 40) { const y = y0 + amp * Math.sin(x * f + t * sp); d += (x ? 'L' : 'M') + x + ' ' + y.toFixed(1); } return d; };
+  document.getElementById('wv1').setAttribute('d', mk(26, 0.006, 560, 0.9));
+  document.getElementById('wv2').setAttribute('d', mk(34, 0.0045, 600, -0.7));
+}
+
+window.seek = (t) => {
+  t = clamp(t, 0, TOTAL);
+  const k = sceneAt(t);
+  wave(t);
+  stars.forEach((s) => { s.el.style.transform = `translate(${s.x.toFixed(1)}px, ${s.y.toFixed(1)}px) scale(${s.s / 4})`;
+    s.el.style.opacity = (0.15 + 0.35 * (0.5 + 0.5 * Math.sin(t * 1.6 + s.ph))).toFixed(3); });
+  dots.forEach((d, i) => { const on = i === k; d.style.width = on ? '46px' : '14px'; d.style.background = on ? 'linear-gradient(90deg,#ff7a1a,#ffb347)' : (i < k ? 'rgba(255,255,255,.55)' : 'rgba(255,255,255,.22)'); });
+  scenes.forEach((el, i) => {
+    const start = STARTS[i], end = i + 1 < N ? STARTS[i + 1] - 0.1 : LOOP_AT, local = t - start;
+    const on = t >= start - 0.05 && t <= end;
+    el.style.visibility = on ? 'visible' : 'hidden';
+    if (!on) return;
+    const out = clamp((t - (end - 0.35)) / 0.35, 0, 1);
+    el.querySelectorAll('.tx').forEach((tx) => {
+      const a = spring(local - parseFloat(tx.dataset.d), 11, 0.8), v = clamp(a, 0, 1) * (1 - out);
+      tx.style.opacity = v.toFixed(3); tx.style.filter = `blur(${((1 - clamp(a, 0, 1)) * 14 + out * 10).toFixed(2)}px)`;
+      tx.style.transform = `translateY(${((1 - a) * 60 - out * 40).toFixed(2)}px)`;
+    });
+    el.querySelectorAll('.obj').forEach((ob) => {
+      const a = spring(local - parseFloat(ob.dataset.d), 9, 0.75), v = clamp(a, 0, 1) * (1 - out);
+      const lay = el.dataset.lay, tilt = lay === 'card' ? (1 - a) * 28 + Math.sin(local * 1.3) * 3 : (1 - a) * 18;
+      ob.style.opacity = v.toFixed(3);
+      ob.style.transform = `perspective(1600px) translateY(${((1 - a) * 160 - out * 60).toFixed(1)}px) rotateX(${(lay === 'card' ? 0 : tilt).toFixed(2)}deg) rotateY(${(lay === 'card' ? tilt : 0).toFixed(2)}deg) scale(${(0.92 + 0.08 * clamp(a, 0, 1.05)).toFixed(4)})`;
+    });
+    // كتابة حرفاً حرفاً في المحرّر
+    let budget = Math.max(0, (local - 0.7) * 34);
+    const lines = [...el.querySelectorAll('[data-type]')];
+    let caretSet = false;
+    lines.forEach((sp) => {
+      const full = sp.dataset.type, n = Math.min(full.length, Math.floor(budget));
+      budget -= full.length;
+      sp.textContent = full.slice(0, n);
+      const old = sp.parentElement.querySelector('.caret'); if (old) old.remove();
+      if (!caretSet && n < full.length) { const c = document.createElement('i'); c.className = 'caret'; c.style.opacity = (Math.floor(t * 2.5) % 2) ? '1' : '0.15'; sp.after(c); caretSet = true; }
+    });
+    if (!caretSet && lines.length) { const lastLn = lines[lines.length - 1]; const c = document.createElement('i'); c.className = 'caret'; c.style.opacity = (Math.floor(t * 2.5) % 2) ? '1' : '0.15'; lastLn.after(c); }
+    // الخط الزمني: ينمو ويُظهر العقد والبطاقات بالتتابع
+    const rail = el.querySelector('.rail b');
+    if (rail) {
+      const g = ease((local - 0.5) / 2.2); rail.style.width = (g * 100).toFixed(2) + '%';
+      const m = el.querySelectorAll('.mini').length || 1;
+      el.querySelectorAll('.node, .mini').forEach((nd) => {
+        const at = 0.5 + 2.2 * (parseInt(nd.dataset.k, 10) + 0.5) / m, a = spring(local - at, 10, 0.7);
+        nd.style.opacity = (clamp(a, 0, 1) * (1 - out)).toFixed(3);
+        nd.style.transform = nd.classList.contains('mini') ? `translateY(${((1 - a) * 80).toFixed(1)}px)` : `scale(${clamp(a, 0, 1.2).toFixed(3)})`;
+      });
+    }
+    // زر ونقرة
+    const rip = el.querySelector('.rip');
+    if (rip) { const ct = DURS[i] * 0.62, r = clamp((local - ct) / 0.6, 0, 1); rip.style.transform = `translate(-50%,-50%) scale(${(r * 22).toFixed(2)})`; rip.style.opacity = (1 - r).toFixed(3); }
+  });
+  // المؤشر: يدخل، يتّجه للهدف، ينقر (يصغر لحظة)، ثم يخرج قبل المشهد التالي
+  const lay = scenes[k].dataset.lay, P = PATH[lay] || PATH.win, local = t - STARTS[k], d = DURS[k];
+  const p1 = ease((local - 0.4) / (d * 0.45)), p2 = ease((local - d * 0.5) / (d * 0.12));
+  let x = P[0][0] + (P[1][0] - P[0][0]) * p1 + (P[2][0] - P[1][0]) * p2, y = P[0][1] + (P[1][1] - P[0][1]) * p1 + (P[2][1] - P[1][1]) * p2;
+  const click = Math.exp(-Math.pow((local - d * 0.62) * 9, 2));
+  const leave = clamp((local - (d - 0.6)) / 0.5, 0, 1);
+  cursor.style.transform = `translate(${x.toFixed(1)}px, ${(y + leave * 400).toFixed(1)}px) scale(${(1 - 0.25 * click).toFixed(3)})`;
+  cursor.style.opacity = (clamp((local - 0.3) / 0.3, 0, 1) * (1 - leave)).toFixed(3);
+};
+window.ready = (async () => { await document.fonts.ready; window.seek(0); window.__ready = true; })();
+</script>
+</body>
+</html>
