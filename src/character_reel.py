@@ -289,15 +289,17 @@ def estimate_timeline(sc: dict) -> dict:
 def build_data(sc: dict, tl: dict, env_h: list[float] | None = None, env_c: list[float] | None = None) -> dict:
     by = {x["line"]: x for x in tl["lines"]}
     text = {n: t for n, _, t in sc["lines"]}
-    steps = [dict(title=s["title"], kind=s["kind"], items=s["items"], note=s.get("note", ""), start=by[s["at"]]["start"], end=0.0) for s in sc["steps"]]
+    nt = no_tashkeel                          # الشاشة بلا تشكيل (للقراءة)، والصوت بالتشكيل (للنطق)
+    steps = [dict(title=nt(s["title"]), kind=s["kind"], items=[nt(x) for x in s["items"]], note=nt(s.get("note", "")),
+                  start=by[s["at"]]["start"], end=0.0) for s in sc["steps"]]
     relay_start, cta_start = round(by[sc["relay_at"]]["start"] + 0.2, 2), round(by[sc["cta_at"]]["start"] + 0.2, 2)
     for i, s in enumerate(steps):
         s["end"] = round((steps[i + 1]["start"] - 0.15) if i + 1 < len(steps) else (relay_start - 0.2), 2)
     first = steps[0]["start"]
     return {
-        "dur": tl["dur"], "hook": sc["hook"], "hookEnd": round(first - 0.28, 2), "steps": steps,
-        "relay": {"title": sc["relay"]["title"], "nodes": sc["relay"]["nodes"], "start": relay_start, "end": round(cta_start - 0.2, 2)},
-        "cta": ({**sc["cta"], "start": cta_start} if sc["cta"] else None),
+        "dur": tl["dur"], "hook": {k: nt(v) for k, v in sc["hook"].items()}, "hookEnd": round(first - 0.28, 2), "steps": steps,
+        "relay": {"title": nt(sc["relay"]["title"]), "nodes": [nt(x) for x in sc["relay"]["nodes"]], "start": relay_start, "end": round(cta_start - 0.2, 2)},
+        "cta": ({**{k: nt(v) for k, v in sc["cta"].items()}, "start": cta_start} if sc["cta"] else None),
         "lines": [{"s": by[n]["start"], "e": by[n]["end"], "k": spk, "t": no_tashkeel(plain(text[n]))} for n, spk, _ in sc["lines"]],
         "envH": env_h or [], "envC": env_c or [],
     }
@@ -416,7 +418,7 @@ def write_script(topic: str, extra: str = "", lang: str = "fusha") -> tuple[dict
                 raise CharacterError(f"تعذّرت كتابة السكربت: {str(e)[:200]}")
             print(f"… إعادة المحاولة {attempt + 2}/4 بعد: {str(e)[:100]}")
             time.sleep(40 * (attempt + 1))
-    posts = {k: str(obj.pop(k, "")).strip() for k in ("facebook", "instagram", "threads")}
+    posts = {k: no_tashkeel(str(obj.pop(k, ""))).strip() for k in ("facebook", "instagram", "threads")}   # التشكيل للصوت لا للمنشورات
     obj["lang"] = lang
     sc = normalize(obj)
     errs = validate_script(sc)
