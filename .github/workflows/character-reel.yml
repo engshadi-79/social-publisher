@@ -69,6 +69,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.ref_name }}   # أحدث نسخة: فيها المسودة التي دفعها العمل الأول (الافتراضي يسحب نسخة لحظة التشغيل)
           fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
