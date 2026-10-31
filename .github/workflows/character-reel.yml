@@ -12,6 +12,10 @@ on:
         description: "ملاحظات للكاتب (اختياري)"
         required: false
         default: ""
+      lang:
+        description: "اللغة: levant (شامية) أو fusha (فصحى) أو egypt (مصرية)"
+        required: false
+        default: "levant"
 
 permissions:
   contents: write
@@ -42,7 +46,8 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           TOPIC: ${{ inputs.topic }}
           EXTRA: ${{ inputs.extra }}
-        run: python character_reel.py --topic "$TOPIC" --extra "$EXTRA" --no-video
+          LANG_STYLE: ${{ inputs.lang }}
+        run: python character_reel.py --topic "$TOPIC" --extra "$EXTRA" --lang "$LANG_STYLE" --no-video
       - name: Commit the draft and refresh the dashboard
         env:
           GH_TOKEN: ${{ github.token }}

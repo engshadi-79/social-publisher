@@ -48,7 +48,7 @@ if ($("chGo")) $("chGo").onclick = async () => {
   if (!confirm("سأكتب حواراً لموضوع «" + topic + "» وأبني فيديو بصوتين (نحو 10 دقائق). تصلك مسودة لا تُنشر قبل موافقتك. متابعة؟")) return;
   try {
     say(m, "جارٍ الإرسال…", true);
-    await gh("actions/workflows/character-reel.yml/dispatches", { method: "POST", body: JSON.stringify({ ref: "main", inputs: { topic, extra: $("chExtra").value.trim() } }) });
+    await gh("actions/workflows/character-reel.yml/dispatches", { method: "POST", body: JSON.stringify({ ref: "main", inputs: { topic, extra: $("chExtra").value.trim(), lang: $("chLang").value } }) });
     say(m, "⏳ بدأ العمل: بعد دقيقة تظهر المسودة في «طابور المراجعة»، وبعد نحو 10 دقائق يجهز فيديوها (زر «شاهد الفيديو»). لا يُنشر شيء قبل موافقتك.", true);
     $("chTopic").value = ""; $("chExtra").value = "";
   } catch (e) { say(m, e.message, false); }

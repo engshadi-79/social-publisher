@@ -25,8 +25,23 @@ STYLE = "character"
 CHAR_DIR = ROOT / "brand" / "character"
 GSAP = ROOT / "templates" / "character" / "gsap.min.js"
 FPS = 30
-EDGE_VOICES = {"H": "ar-JO-TaimNeural", "C": "ar-JO-SanaNeural"}
+LANGS = ("levant", "fusha", "egypt")
+# أصوات edge-tts لكل لغة: شامية (أردنية، فلا صوت فلسطيني)، فصحى واضحة (سعودية)، مصرية
+EDGE_VOICES = {"levant": {"H": "ar-JO-TaimNeural", "C": "ar-JO-SanaNeural"},
+               "fusha": {"H": "ar-SA-HamedNeural", "C": "ar-SA-ZariyahNeural"},
+               "egypt": {"H": "ar-EG-ShakirNeural", "C": "ar-EG-SalmaNeural"}}
 GEMINI_VOICES = {"H": "Charon", "C": "Kore"}
+GEMINI_STYLE = {
+    "levant": "Speak in a natural, spoken Palestinian Arabic dialect (Levantine, like a young person from Ramallah or Jerusalem), conversational and clear, not Modern Standard Arabic and not Egyptian.",
+    "fusha": "Speak in clear Modern Standard Arabic (fusha) like a warm, professional presenter: carefully pronounced, correct vowels exactly as the diacritics show, natural pacing, not a dialect.",
+    "egypt": "Speak in a natural, spoken Egyptian Arabic dialect, conversational and clear.",
+}
+# كلمات لاتينية تُنطق بالحروف العربية عند التوليد الصوتي فقط (الشاشة تعرضها كما كُتبت)
+PRONOUNCE = {"AI": "إيه آي", "Claude": "كْلُود", "ChatGPT": "تشات جي بي تي", "GPT": "جي بي تي", "Gemini": "جيميناي", "Vercel": "فيرسِل",
+             "Supabase": "سوبابيس", "GitHub": "جِت هَب", "WhatsApp": "واتساب", "Excel": "إكسِل", "Instagram": "إنستغرام",
+             "Facebook": "فيسبوك", "YouTube": "يوتيوب", "Google": "جوجل", "PDF": "بي دي إف", "QR": "كيو آر", "API": "إيه بي آي",
+             "SEO": "إس إي أو", "CRM": "سي آر إم", "App": "أَب", "Online": "أونلاين", "online": "أونلاين", "SMS": "إس إم إس",
+             "Wi-Fi": "واي فاي", "WiFi": "واي فاي", "Zoom": "زوم", "Canva": "كانفا", "TikTok": "تيك توك", "LinkedIn": "لينكد إن"}
 GEMINI_TTS_MODELS = [m for m in (os.environ.get("GEMINI_TTS_MODEL"), "gemini-2.5-flash-preview-tts", "gemini-2.5-flash-tts") if m]
 KINDS = ("rows", "chips", "checks")
 
@@ -55,6 +70,14 @@ def no_tashkeel(text: str) -> str:
     return re.sub("[ً-ْٰ]", "", text)
 
 
+def tts_text(text: str) -> str:
+    """النص المنطوق: بلا وسوم ولا نجوم، والكلمات اللاتينية بحروف عربية (الأطول أولاً حتى لا يقطع «AI» كلمة أطول)."""
+    out = plain(text)
+    for k in sorted(PRONOUNCE, key=len, reverse=True):
+        out = re.sub(rf"(?<![A-Za-z]){re.escape(k)}(?![A-Za-z])", PRONOUNCE[k], out)
+    return out
+
+
 def tags_of(text: str) -> list[str]:
     return [t.lower() for t in re.findall(r"\[([^\]]+)\]", str(text or ""))]
 
@@ -72,7 +95,7 @@ def validate_script(sc: dict) -> list[str]:
     for it in lines:
         if not (isinstance(it, (list, tuple)) and len(it) == 3 and it[1] in ("H", "C") and plain(it[2])):
             return ["كل سطر حوار بالشكل [معرّف، H أو C، نص]"]
-        if len(plain(it[2])) > 110:
+        if len(no_tashkeel(plain(it[2]))) > 110:
             errs.append(f"السطر {it[0]} أطول من 110 حرفاً")
         ids.append(str(it[0]))
     if len(set(ids)) != len(ids):
@@ -99,6 +122,8 @@ def validate_script(sc: dict) -> list[str]:
             errs.append(f"الخطوة {n}: عنصر أطول من 38 حرفاً")
         if s.get("kind", "rows") not in KINDS:
             errs.append(f"الخطوة {n}: نوع غير معروف")
+    if sc.get("lang") not in (None,) + LANGS:
+        errs.append("lang يجب أن يكون levant أو fusha أو egypt")
     for key in ("relay_at", "cta_at"):
         if sc.get(key) is not None and str(sc[key]) not in pos:
             errs.append(f"«{key}» لا يشير إلى سطر موجود")
@@ -119,6 +144,7 @@ def normalize(sc: dict) -> dict:
     sc.setdefault("relay_at", ids[max(0, len(ids) - 3)])
     sc.setdefault("cta_at", ids[-1])
     sc["relay_at"], sc["cta_at"] = str(sc["relay_at"]), str(sc["cta_at"])
+    sc.setdefault("lang", "levant")
     sc.setdefault("relay", {})
     sc["relay"].setdefault("nodes", [plain(s["title"])[:16] for s in sc["steps"]])
     sc["relay"].setdefault("title", "")
@@ -143,15 +169,14 @@ def _gemini_key() -> str:
     return os.environ.get("GEMINI_API_KEY", "")
 
 
-def _tts_gemini(text: str, spk: str, out: Path, model: str) -> None:
+def _tts_gemini(text: str, spk: str, out: Path, model: str, lang: str = "levant") -> None:
     import base64
 
     import requests
     tags = tags_of(text)
-    style = ("Speak in a natural, spoken Palestinian Arabic dialect (Levantine, like a young person from Ramallah or Jerusalem), "
-             "conversational and clear, not Modern Standard Arabic and not Egyptian. Read exactly this line"
+    style = (GEMINI_STYLE.get(lang, GEMINI_STYLE["levant"]) + " Read exactly this line, with every diacritic respected"
              + (f", in a {', '.join(tags)} tone" if tags else "") + ":\n")
-    body = {"contents": [{"parts": [{"text": style + plain(text)}]}],
+    body = {"contents": [{"parts": [{"text": style + tts_text(text)}]}],
             "generationConfig": {"responseModalities": ["AUDIO"],
                                  "speechConfig": {"voiceConfig": {"prebuiltVoiceConfig": {"voiceName": GEMINI_VOICES[spk]}}}}}
     for attempt in range(5):
@@ -171,20 +196,20 @@ def _tts_gemini(text: str, spk: str, out: Path, model: str) -> None:
         w.writeframes(pcm)
 
 
-def _tts_edge(text: str, spk: str, out: Path) -> None:
+def _tts_edge(text: str, spk: str, out: Path, lang: str = "levant") -> None:
     rate, pitch = 0, 0
     for t in tags_of(text):
         if t in TONE:
             rate, pitch = TONE[t]
             break
-    clean = plain(text).replace("…", "، ")
-    p = subprocess.run([sys.executable, "-m", "edge_tts", "--voice", EDGE_VOICES[spk], f"--rate={rate:+d}%", f"--pitch={pitch:+d}Hz",
+    clean = tts_text(text).replace("…", "، ")
+    p = subprocess.run([sys.executable, "-m", "edge_tts", "--voice", EDGE_VOICES.get(lang, EDGE_VOICES["levant"])[spk], f"--rate={rate:+d}%", f"--pitch={pitch:+d}Hz",
                         "--text", clean, "--write-media", str(out)], capture_output=True, text=True)
     if p.returncode:
         raise CharacterError(f"edge-tts: {(p.stderr or p.stdout)[-300:]}")
 
 
-def synth(lines: list[list[str]], takes: Path, engine: str | None = None) -> str:
+def synth(lines: list[list[str]], takes: Path, engine: str | None = None, lang: str = "levant") -> str:
     """يولّد ملف صوت لكل سطر ويقصّ الصمت من أطرافه. يرجع المحرّك المستعمل (gemini أو edge)."""
     takes.mkdir(parents=True, exist_ok=True)
     order = [engine] if engine else (["gemini"] if _gemini_key() else []) + ["edge"]
@@ -196,7 +221,7 @@ def synth(lines: list[list[str]], takes: Path, engine: str | None = None) -> str
                 try:
                     for n, spk, text in lines:
                         raw = takes / (f"{n}_raw.wav" if eng == "gemini" else f"{n}_raw.mp3")
-                        (_tts_gemini(text, spk, raw, model) if eng == "gemini" else _tts_edge(text, spk, raw))
+                        (_tts_gemini(text, spk, raw, model, lang) if eng == "gemini" else _tts_edge(text, spk, raw, lang))
                         _ffmpeg("-i", str(raw), "-af", "silenceremove=start_periods=1:start_threshold=-45dB,areverse,"
                                 "silenceremove=start_periods=1:start_threshold=-45dB,areverse", "-ar", "44100", "-ac", "1", str(takes / f"{n}.wav"))
                         print(f"  صوت {n} ({eng}{'/' + model if model else ''})")
@@ -303,7 +328,7 @@ def render_poster(renderer, post: dict, out_png: Path, scene: int = 1) -> Path:
     sc = normalize(post["image"]["character"])
     page = _page(renderer, sc, build_data(sc, estimate_timeline(sc)), f"{post['id']}-poster", OUT_DIR / "_tmp")
     try:
-        page.evaluate("() => { window.__tl.seek(1.4); }")
+        page.evaluate("() => { window.__seek(1.4); }")
         out_png.parent.mkdir(parents=True, exist_ok=True)
         page.screenshot(path=str(out_png))
     finally:
@@ -324,7 +349,7 @@ def render_reel(renderer, post: dict, out_dir: Path) -> Path:
         shutil.rmtree(work)
     takes, frames = work / "takes", work / "frames"
     frames.mkdir(parents=True)
-    engine = synth(sc["lines"], takes)
+    engine = synth(sc["lines"], takes, lang=sc.get("lang", "levant"))
     tl = assemble(sc, takes, work)
     data = build_data(sc, tl, envelope(work / "H_only.wav"), envelope(work / "C_only.wav"))
     print(f"[{post['id']}] صوت {engine} · المدة {data['dur']}s")
@@ -332,7 +357,7 @@ def render_reel(renderer, post: dict, out_dir: Path) -> Path:
     try:
         n = int(data["dur"] * FPS)
         for f in range(n):
-            page.evaluate("t => { window.__tl.seek(t); }", f / FPS)
+            page.evaluate("t => { window.__seek(t); }", f / FPS)
             page.screenshot(path=str(frames / f"{f + 1:05d}.jpg"), type="jpeg", quality=90)
     finally:
         page.close()
@@ -353,14 +378,21 @@ def _extract_obj(text: str) -> dict:
     return json.loads(text[a:b + 1])
 
 
-def write_script(topic: str, extra: str = "") -> tuple[dict, dict]:
+LANG_AR = {"levant": "فلسطينية محكية بيضاء (بدّي، شو، هيك، كتير، ليش، إنت، لسّا، بس)، وليست فصحى ولا مصرية",
+           "fusha": "عربية فصحى مبسّطة واضحة كمقدّم محترف، بجمل قصيرة وبلا عامّية",
+           "egypt": "مصرية محكية (عايز، إزاي، دلوقتي، كده، ده)، وليست فصحى"}
+
+
+def write_script(topic: str, extra: str = "", lang: str = "levant") -> tuple[dict, dict]:
     """يرجع (سكربت الشخصية، نصوص المنصات) لموضوع المالك."""
     import generator
     prompt = (
         "اكتب سكربت ريل عمودي بصيغة حوار كرتوني بين شخصيتين، موضوعه بالضبط:\n«" + topic.strip() + "»\n" + (extra + "\n" if extra else "") +
         "الشخصيتان: H = المهندس شادي، مضيف فضولي يسأل ويعلّق ويعترض أحياناً. C = Claude، روبوت يشرح ببساطة وبحماس هادئ.\n"
-        "اللهجة: فلسطينية محكية بيضاء (بدّي، شو، هيك، كتير، ليش، إنت، لسّا، بس)، وليست فصحى ولا مصرية. جمل قصيرة طبيعية كأن شخصين يتكلمان.\n"
-        "الحوار: من 14 إلى 18 سطراً متبادلاً يبدأ بـ H يطرح المشكلة. كل سطر حتى 85 حرفاً ويبدأ بوسم نبرة إنجليزي بين قوسين "
+        "اللغة: " + LANG_AR.get(lang, LANG_AR["levant"]) + ". جمل قصيرة طبيعية كأن شخصين يتكلمان.\n"
+        "النطق (مهم جداً لأن الصوت يُقرأ آلياً): اكتب نص كل سطر في lines بالتشكيل الكامل (فتحة وضمة وكسرة وسكون وشدّة وتنوين) على كل كلمة عربية، "
+        "واكتب الأرقام بالحروف داخل الحوار (مثلاً «خَمْس خُطُوات» لا «5 خطوات»). اترك الكلمات الإنجليزية كما هي مثل AI وClaude وVercel (يحوّلها النظام للنطق العربي).\n"
+        "الحوار: من 14 إلى 18 سطراً متبادلاً يبدأ بـ H يطرح المشكلة. كل سطر حتى 85 حرفاً (دون عدّ التشكيل) ويبدأ بوسم نبرة إنجليزي بين قوسين "
         "من: [excited] [curious] [warm] [calm] [proud] [playful] [confident] [happy] [smiling] [honest]. المعرّفات \"01\" \"02\" … بالترتيب.\n"
         "الخطوات (steps) من 3 إلى 5، لكلٍّ: title (حتى 30 حرفاً وفيه كلمة مفتاحية بين **نجمتين**)، kind (rows أو chips أو checks)، "
         "items (من 2 إلى 4 عناصر، كل عنصر حتى 30 حرفاً)، note اختياري (حتى 50 حرفاً)، و at = معرّف السطر الذي يبدأ عنده الكلام عن هذه الخطوة "
@@ -376,6 +408,7 @@ def write_script(topic: str, extra: str = "") -> tuple[dict, dict]:
     text, _ = generator.generate_text(prompt)
     obj = _extract_obj(text)
     posts = {k: str(obj.pop(k, "")).strip() for k in ("facebook", "instagram", "threads")}
+    obj["lang"] = lang
     sc = normalize(obj)
     errs = validate_script(sc)
     if errs:
@@ -383,13 +416,13 @@ def write_script(topic: str, extra: str = "") -> tuple[dict, dict]:
     return sc, {k: v for k, v in posts.items() if v}
 
 
-def create_draft(topic: str, extra: str = "") -> dict:
+def create_draft(topic: str, extra: str = "", lang: str = "levant") -> dict:
     """مسودة ريل شخصية في الطابور (approved: false). يرجع المنشور."""
     from datetime import timedelta
 
     import generate
     from queue_io import load_queue, now_local
-    sc, platforms = write_script(topic, extra)
+    sc, platforms = write_script(topic, extra, lang)
     queue = load_queue()
     taken = {str(p["publish_at"]) for p in queue}
     day = (now_local() + timedelta(days=1)).date()
@@ -414,7 +447,7 @@ def main() -> int:
     from queue_io import load_queue
     from render import Renderer
     if opt("--topic"):
-        post = create_draft(opt("--topic"), opt("--extra"))
+        post = create_draft(opt("--topic"), opt("--extra"), opt("--lang") or "levant")
         print("مسودة:", post["id"], "|", post["image"]["title"])
         if os.environ.get("GITHUB_OUTPUT"):
             with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as fh:

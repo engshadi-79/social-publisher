@@ -20,8 +20,14 @@ html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; backgro
 b { color: var(--org); }
 #brand { position: absolute; top: 60px; right: 60px; font: 700 28px "Alexandria"; color: #b9b0d6; letter-spacing: .5px; }
 
-#flap { position: absolute; left: -60px; top: 1190px; width: 760px; height: 760px; z-index: 30; }
+#flap { position: absolute; left: -60px; top: 1190px; width: 760px; height: 760px; z-index: 30; transform-origin: 50% 100%; }
 #flap img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+#body, #head { position: absolute; inset: 0; }
+/* الرأس طبقة فوق الجسم تُقصّ عند الوشاح بقناع ناعم، وتدور حول الرقبة. الجسم تحتها بالصورة كاملة، فلا ثقب يظهر مهما تحرّك الرأس قليلاً */
+#head { transform-origin: 418px 364px;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 350px, transparent 384px), linear-gradient(to right, transparent 215px, #000 255px, #000 535px, transparent 575px);
+  mask-image: linear-gradient(to bottom, #000 0, #000 350px, transparent 384px), linear-gradient(to right, transparent 215px, #000 255px, #000 535px, transparent 575px);
+  -webkit-mask-composite: source-in; mask-composite: intersect; }
 #helper { position: absolute; left: 770px; top: 1520px; width: 260px; height: 260px; z-index: 30; }
 #helperTag { position: absolute; left: 790px; top: 1790px; width: 220px; text-align: center; font: 700 22px "Silkscreen"; color: var(--org); direction: ltr; z-index: 30; }
 
@@ -73,7 +79,10 @@ b { color: var(--org); }
 <body>
 <div id="root" data-composition-id="main" data-start="0" data-duration="{{ data.dur }}" data-width="1080" data-height="1920" data-fps="30">
   <div id="brand">{{ brand_html|safe }}</div>
-  <div id="flap"><img id="mClosed" src="{{ images.closed }}"><img id="mOpen" src="{{ images.open }}" style="opacity:0"></div>
+  <div id="flap">
+    <div id="body"><img src="{{ images.closed }}"></div>
+    <div id="head"><img id="mClosed" src="{{ images.closed }}"><img id="mOpen" src="{{ images.open }}" style="opacity:0"></div>
+  </div>
   <svg id="helper" viewBox="0 0 24 24" shape-rendering="crispEdges">
     <rect x="11" y="1" width="2" height="3" fill="#F2C14E"/><rect x="3" y="4" width="18" height="15" fill="#E07A55"/>
     <rect x="6" y="8" width="4" height="4" fill="#F6EEDF"/><rect x="14" y="8" width="4" height="4" fill="#F6EEDF"/>
@@ -159,23 +168,30 @@ b { color: var(--org); }
     pop("#cta", D.cta.start, { y: 40, from: .8 });
   }
 
-  // ---- الشخصية: فمها يتحرّك من صوتها فقط، وهزّة رأس خفيفة، وصمت ساكن ----
-  const EH = D.envH || []; let last = 0;
-  for (let f = 0; f < Math.min(EH.length, DUR * FPS); f++) {
-    const open = EH[f] > .22 && (f % 4 !== 3), prev = f ? (EH[f - 1] > .22 && ((f - 1) % 4 !== 3)) : false;
-    if (open !== prev) tl.set("#mOpen", { opacity: open ? 1 : 0 }, f / FPS);
-    if (EH[f] > .5 && f - last > 9) { last = f; tl.to("#flap", { y: -6, rotation: f % 2 ? 1 : -1, duration: .12, yoyo: true, repeat: 1, transformOrigin: "50% 100%" }, f / FPS); }
-  }
-  const E = D.envC || []; let ph = -1;
-  for (let f = 0; f < Math.min(E.length, DUR * FPS); f++) {
-    const h = E[f] < .08 ? 1 : (E[f] < .45 ? 2 : 4);
-    if (h !== ph) { tl.set("#hMouth", { attr: { height: h } }, f / FPS); ph = h; }
-  }
-  for (let t = 1; t < DUR; t += 2.4) tl.to("#helper", { y: -8, duration: .25, yoyo: true, repeat: 1, ease: "steps(2)" }, t);
+  // ---- الشخصية: حركة مرتبطة بالصوت، تُحسب من الزمن وحده (تُستدعى بعد كل seek) ----
+  // • الجسم يتنفّس ببطء. • الرأس يميل وينحني ويتقدّم قليلاً مع شدّة صوت شادي، ويلتفت نحو الروبوت حين يتكلم Claude.
+  // • الفم يُفتح تدريجياً بقدر علوّ الصوت (مزج الصورتين) لا مفتوح/مغلق فقط.
+  const EH = D.envH || [], EC = D.envC || [], flap = document.getElementById("flap"), head = document.getElementById("head");
+  const mOpen = document.getElementById("mOpen"), hMouth = document.getElementById("hMouth"), helper = document.getElementById("helper");
+  const avg = (arr, f, r) => { let s = 0, n = 0; for (let i = f - r; i <= f + r; i++) { if (i >= 0 && i < arr.length) { s += arr[i]; n++; } } return n ? s / n : 0; };
+  const cl01 = (x) => Math.max(0, Math.min(1, x));
+  const apply = (t) => {
+    const f = Math.round(t * FPS), sh = cl01(avg(EH, f, 3) * 1.25), sc = cl01(avg(EC, f, 4) * 1.25), s2 = Math.PI * 2;
+    const swell = Math.max(avg(EH, f, 8), avg(EH, f - 6, 8));         // الجملة كلها لا المقطع الواحد: يحرّك الرأس بسلاسة
+    flap.style.transform = `translateY(${(2.5 * Math.sin(s2 * t / 3.7)).toFixed(2)}px) scale(${(1 + 0.006 * Math.sin(s2 * t / 3.7 - 0.8)).toFixed(4)})`;
+    const hx = 4.5 * Math.sin(s2 * t / 4.4 + 0.5) * (0.3 + swell * 1.3) + 5 * sc;                  // يميل نحو الروبوت (يمين الشاشة) حين يتكلم
+    const hy = 2.5 * Math.sin(s2 * t / 2.9) + 7 * sh * (0.5 + 0.5 * Math.sin(s2 * t * 1.7)) + 4 * sc;  // ينحني مع كل نبرة
+    const hr = 1.0 * Math.sin(s2 * t / 5.3 + 1.2) * (0.35 + swell * 1.2) + 1.6 * sc;
+    head.style.transform = `translate(${hx.toFixed(2)}px, ${hy.toFixed(2)}px) rotate(${hr.toFixed(3)}deg) scale(${(1 + 0.007 * sh).toFixed(4)})`;
+    mOpen.style.opacity = cl01((avg(EH, f, 1) - 0.12) / 0.4).toFixed(3);
+    hMouth.setAttribute("height", String(avg(EC, f, 1) < 0.08 ? 1 : avg(EC, f, 1) < 0.45 ? 2 : 4));
+    helper.style.transform = `translateY(${(-6 * Math.abs(Math.sin(s2 * t / 4.8))).toFixed(2)}px)`;
+  };
 
   tl.set({}, {}, DUR);
   window.__tl = tl; window.__dur = DUR;
-  window.ready = (async () => { await document.fonts.ready; await Promise.all([...document.images].map((i) => i.decode().catch(() => {}))); tl.seek(0); window.__ready = true; })();
+  window.__seek = (t) => { tl.seek(t); apply(t); };                    // نقطة الدخول الوحيدة للالتقاط: تحرّك الخط الزمني والشخصية معاً
+  window.ready = (async () => { await document.fonts.ready; await Promise.all([...document.images].map((i) => i.decode().catch(() => {}))); window.__seek(0); window.__ready = true; })();
 })();
 </script>
 </body>

@@ -785,6 +785,8 @@ input:focus,textarea:focus,select:focus{border-color:var(--purple)}
     <h2>🎭 ريل بالشخصية (شادي وClaude)</h2>
     <p class="hint">اكتب الموضوع الذي تريده بنفسك، فيكتب Gemini حواراً بين شادي وClaude بلهجة فلسطينية، ويُولَّد الصوت، ويُبنى الفيديو (نحو 10 دقائق). يصلك <b>مسودة</b> تشاهدها وتعدّل سكربتها، ولا يُنشر شيء قبل موافقتك.</p>
     <label>الموضوع *</label><input id="chTopic" placeholder="مثل: كيف تحمي بيانات عملائك في مشروعك الصغير">
+    <label>لغة الحوار والصوت</label>
+    <select id="chLang"><option value="levant">لهجة شامية (أصوات أردنية)</option><option value="fusha">عربية فصحى واضحة</option><option value="egypt">لهجة مصرية</option></select>
     <label>ملاحظات للكاتب (اختياري)</label><textarea id="chExtra" rows="2" placeholder="مثل: ركّز على 4 خطوات، ولا تذكر أدوات مدفوعة"></textarea>
     <button class="act" id="chGo" type="button">🎬 اصنع الريل</button>
     <div class="msg" id="chMsg"></div>
