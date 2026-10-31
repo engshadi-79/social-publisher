@@ -186,6 +186,12 @@ def _tts_gemini(text: str, spk: str, out: Path, model: str, lang: str = "fusha")
             time.sleep(10 * (attempt + 1))
             continue
         if r.status_code != 200:
+            if r.status_code == 404:        # اسم النموذج غير متاح لهذا المفتاح: اطبع ما هو متاح للصوت ليُضبط GEMINI_TTS_MODEL
+                try:
+                    ms = requests.get("https://generativelanguage.googleapis.com/v1beta/models?pageSize=200", headers={"x-goog-api-key": _gemini_key()}, timeout=30).json()
+                    print("نماذج الصوت المتاحة:", [m["name"] for m in ms.get("models", []) if "tts" in m["name"].lower()])
+                except Exception:  # noqa: BLE001
+                    pass
             raise CharacterError(f"Gemini TTS {r.status_code}: {r.text[:200]}")
         break
     pcm = base64.b64decode(r.json()["candidates"][0]["content"]["parts"][0]["inlineData"]["data"])
