@@ -4,8 +4,8 @@
 const { createHmac, timingSafeEqual } = require('node:crypto');
 
 const REPO = process.env.GITHUB_REPO || 'engshadi-79/social-publisher';
-const WORKFLOWS = /^actions\/workflows\/(publish|dashboard|generate|health|daily|reel-preview)\.yml\/dispatches$/;
-const RUNS = /^actions\/workflows\/(dashboard|reel-preview|generate)\.yml\/runs$/;   // متابعة التحديث بعد الحفظ (قراءة فقط)
+const WORKFLOWS = /^actions\/workflows\/(publish|dashboard|generate|health|daily|reel-preview|character-reel)\.yml\/dispatches$/;
+const RUNS = /^actions\/workflows\/(dashboard|reel-preview|generate|character-reel)\.yml\/runs$/;   // متابعة التحديث بعد الحفظ (قراءة فقط)
 const CONTENT = /^contents\/content\/[A-Za-z0-9._\-\/]+$/;
 
 const sessionToken = (pw) => createHmac('sha256', pw).update('social-dashboard-session-v1').digest('hex');

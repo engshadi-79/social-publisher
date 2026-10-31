@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+{# ريل الشخصية الناطقة: حوار بين المهندس شادي (الكرتون) وClaude (الروبوت)، ومشاهد شرح تُبنى من البيانات.
+   كل التوقيتات تأتي جاهزة من src/character_reel.py (من أطوال الصوت الفعلية)، والصفحة تبني خطاً زمنياً واحداً
+   بـ GSAP متوقفاً، ويلتقطه Playwright إطاراً إطاراً بـ window.__tl.seek(t) فيخرج الفيديو نفسه دائماً.
+   الكتابة داخل النصوص: **كلمة** تُلوَّن بالبرتقالي. #}
+<link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@400;700;800;900&family=Silkscreen:wght@700&display=swap" rel="stylesheet">
+<script src="{{ gsap }}"></script>
+<style>
+:root { --org: #E07A55; --cream: #F6EEDF; --ink: #1A1620; --yel: #F2C14E; --teal: #2FA39A; --line: #2c2738; --panel: #14121c; }
+html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #07080e; }
+#root { position: relative; width: 1080px; height: 1920px; overflow: hidden; direction: rtl; font-family: "Alexandria"; color: var(--cream);
+  background: radial-gradient(1.6px 1.6px at 12% 8%, #6b5fa8 99%, transparent), radial-gradient(1.6px 1.6px at 78% 5%, #8a7fc4 99%, transparent),
+  radial-gradient(1.6px 1.6px at 55% 14%, #6b5fa8 99%, transparent), radial-gradient(1.6px 1.6px at 30% 22%, #8a7fc4 99%, transparent),
+  linear-gradient(180deg, #171230 0%, #110d24 30%, #0b0a17 58%, #07080e 78%); }
+#root * { box-sizing: border-box; }
+.o { opacity: 0; }
+b { color: var(--org); }
+#brand { position: absolute; top: 60px; right: 60px; font: 700 28px "Alexandria"; color: #b9b0d6; letter-spacing: .5px; }
+
+#flap { position: absolute; left: -60px; top: 1190px; width: 760px; height: 760px; z-index: 30; }
+#flap img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+#helper { position: absolute; left: 770px; top: 1520px; width: 260px; height: 260px; z-index: 30; }
+#helperTag { position: absolute; left: 790px; top: 1790px; width: 220px; text-align: center; font: 700 22px "Silkscreen"; color: var(--org); direction: ltr; z-index: 30; }
+
+/* الفقاعات تنمو للأعلى من حافة ثابتة فوق الشخصية، فلا تغطي وجهها مهما طال النص */
+.bub { position: absolute; z-index: 40; max-width: 880px; padding: 18px 30px 22px; background: var(--cream); color: var(--ink); font: 800 42px/1.45 "Alexandria";
+  border: 5px solid var(--ink); box-shadow: 8px 8px 0 #000; opacity: 0; bottom: 770px; }
+.bub.h { left: 60px; }
+.bub.c { right: 60px; background: var(--org); color: var(--cream); }
+.bub b { color: inherit; text-decoration: underline; text-decoration-thickness: 4px; }
+.who { display: block; font: 700 20px "Silkscreen"; direction: ltr; text-align: right; opacity: .75; margin-bottom: 2px; }
+
+#hook { position: absolute; left: 60px; right: 60px; top: 330px; text-align: center; }
+#hook .k1 { font: 800 50px "Alexandria"; color: #b9b0d6; }
+#hook .k2 { font: 900 96px/1.25 "Alexandria"; margin-top: 18px; white-space: pre-line; }
+#hook .k3 { display: inline-block; margin-top: 34px; padding: 12px 34px; border: 4px solid var(--teal); color: var(--teal); font: 800 40px "Alexandria"; box-shadow: 6px 6px 0 #000; }
+
+#step { position: absolute; left: 50%; top: 150px; width: 300px; margin-left: -150px; height: 64px; z-index: 50; border: 4px solid var(--org); background: #120f17;
+  display: flex; align-items: center; justify-content: center; gap: 18px; font: 700 30px "Silkscreen"; direction: ltr; opacity: 0; box-shadow: 6px 6px 0 #000; }
+.title { position: absolute; left: 60px; right: 60px; top: 245px; text-align: center; font: 800 60px/1.25 "Alexandria"; opacity: 0; }
+
+.card { position: absolute; left: 60px; right: 60px; top: 380px; height: 540px; background: var(--panel); border: 5px solid var(--line); box-shadow: 10px 10px 0 #000;
+  padding: 40px 44px; opacity: 0; overflow: hidden; }
+.row { display: flex; align-items: center; gap: 22px; font: 800 42px/1.35 "Alexandria"; margin-bottom: 26px; opacity: 0; }
+.qm { width: 68px; height: 68px; flex: none; display: flex; align-items: center; justify-content: center; background: var(--org); color: var(--cream); font: 900 40px "Alexandria"; box-shadow: 5px 5px 0 #000; }
+.note { position: absolute; left: 44px; right: 44px; bottom: 36px; padding: 20px 28px; background: var(--cream); color: var(--ink); font: 800 36px/1.4 "Alexandria";
+  border: 4px solid var(--ink); box-shadow: 6px 6px 0 #000; transform: rotate(-1.5deg); opacity: 0; }
+.note b { color: #B9553A; }
+.chips { display: flex; flex-wrap: wrap; gap: 22px; justify-content: center; margin-top: 30px; }
+.chip { padding: 22px 34px; background: #1d1a27; border: 4px solid var(--org); font: 800 44px "Alexandria"; box-shadow: 6px 6px 0 #000; opacity: 0; }
+.chk { display: flex; align-items: center; gap: 22px; font: 800 40px/1.35 "Alexandria"; margin-bottom: 26px; opacity: 0; }
+.box { width: 60px; height: 60px; flex: none; border: 5px solid var(--teal); display: flex; align-items: center; justify-content: center; font: 900 40px "Alexandria"; color: var(--teal); }
+.box i { font-style: normal; opacity: 0; }
+
+.node { position: absolute; width: 430px; height: 100px; display: flex; align-items: center; gap: 16px; padding: 0 20px; background: #1d1a27; border: 4px solid var(--line);
+  box-shadow: 6px 6px 0 #000; font: 800 34px "Alexandria"; white-space: nowrap; overflow: hidden; opacity: 0; z-index: 20; }
+.node .n { font: 700 26px "Silkscreen"; color: var(--org); width: 40px; direction: ltr; flex: none; }
+.node.done { border-color: var(--teal); }
+#baton { position: absolute; width: 44px; height: 44px; background: var(--org); box-shadow: 0 0 0 6px rgba(224,122,85,.35), 6px 6px 0 #000; z-index: 60; opacity: 0; }
+#relayT { position: absolute; left: 60px; right: 60px; top: 200px; text-align: center; font: 800 54px "Alexandria"; opacity: 0; }
+#relayT b { color: var(--teal); }
+
+#cta { position: absolute; left: 70px; right: 70px; top: 360px; padding: 50px 40px; text-align: center; background: var(--org); border: 6px solid var(--ink); box-shadow: 12px 12px 0 #000; opacity: 0; z-index: 45; }
+#cta .c1 { font: 800 46px/1.3 "Alexandria"; }
+#cta .c2 { font: 900 110px/1.2 "Alexandria"; margin-top: 10px; color: var(--ink); }
+#cta .c3 { font: 800 40px "Alexandria"; margin-top: 10px; }
+#cta b { color: var(--ink); }
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-duration="{{ data.dur }}" data-width="1080" data-height="1920" data-fps="30">
+  <div id="brand">{{ brand_html|safe }}</div>
+  <div id="flap"><img id="mClosed" src="{{ images.closed }}"><img id="mOpen" src="{{ images.open }}" style="opacity:0"></div>
+  <svg id="helper" viewBox="0 0 24 24" shape-rendering="crispEdges">
+    <rect x="11" y="1" width="2" height="3" fill="#F2C14E"/><rect x="3" y="4" width="18" height="15" fill="#E07A55"/>
+    <rect x="6" y="8" width="4" height="4" fill="#F6EEDF"/><rect x="14" y="8" width="4" height="4" fill="#F6EEDF"/>
+    <rect id="hMouth" x="8" y="14" width="8" height="3" fill="#1A1620"/><rect x="5" y="19" width="3" height="4" fill="#B9553A"/><rect x="16" y="19" width="3" height="4" fill="#B9553A"/></svg>
+  <div id="helperTag">CLAUDE</div>
+  <div id="stage"></div>
+  <div id="bubs"></div>
+</div>
+<script type="application/json" id="data">{{ data_json|safe }}</script>
+<script>
+(() => {
+  const D = JSON.parse(document.getElementById("data").textContent), FPS = 30, DUR = D.dur;
+  const tl = gsap.timeline({ paused: true });
+  gsap.defaults({ lazy: false });
+  const pop = (s, t, o = {}) => tl.fromTo(s, { opacity: 0, scale: o.from ?? .7, y: o.y ?? 0, x: o.x ?? 0 }, { opacity: 1, scale: 1, y: 0, x: 0, duration: .3, ease: "back.out(2)", immediateRender: false }, t);
+  const out = (s, t) => tl.to(s, { opacity: 0, scale: .92, duration: .2 }, t);
+  const stage = document.getElementById("stage");
+  const el = (tag, cls, parent, id) => { const e = document.createElement(tag); if (cls) e.className = cls; if (id) e.id = id; (parent || stage).appendChild(e); return e; };
+  const rich = (node, text) => { String(text || "").split("**").forEach((part, i) => { if (i % 2) { const b = document.createElement("b"); b.textContent = part; node.appendChild(b); } else node.appendChild(document.createTextNode(part)); }); return node; };
+
+  // ---- فقاعات الحوار ----
+  const L = D.lines, host = document.getElementById("bubs");
+  L.forEach((l, i) => {
+    const d = el("div", "bub " + (l.k === "H" ? "h" : "c"), host, "bb" + i);
+    const w = document.createElement("span"); w.className = "who"; w.textContent = l.k === "H" ? "SHADI" : "CLAUDE"; d.appendChild(w); rich(d, l.t);
+    const end = i + 1 < L.length ? Math.min(l.e + .15, L[i + 1].s - .03) : l.e + .4;
+    pop("#bb" + i, Math.max(0, l.s - .05), { y: 26, from: .85 }); out("#bb" + i, end);
+  });
+
+  // ---- الافتتاحية ----
+  const hk = el("div", "o", null, "hook");
+  rich(el("div", "k1", hk), D.hook.k1); rich(el("div", "k2", hk), D.hook.k2); if (D.hook.k3) rich(el("div", "k3", hk), D.hook.k3);
+  pop("#hook", .3, { y: 40, from: .9 }); out("#hook", D.hookEnd);
+
+  // ---- الخطوات ----
+  const stepBox = el("div", "", null, "step"); el("span", "", stepBox).textContent = "STEP"; el("b", "", stepBox, "stepN").textContent = "01";
+  D.steps.forEach((s, i) => {
+    const a = s.start, b = s.end, n = s.items.length, span = Math.max(2, b - a);
+    rich(el("div", "title", null, "t" + i), s.title);
+    const card = el("div", "card", null, "c" + i);
+    const wrap = s.kind === "chips" ? el("div", "chips", card) : card;
+    const gap = Math.min(2.6, (span - 2.2) / Math.max(1, n));
+    s.items.forEach((txt, j) => {
+      const at = a + 1.1 + j * gap, id = `i${i}_${j}`;
+      if (s.kind === "chips") { rich(el("div", "chip", wrap, id), txt); pop("#" + id, at); }
+      else if (s.kind === "checks") {
+        const r = el("div", "chk", wrap, id), bx = el("span", "box", r); el("i", "", bx, id + "k").textContent = "✓"; rich(el("span", "", r), txt);
+        pop("#" + id, at, { x: 50 }); pop("#" + id + "k", at + .6, { from: .3 });
+      } else {
+        const r = el("div", "row", wrap, id); el("span", "qm", r).textContent = String(j + 1); rich(el("span", "", r), txt); pop("#" + id, at, { x: 60, from: .9 });
+      }
+    });
+    if (s.note) { rich(el("div", "note", card, "n" + i), s.note); pop("#n" + i, a + span * .55, { y: 30 }); }
+    tl.set("#stepN", { textContent: String(i + 1).padStart(2, "0") }, a);
+    pop("#t" + i, a + .05, { y: 30 }); pop("#c" + i, a + .15, { y: 50, from: .95 });
+    out(["#t" + i, "#c" + i], b);
+  });
+  if (D.steps.length) { pop("#step", D.steps[0].start, { y: -30 }); out("#step", D.steps[D.steps.length - 1].end); }
+
+  // ---- الخلاصة: تمرير العصا بين الخطوات ----
+  const R = D.relay;
+  if (R && R.nodes.length) {
+    rich(el("div", "", null, "relayT"), R.title); pop("#relayT", R.start, { y: 30 });
+    const N = R.nodes.map((_, i) => ({ x: i % 2 ? 90 : 560, y: 315 + i * Math.min(118, 470 / Math.max(1, R.nodes.length - 1)) }));   // آخر عقدة تنتهي قبل أعلى فقاعة (3 أسطر)
+    R.nodes.forEach((txt, i) => {
+      const nd = el("div", "node", null, "nd" + i); nd.style.left = N[i].x + "px"; nd.style.top = N[i].y + "px";
+      el("span", "n", nd).textContent = String(i + 1).padStart(2, "0"); rich(el("span", "", nd), txt);
+      pop("#nd" + i, R.start + .05 + i * .25, { x: i % 2 ? -60 : 60, from: .9 });
+    });
+    const bt = el("div", "", null, "baton"), C = N.map((p) => [p.x + 60, p.y + 50]), t0 = R.start + 1.45;
+    tl.set("#baton", { left: C[0][0] - 22, top: C[0][1] - 22, opacity: 1 }, t0); tl.set("#nd0", { className: "node done" }, t0 + .1);
+    for (let i = 1; i < N.length; i++) {
+      tl.to("#baton", { left: C[i][0] - 22, top: C[i][1] - 22, duration: .42, ease: "power2.inOut" }, t0 + .15 + (i - 1) * .55);
+      tl.set("#nd" + i, { className: "node done" }, t0 + .57 + (i - 1) * .55);
+    }
+    out(["#relayT", "#baton"].concat(R.nodes.map((_, i) => "#nd" + i)), R.end);
+  }
+
+  // ---- الدعوة ----
+  if (D.cta) {
+    const c = el("div", "", null, "cta");
+    rich(el("div", "c1", c), D.cta.c1); rich(el("div", "c2", c), D.cta.c2); rich(el("div", "c3", c), D.cta.c3);
+    pop("#cta", D.cta.start, { y: 40, from: .8 });
+  }
+
+  // ---- الشخصية: فمها يتحرّك من صوتها فقط، وهزّة رأس خفيفة، وصمت ساكن ----
+  const EH = D.envH || []; let last = 0;
+  for (let f = 0; f < Math.min(EH.length, DUR * FPS); f++) {
+    const open = EH[f] > .22 && (f % 4 !== 3), prev = f ? (EH[f - 1] > .22 && ((f - 1) % 4 !== 3)) : false;
+    if (open !== prev) tl.set("#mOpen", { opacity: open ? 1 : 0 }, f / FPS);
+    if (EH[f] > .5 && f - last > 9) { last = f; tl.to("#flap", { y: -6, rotation: f % 2 ? 1 : -1, duration: .12, yoyo: true, repeat: 1, transformOrigin: "50% 100%" }, f / FPS); }
+  }
+  const E = D.envC || []; let ph = -1;
+  for (let f = 0; f < Math.min(E.length, DUR * FPS); f++) {
+    const h = E[f] < .08 ? 1 : (E[f] < .45 ? 2 : 4);
+    if (h !== ph) { tl.set("#hMouth", { attr: { height: h } }, f / FPS); ph = h; }
+  }
+  for (let t = 1; t < DUR; t += 2.4) tl.to("#helper", { y: -8, duration: .25, yoyo: true, repeat: 1, ease: "steps(2)" }, t);
+
+  tl.set({}, {}, DUR);
+  window.__tl = tl; window.__dur = DUR;
+  window.ready = (async () => { await document.fonts.ready; await Promise.all([...document.images].map((i) => i.decode().catch(() => {}))); tl.seek(0); window.__ready = true; })();
+})();
+</script>
+</body>
+</html>

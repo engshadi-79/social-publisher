@@ -77,6 +77,9 @@ def render_poster(renderer, post: dict, out_png: Path, scene: int = 1) -> Path:
     from queue_io import load_brand
     from render import _fonts, post_hue, reel_template
 
+    import character_reel
+    if character_reel.is_character(post):     # ريل الشخصية: الافتتاحية وأول فقاعة
+        return character_reel.render_poster(renderer, post, out_png, scene)
     import morning
     if morning.is_morning(post):          # ريل الصباح: لقطات حقيقية لا رسوم
         return morning.render_poster(renderer, post, out_png, scene)
@@ -123,6 +126,9 @@ def render_reel(renderer, post: dict, out_dir: Path, photos: dict[int, Path] | N
         ready = fetch_preview(post, out_dir)
         if ready:
             return ready
+    import character_reel
+    if character_reel.is_character(post):     # يبني صوتاً وفيديو كاملاً (دقائق): الأفضل أن تكون المعاينة مبنية سلفاً
+        return character_reel.render_reel(renderer, post, out_dir)
     import morning
     if morning.is_morning(post):
         return morning.render_reel(renderer, post, out_dir)

@@ -468,7 +468,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--purple)}
   <label>لون التصميم</label><div id="eHueBox" class="hues"></div></div>
   <label>العنوان على الصورة *</label><input id="eTitle">
   <label>النص الصغير</label><input id="eBody">
-  <label>شرائح الكاروسيل أو مشاهد الريل <span class="hint">(لكل مشهد: «# العنوان»، «@ اسم النصيحة»، سطر النص، «~ 5» للثواني، و<b>«! https://رابط»</b> لعرض لقطة من موقع في نافذة متصفّح. افصل المشاهد بـ «---»)</span></label><textarea id="eSlides" rows="10"></textarea>
+  <label>شرائح الكاروسيل أو مشاهد الريل <span class="hint">(ريل الشخصية: هنا سكربته كاملاً بصيغة JSON، فعدّل الحوار أو الخطوات ثم احفظ، وتُعاد معاينة الفيديو عند الطلب). (لكل مشهد: «# العنوان»، «@ اسم النصيحة»، سطر النص، «~ 5» للثواني، و<b>«! https://رابط»</b> لعرض لقطة من موقع في نافذة متصفّح. افصل المشاهد بـ «---»)</span></label><textarea id="eSlides" rows="10"></textarea>
   <label>نقاط الإنفوجرافك (سطر لكل نقطة)</label><textarea id="ePoints" rows="4"></textarea>
   <label>كلمات إنجليزية للصورة <span class="hint">(تغييرها يعيد توليد الصورة)</span></label><input id="eQuery" dir="ltr">
   <label>وصف بديل للصورة (إنجليزي)</label><textarea id="eVP" dir="ltr" rows="2"></textarea>
@@ -781,6 +781,14 @@ input:focus,textarea:focus,select:focus{border-color:var(--purple)}
 <section id="postPanel" hidden>
   <div class="pagehead"><div><span class="eyebrow"><i class="pulse"></i>يدوي</span>
     <h1>إضافة منشور أو توليد مسودات</h1><p>أنشئ منشوراً بنفسك، أو اطلب من الذكاء الاصطناعي مسودات لموضوع محدد.</p></div></div>
+  <div class="panel">
+    <h2>🎭 ريل بالشخصية (شادي وClaude)</h2>
+    <p class="hint">اكتب الموضوع الذي تريده بنفسك، فيكتب Gemini حواراً بين شادي وClaude بلهجة فلسطينية، ويُولَّد الصوت، ويُبنى الفيديو (نحو 10 دقائق). يصلك <b>مسودة</b> تشاهدها وتعدّل سكربتها، ولا يُنشر شيء قبل موافقتك.</p>
+    <label>الموضوع *</label><input id="chTopic" placeholder="مثل: كيف تحمي بيانات عملائك في مشروعك الصغير">
+    <label>ملاحظات للكاتب (اختياري)</label><textarea id="chExtra" rows="2" placeholder="مثل: ركّز على 4 خطوات، ولا تذكر أدوات مدفوعة"></textarea>
+    <button class="act" id="chGo" type="button">🎬 اصنع الريل</button>
+    <div class="msg" id="chMsg"></div>
+  </div>
   <div class="panel">
     <h2>✨ توليد منشورات تلقائياً</h2>
     <p class="hint">اختر موضوعاً وعدداً، ويكتب Gemini المنشورات وكلمات الصور، ويقترح هاشتاجات تستفيد من <b>ترند Google الحالي</b> (ما يناسب الموضوع فقط)، فتظهر <b>كمسودات</b> تراجعها وتوافق عليها. لا يُنشر شيء قبل موافقتك.</p>

@@ -211,7 +211,7 @@ def main() -> int:
             bg = imagegen.post_bg_path(post)
             if post["template"] == "reel":      # لقطة غلاف بدل بناء الفيديو كاملاً
                 import video
-                n_sc = len((post.get("image") or {}).get("scenes") or [])    # كل مشهد بلقطته ليراجعها صاحبها
+                n_sc = len((post.get("image") or {}).get("scenes") or []) or 1    # كل مشهد بلقطته ليراجعها صاحبها (ريل الشخصية: لقطة واحدة)
                 pngs = [video.render_poster(r, post, OUT_DIR / "_tmp" / f"{post['id']}-poster{k}.png", k) for k in range(1, n_sc + 1)]
             else:
                 pngs = r.render_post(post, OUT_DIR / "_tmp", bg if bg.exists() else None)
@@ -229,7 +229,7 @@ def main() -> int:
             it["slides_json"] = json.dumps(fulls) if len(fulls) > 1 else ""
             it["slide_count"] = len(fulls)
             it["tok"] = img_token(it["id"])
-            it["reel_scenes"] = len((post.get("image") or {}).get("scenes") or []) if post["template"] == "reel" else 0
+            it["reel_scenes"] = (len((post.get("image") or {}).get("scenes") or []) or len(((post.get("image") or {}).get("character") or {}).get("steps") or [])) if post["template"] == "reel" else 0
             if post["template"] == "reel":      # فيديو المعاينة (يُبنى عند الطلب) باسم يحمل بصمة المحتوى
                 import video
                 it["vname"] = video.preview_name(post)

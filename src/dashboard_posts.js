@@ -14,6 +14,7 @@ function serializePost(p) {
   if (im.photo_query) b += "    photo_query: " + q(im.photo_query) + "\n";
   if (im.style) b += "    style: " + q(im.style) + "\n";
   if (im.hue != null) b += "    hue: " + im.hue + "\n";
+  if (im.character) b += "    character: " + JSON.stringify(im.character) + "\n";
   if (im.bg_from) b += "    bg_from: " + q(im.bg_from) + "\n";
   if (im.visual_prompt) b += "    visual_prompt: " + q(im.visual_prompt) + "\n";
   if (im.seed != null) b += "    seed: " + im.seed + "\n";
@@ -55,11 +56,37 @@ async function deleteChangedPhotos(id, oldList, newList, oldBase, newBase) {
   }
 }
 
+// ---------- التحقق من سكربت الشخصية (يطابق character_reel.validate_script) ----------
+function characterError(sc) {
+  if (!sc || typeof sc !== "object") return "السكربت ليس كائناً.";
+  const L = sc.lines;
+  if (!Array.isArray(L) || L.length < 6 || L.length > 24 || L.some((x) => !Array.isArray(x) || x.length !== 3 || !["H", "C"].includes(x[1]) || !String(x[2] || "").trim()))
+    return "الحوار: من 6 إلى 24 سطراً، كل سطر [معرّف، H أو C، نص].";
+  if (L.some((x) => String(x[2]).replace(/\[[^\]]*\]|\*\*/g, "").trim().length > 110)) return "سطر حوار أطول من 110 حرفاً.";
+  const ids = L.map((x) => String(x[0]));
+  if (new Set(ids).size !== ids.length) return "معرّفات الأسطر مكرّرة.";
+  const S = sc.steps;
+  if (!Array.isArray(S) || S.length < 2 || S.length > 5) return "الخطوات من 2 إلى 5.";
+  let last = -1;
+  for (const s of S) {
+    const p = ids.indexOf(String(s.at));
+    if (p < 0) return "خطوة «at» لا يشير إلى سطر موجود: " + s.at;
+    if (p <= last) return "ترتيب «at» في الخطوات يجب أن يتصاعد.";
+    last = p;
+    if (!String(s.title || "").trim()) return "خطوة بلا عنوان.";
+    if (!Array.isArray(s.items) || !s.items.length || s.items.length > 4 || s.items.some((x) => String(x).length > 38)) return "كل خطوة من 1 إلى 4 عناصر، كل عنصر حتى 38 حرفاً.";
+    if (s.kind && !["rows", "chips", "checks"].includes(s.kind)) return "نوع خطوة غير معروف: " + s.kind;
+  }
+  for (const k of ["relay_at", "cta_at"]) if (sc[k] != null && !ids.includes(String(sc[k]))) return k + " لا يشير إلى سطر موجود.";
+  if (!sc.hook || !String(sc.hook.k2 || "").trim()) return "الافتتاحية تحتاج hook.k2.";
+  return "";
+}
+
 // ---------- نافذة التعديل ----------
 // ---------- نمط التصميم ولونه ----------
 const STYLES = {
   infographic: { cards: "بطاقات", bento: "بنتو", timeline: "خط زمني", bold: "جريء", glass: "زجاجي", steps: "درج", neon: "نيون", checklist: "قائمة تحقق", bignum: "الرقم الكبير", blueprint: "مخطط", pills: "كبسولات", columns: "شريط جانبي" },
-  reel: { explainer: "شرح بأسلوب متقن", morning: "ريل الصباح (لقطات حقيقية)", motion: "موشن نيلي (بموسيقى)", "motion-sunset": "موشن غروب (بموسيقى)", "motion-mint": "موشن نعناعي (بموسيقى)", geo: "أشكال هندسية", bold: "جريء", split: "شقّان", card: "بطاقة", terminal: "طرفية", neon: "نيون", paper: "ورقي", mesh: "شبكة ألوان" },
+  reel: { character: "ريل الشخصية", explainer: "شرح بأسلوب متقن", morning: "ريل الصباح (لقطات حقيقية)", motion: "موشن نيلي (بموسيقى)", "motion-sunset": "موشن غروب (بموسيقى)", "motion-mint": "موشن نعناعي (بموسيقى)", geo: "أشكال هندسية", bold: "جريء", split: "شقّان", card: "بطاقة", terminal: "طرفية", neon: "نيون", paper: "ورقي", mesh: "شبكة ألوان" },
   carousel: { blueprint: "مخطط", editorial: "مجلة", terminal: "طرفية", poster: "ملصق", sticky: "ورقة ملصقة", duo: "لوحان", neon: "نيون", paper: "ورقي", gradient: "تدرج" },
 };
 const HUES = [0, 35, 70, 140, 190, 250, 290, 325];
@@ -90,16 +117,22 @@ function openEdit(id) {
   accPicker("eAcc", p.targets || null);
   $("eHead").textContent = "تعديل: " + (im.title || id);
   $("eNote").textContent = p.approved ? "هذا المنشور معتمد: سيُنشر بالنص الجديد في موعده." : "";
+  if (im.character) $("eSlides").value = JSON.stringify(im.character, null, 1);
   say($("eMsg"), "", true); $("editBox").classList.add("on");
 }
 $("eTemplate").onchange = () => fillLook($("eTemplate").value, "", null);
 $("eCancel").onclick = () => $("editBox").classList.remove("on");
 $("eSave").onclick = async () => {
   const m = $("eMsg"), v = (i) => $(i).value.trim(), old = POSTS[editId];
+  let chNew = null;                                       // ريل الشخصية: السكربت JSON بدل مشاهد
+  if (old.image && old.image.character && $("eTemplate").value === "reel") {
+    try { chNew = JSON.parse($("eSlides").value); } catch (e0) { say(m, "سكربت الشخصية ليس JSON صالحاً: " + e0.message, false); return; }
+    const ce = characterError(chNew); if (ce) { say(m, ce, false); return; }
+  }
   const platforms = {};
   PLATS.forEach((k) => { if ($("ep_" + k).checked && v("et_" + k)) platforms[k] = v("et_" + k); });
-  const tpl = $("eTemplate").value, eSlides = tpl === "carousel" ? parseSlides($("eSlides").value) : tpl === "reel" ? parseScenes($("eSlides").value) : [], points = v("ePoints").split("\n").map((x) => x.trim()).filter(Boolean);
-  const multi = tpl === "carousel" || tpl === "reel", err = (tpl === "carousel" && slidesError(eSlides)) ? slidesError(eSlides) : (tpl === "reel" && scenesError(eSlides)) ? scenesError(eSlides) : (!multi && !v("eTitle")) ? "العنوان مطلوب." : !Object.keys(platforms).length ? "اختر منصة واحدة على الأقل بنص غير فارغ." :
+  const tpl = $("eTemplate").value, eSlides = chNew ? [] : tpl === "carousel" ? parseSlides($("eSlides").value) : tpl === "reel" ? parseScenes($("eSlides").value) : [], points = v("ePoints").split("\n").map((x) => x.trim()).filter(Boolean);
+  const multi = (tpl === "carousel" || tpl === "reel") && !chNew, err = (tpl === "carousel" && slidesError(eSlides)) ? slidesError(eSlides) : (tpl === "reel" && scenesError(eSlides)) ? scenesError(eSlides) : (!multi && !v("eTitle")) ? "العنوان مطلوب." : !Object.keys(platforms).length ? "اختر منصة واحدة على الأقل بنص غير فارغ." :
     !v("eWhen") ? "اختر الموعد." : (tpl === "infographic" && (points.length < 2 || points.length > 6)) ? "الإنفوجرافك يحتاج من 2 إلى 6 نقاط." :
     (platforms.threads && platforms.threads.length > 500) ? "نص ثريدز أطول من 500 حرف." :
     (platforms.instagram && platforms.instagram.length > 2200) ? "نص إنستغرام أطول من 2200 حرف." :
@@ -108,9 +141,10 @@ $("eSave").onclick = async () => {
   if (err) { say(m, err, false); return; }
   const oi = old.image || {};
   const img = { style: $("eStyle").value || undefined, hue: eHue != null && (tpl === "infographic" || tpl === "reel" || tpl === "carousel") ? eHue : undefined, title: multi ? eSlides[0].title : v("eTitle"), body: multi ? "" : v("eBody"), seed: oi.seed != null ? oi.seed : 1 };
+  if (chNew) { img.character = chNew; img.style = "character"; }
   if (tpl === "reel") eSlides.forEach((sc, i) => { const o = (oi.scenes || [])[i] || {};
     if (o.video_url && (o.photo_query || "") === (sc.photo_query || "")) { sc.video_url = o.video_url; if (o.thumb) sc.thumb = o.thumb; } });
-  if (tpl === "carousel") img.slides = eSlides; else if (tpl === "reel") { img.scenes = eSlides; if (v("eQuery")) img.photo_query = v("eQuery"); } else if (tpl === "infographic") img.points = points; else { img.photo_query = v("eQuery"); if (v("eVP")) img.visual_prompt = v("eVP"); }
+  if (tpl === "carousel") img.slides = eSlides; else if (tpl === "reel" && !chNew) { img.scenes = eSlides; if (v("eQuery")) img.photo_query = v("eQuery"); } else if (tpl === "infographic") img.points = points; else { img.photo_query = v("eQuery"); if (v("eVP")) img.visual_prompt = v("eVP"); }
   let targets;
   try { targets = readTargets("eAcc", Object.keys(platforms)); } catch (e4) { say(m, e4.message, false); return; }
   const nu = { id: editId, approved: old.approved, targets, publish_at: v("eWhen").replace("T", " "), template: tpl,

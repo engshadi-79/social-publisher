@@ -1,0 +1,96 @@
+name: character-reel
+# ريل بالشخصية (شادي وClaude): تكتب موضوعك في اللوحة فيكتب Gemini الحوار، ويُولَّد الصوت، ويُبنى الفيديو.
+# عملان: الأول يكتب المسودة ويرفعها للطابور (دقيقة)، والثاني يبني فيديو المعاينة (نحو 10 دقائق) دون أن يحجب النشر.
+# لا يُنشر شيء: المسودة approved: false وتنتظر مراجعتك وموافقتك.
+on:
+  workflow_dispatch:
+    inputs:
+      topic:
+        description: "موضوع الريل"
+        required: true
+      extra:
+        description: "ملاحظات للكاتب (اختياري)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  draft:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: publish
+      cancel-in-progress: false
+    outputs:
+      id: ${{ steps.gen.outputs.id }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Write the draft
+        id: gen
+        working-directory: src
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          TOPIC: ${{ inputs.topic }}
+          EXTRA: ${{ inputs.extra }}
+        run: python character_reel.py --topic "$TOPIC" --extra "$EXTRA" --no-video
+      - name: Commit the draft and refresh the dashboard
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "publisher-bot"
+          git config user.email "publisher-bot@users.noreply.github.com"
+          git add content
+          if ! git diff --cached --quiet; then
+            git commit -m "bot: character reel draft ${{ steps.gen.outputs.id }} [skip ci]"
+            git pull --rebase origin "${GITHUB_REF_NAME}"
+            git push
+          fi
+          gh workflow run dashboard.yml
+
+  video:
+    needs: draft
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: pip install edge-tts
+      - name: Cache Playwright browsers
+        id: pw
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: pw-${{ hashFiles('requirements.txt') }}
+      - run: playwright install --with-deps chromium
+        if: steps.pw.outputs.cache-hit != 'true'
+      - run: playwright install-deps chromium
+        if: steps.pw.outputs.cache-hit == 'true'
+      - name: Ensure ffmpeg
+        run: command -v ffmpeg >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg; }
+      - name: Build and upload the preview video
+        working-directory: src
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          POST_ID: ${{ needs.draft.outputs.id }}
+          PYTHONUTF8: "1"
+        run: |
+          git config --global user.name "publisher-bot"
+          git config --global user.email "publisher-bot@users.noreply.github.com"
+          # gh-pages قد يتقدّم أثناء البناء بسبب النشر: نعيد الرفع مرة إن رُفض
+          python character_reel.py --build "$POST_ID" || { sleep 30; python character_reel.py --build "$POST_ID"; }

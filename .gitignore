@@ -4,3 +4,18 @@ __pycache__/
 .render/
 out/
 .env
+
+# talking character (Character Kit): keep sources, ignore heavy build output
+character/*.wav
+character/takes/
+character/takes2/
+character/audition/
+character/snapshots/
+character/check/
+character/output/
+character/render.log
+
+# صورتك الشخصية الأصلية وتسجيلات صوتك: لا تُرفع إلى المستودع العام أبداً
+character/me.jpg
+character/_t.*
+private/

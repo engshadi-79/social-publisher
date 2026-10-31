@@ -104,8 +104,12 @@ def validate(queue: list[dict]) -> list[str]:
                         errors.append(f"{tag} الشريحة {n}: العنوان أو النص أطول من المسموح")
                     elif len(s_.get("points") or []) > 5:
                         errors.append(f"{tag} الشريحة {n}: أكثر من 5 نقاط")
-        elif p.get("template") == "reel" and str(img.get("style", "") or "").strip() and str(img["style"]).strip().lower() not in REEL_STYLES + ("morning",):
+        elif p.get("template") == "reel" and str(img.get("style", "") or "").strip() and str(img["style"]).strip().lower() not in REEL_STYLES + ("morning", "character"):
             errors.append(f"{tag} نمط ريل غير معروف: {img['style']} (المتاح: {', '.join(REEL_STYLES)})")
+        elif p.get("template") == "reel" and str(img.get("style") or "") == "character":
+            import character_reel
+            for e in character_reel.validate_script(img.get("character")):
+                errors.append(f"{tag} ريل الشخصية: {e}")
         elif p.get("template") == "reel":
             sc = img.get("scenes")
             if not (isinstance(sc, list) and 3 <= len(sc) <= 8):

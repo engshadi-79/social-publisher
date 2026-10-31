@@ -41,6 +41,19 @@ document.addEventListener("click", async (e) => {
   } catch (err) { say(out, err.message, false); }
 });
 
+// ---------- ريل بالشخصية: الموضوع من المالك ----------
+if ($("chGo")) $("chGo").onclick = async () => {
+  const m = $("chMsg"), topic = $("chTopic").value.trim();
+  if (!topic) { say(m, "اكتب موضوع الريل أولاً.", false); return; }
+  if (!confirm("سأكتب حواراً لموضوع «" + topic + "» وأبني فيديو بصوتين (نحو 10 دقائق). تصلك مسودة لا تُنشر قبل موافقتك. متابعة؟")) return;
+  try {
+    say(m, "جارٍ الإرسال…", true);
+    await gh("actions/workflows/character-reel.yml/dispatches", { method: "POST", body: JSON.stringify({ ref: "main", inputs: { topic, extra: $("chExtra").value.trim() } }) });
+    say(m, "⏳ بدأ العمل: بعد دقيقة تظهر المسودة في «طابور المراجعة»، وبعد نحو 10 دقائق يجهز فيديوها (زر «شاهد الفيديو»). لا يُنشر شيء قبل موافقتك.", true);
+    $("chTopic").value = ""; $("chExtra").value = "";
+  } catch (e) { say(m, e.message, false); }
+};
+
 // ---------- ولّد بديلاً ----------
 document.addEventListener("click", async (e) => {
   const b = e.target.closest('[data-act="regen"]'); if (!b) return;
