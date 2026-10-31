@@ -1,7 +1,8 @@
 {
-  "id": "rmvw331g4",
-  "ok": false,
-  "count": 0,
-  "topic": "2026-11-09-g1",
-  "message": "فشل توليد البديل: Gemini gemini-3.8-flash: HTTPSConnectionPool(host='generativelanguage.googleapis.com', port=443): Read timed out. (read timeout=180) | Gemini gemini-3.8-flash (generateContent): HTTPSConnectionPool(host='generativelanguage.googleapis.com', port=443): Read timed out. (read timeout=180) | Gemini 3.6: gemini-3.6-flash (interactions) HTTP 503: gemini-3.6-flash is currently experiencing high demand, sp"
+  "id": "daily-2026-11-11",
+  "ok": true,
+  "count": 2,
+  "topic": "كل المواضيع",
+  "method": "daily",
+  "message": "يومي 2026-11-11: وُلِّد 2 مسودة."
 }
