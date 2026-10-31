@@ -405,8 +405,17 @@ def write_script(topic: str, extra: str = "", lang: str = "fusha") -> tuple[dict
         "ثم نصوص المنصات: facebook وinstagram (سطر أول جذّاب، جملتان عن فكرة الريل، سؤال واحد للتعليق، ثم 4 إلى 6 هاشتاقات عربية) "
         "وthreads (حتى 380 حرفاً)، بلا روابط.\n"
         "أرجع كائن JSON واحداً فقط بالمفاتيح: hook, lines (مصفوفة [id, \"H\" أو \"C\", text]), steps, relay_at, cta_at, relay, cta, facebook, instagram, threads.")
-    text, _ = generator.generate_text(prompt)
-    obj = _extract_obj(text)
+    text = ""
+    for attempt in range(4):              # Gemini المجاني يزدحم (503/429): انتظار متزايد ثم إعادة، كما في التوليد اليومي
+        try:
+            text, _ = generator.generate_text(prompt)
+            obj = _extract_obj(text)
+            break
+        except (generator.GeneratorError, CharacterError, json.JSONDecodeError) as e:
+            if attempt == 3:
+                raise CharacterError(f"تعذّرت كتابة السكربت: {str(e)[:200]}")
+            print(f"… إعادة المحاولة {attempt + 2}/4 بعد: {str(e)[:100]}")
+            time.sleep(40 * (attempt + 1))
     posts = {k: str(obj.pop(k, "")).strip() for k in ("facebook", "instagram", "threads")}
     obj["lang"] = lang
     sc = normalize(obj)
