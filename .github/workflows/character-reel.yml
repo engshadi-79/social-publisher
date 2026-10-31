@@ -13,9 +13,9 @@ on:
         required: false
         default: ""
       lang:
-        description: "اللغة: levant (شامية) أو fusha (فصحى) أو egypt (مصرية)"
+        description: "اللغة: fusha (فصحى واضحة، الافتراضي) أو levant (شامية) أو egypt (مصرية)"
         required: false
-        default: "levant"
+        default: "fusha"
 
 permissions:
   contents: write

@@ -144,7 +144,7 @@ def normalize(sc: dict) -> dict:
     sc.setdefault("relay_at", ids[max(0, len(ids) - 3)])
     sc.setdefault("cta_at", ids[-1])
     sc["relay_at"], sc["cta_at"] = str(sc["relay_at"]), str(sc["cta_at"])
-    sc.setdefault("lang", "levant")
+    sc.setdefault("lang", "fusha")
     sc.setdefault("relay", {})
     sc["relay"].setdefault("nodes", [plain(s["title"])[:16] for s in sc["steps"]])
     sc["relay"].setdefault("title", "")
@@ -169,12 +169,12 @@ def _gemini_key() -> str:
     return os.environ.get("GEMINI_API_KEY", "")
 
 
-def _tts_gemini(text: str, spk: str, out: Path, model: str, lang: str = "levant") -> None:
+def _tts_gemini(text: str, spk: str, out: Path, model: str, lang: str = "fusha") -> None:
     import base64
 
     import requests
     tags = tags_of(text)
-    style = (GEMINI_STYLE.get(lang, GEMINI_STYLE["levant"]) + " Read exactly this line, with every diacritic respected"
+    style = (GEMINI_STYLE.get(lang, GEMINI_STYLE["fusha"]) + " Read exactly this line, with every diacritic respected"
              + (f", in a {', '.join(tags)} tone" if tags else "") + ":\n")
     body = {"contents": [{"parts": [{"text": style + tts_text(text)}]}],
             "generationConfig": {"responseModalities": ["AUDIO"],
@@ -196,20 +196,20 @@ def _tts_gemini(text: str, spk: str, out: Path, model: str, lang: str = "levant"
         w.writeframes(pcm)
 
 
-def _tts_edge(text: str, spk: str, out: Path, lang: str = "levant") -> None:
+def _tts_edge(text: str, spk: str, out: Path, lang: str = "fusha") -> None:
     rate, pitch = 0, 0
     for t in tags_of(text):
         if t in TONE:
             rate, pitch = TONE[t]
             break
     clean = tts_text(text).replace("…", "، ")
-    p = subprocess.run([sys.executable, "-m", "edge_tts", "--voice", EDGE_VOICES.get(lang, EDGE_VOICES["levant"])[spk], f"--rate={rate:+d}%", f"--pitch={pitch:+d}Hz",
+    p = subprocess.run([sys.executable, "-m", "edge_tts", "--voice", EDGE_VOICES.get(lang, EDGE_VOICES["fusha"])[spk], f"--rate={rate:+d}%", f"--pitch={pitch:+d}Hz",
                         "--text", clean, "--write-media", str(out)], capture_output=True, text=True)
     if p.returncode:
         raise CharacterError(f"edge-tts: {(p.stderr or p.stdout)[-300:]}")
 
 
-def synth(lines: list[list[str]], takes: Path, engine: str | None = None, lang: str = "levant") -> str:
+def synth(lines: list[list[str]], takes: Path, engine: str | None = None, lang: str = "fusha") -> str:
     """يولّد ملف صوت لكل سطر ويقصّ الصمت من أطرافه. يرجع المحرّك المستعمل (gemini أو edge)."""
     takes.mkdir(parents=True, exist_ok=True)
     order = [engine] if engine else (["gemini"] if _gemini_key() else []) + ["edge"]
@@ -349,7 +349,7 @@ def render_reel(renderer, post: dict, out_dir: Path) -> Path:
         shutil.rmtree(work)
     takes, frames = work / "takes", work / "frames"
     frames.mkdir(parents=True)
-    engine = synth(sc["lines"], takes, lang=sc.get("lang", "levant"))
+    engine = synth(sc["lines"], takes, lang=sc.get("lang", "fusha"))
     tl = assemble(sc, takes, work)
     data = build_data(sc, tl, envelope(work / "H_only.wav"), envelope(work / "C_only.wav"))
     print(f"[{post['id']}] صوت {engine} · المدة {data['dur']}s")
@@ -383,13 +383,13 @@ LANG_AR = {"levant": "فلسطينية محكية بيضاء (بدّي، شو، 
            "egypt": "مصرية محكية (عايز، إزاي، دلوقتي، كده، ده)، وليست فصحى"}
 
 
-def write_script(topic: str, extra: str = "", lang: str = "levant") -> tuple[dict, dict]:
+def write_script(topic: str, extra: str = "", lang: str = "fusha") -> tuple[dict, dict]:
     """يرجع (سكربت الشخصية، نصوص المنصات) لموضوع المالك."""
     import generator
     prompt = (
         "اكتب سكربت ريل عمودي بصيغة حوار كرتوني بين شخصيتين، موضوعه بالضبط:\n«" + topic.strip() + "»\n" + (extra + "\n" if extra else "") +
         "الشخصيتان: H = المهندس شادي، مضيف فضولي يسأل ويعلّق ويعترض أحياناً. C = Claude، روبوت يشرح ببساطة وبحماس هادئ.\n"
-        "اللغة: " + LANG_AR.get(lang, LANG_AR["levant"]) + ". جمل قصيرة طبيعية كأن شخصين يتكلمان.\n"
+        "اللغة: " + LANG_AR.get(lang, LANG_AR["fusha"]) + ". جمل قصيرة طبيعية كأن شخصين يتكلمان.\n"
         "النطق (مهم جداً لأن الصوت يُقرأ آلياً): اكتب نص كل سطر في lines بالتشكيل الكامل (فتحة وضمة وكسرة وسكون وشدّة وتنوين) على كل كلمة عربية، "
         "واكتب الأرقام بالحروف داخل الحوار (مثلاً «خَمْس خُطُوات» لا «5 خطوات»). اترك الكلمات الإنجليزية كما هي مثل AI وClaude وVercel (يحوّلها النظام للنطق العربي).\n"
         "الحوار: من 14 إلى 18 سطراً متبادلاً يبدأ بـ H يطرح المشكلة. كل سطر حتى 85 حرفاً (دون عدّ التشكيل) ويبدأ بوسم نبرة إنجليزي بين قوسين "
@@ -416,7 +416,7 @@ def write_script(topic: str, extra: str = "", lang: str = "levant") -> tuple[dic
     return sc, {k: v for k, v in posts.items() if v}
 
 
-def create_draft(topic: str, extra: str = "", lang: str = "levant") -> dict:
+def create_draft(topic: str, extra: str = "", lang: str = "fusha") -> dict:
     """مسودة ريل شخصية في الطابور (approved: false). يرجع المنشور."""
     from datetime import timedelta
 
@@ -447,7 +447,7 @@ def main() -> int:
     from queue_io import load_queue
     from render import Renderer
     if opt("--topic"):
-        post = create_draft(opt("--topic"), opt("--extra"), opt("--lang") or "levant")
+        post = create_draft(opt("--topic"), opt("--extra"), opt("--lang") or "fusha")
         print("مسودة:", post["id"], "|", post["image"]["title"])
         if os.environ.get("GITHUB_OUTPUT"):
             with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as fh:
