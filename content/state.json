@@ -1265,5 +1265,39 @@
       "account": "لينكدإن — المهندس شادي",
       "published_at": "2026-11-02T23:53:50+00:00"
     }
+  },
+  "2026-10-31-g1": {
+    "facebook": {
+      "attempts": 0,
+      "status": "published",
+      "platform_post_id": "197449247358013_1627469976059324",
+      "error": null,
+      "account": "فيسبوك — المهندس شادي",
+      "published_at": "2026-11-03T20:42:12+00:00"
+    },
+    "instagram": {
+      "attempts": 0,
+      "status": "published",
+      "platform_post_id": "17928282720436191",
+      "error": null,
+      "account": "إنستغرام — engshadi2011",
+      "published_at": "2026-11-03T20:42:27+00:00"
+    },
+    "threads": {
+      "attempts": 0,
+      "status": "published",
+      "platform_post_id": "18113060603581834",
+      "error": null,
+      "account": "ثريدز — engshadi2011",
+      "published_at": "2026-11-03T20:42:46+00:00"
+    },
+    "linkedin": {
+      "attempts": 0,
+      "status": "published",
+      "platform_post_id": "urn:li:share:7523484869570801664",
+      "error": null,
+      "account": "لينكدإن — المهندس شادي",
+      "published_at": "2026-11-03T20:42:53+00:00"
+    }
   }
 }
