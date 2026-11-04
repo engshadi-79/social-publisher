@@ -4302,7 +4302,7 @@
 
       #جمعة_مباركة #الذكاء_الاصطناعي #أعمال_صغيرة #ريادة_الأعمال'
 - id: 2026-11-04-morning
-  approved: false
+  approved: true
   publish_at: 2026-11-04 09:00
   template: reel
   topic: morning-greetings
