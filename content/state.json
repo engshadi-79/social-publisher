@@ -1534,17 +1534,17 @@
   },
   "2026-11-07-morning": {
     "facebook": {
-      "attempts": 1,
+      "attempts": 2,
       "error": "فشل الاستضافة: RuntimeError: الرابط لم يصبح متاحاً خلال 300 ثانية: https://engshadi-79.github.io/social-publisher/images/2026-11-07-morning.mp4",
       "status": "retry"
     },
     "instagram": {
-      "attempts": 1,
+      "attempts": 2,
       "error": "فشل الاستضافة: RuntimeError: الرابط لم يصبح متاحاً خلال 300 ثانية: https://engshadi-79.github.io/social-publisher/images/2026-11-07-morning.mp4",
       "status": "retry"
     },
     "threads": {
-      "attempts": 1,
+      "attempts": 2,
       "error": "فشل الاستضافة: RuntimeError: الرابط لم يصبح متاحاً خلال 300 ثانية: https://engshadi-79.github.io/social-publisher/images/2026-11-07-morning.mp4",
       "status": "retry"
     }
