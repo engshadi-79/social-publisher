@@ -5340,3 +5340,42 @@
 
 
       #جمعة_مباركة #أتمتة_الأعمال #إدارة_المشاريع #ريادة_الأعمال'
+- id: 2026-11-11-morning
+  approved: false
+  publish_at: 2026-11-11 09:00
+  template: reel
+  topic: morning-greetings
+  image:
+    title: استنشق بياض هذا الصباح ودع الأمل يزهر فيك.
+    style: morning
+    seed: 15
+    scenes:
+    - title: استنشق بياض هذا الصباح ودع الأمل يزهر فيك.
+      seconds: 5
+      photo_query: jasmine flowers
+      video_url: https://cdn.pixabay.com/video/2020/07/13/44596-439940206_large.mp4
+      thumb: https://cdn.pixabay.com/video/2020/07/13/44596-439940206_large.jpg
+    - title: دع شغف البدايات يتجدد مع كل حبة تفيض بالدفء.
+      seconds: 5
+      photo_query: coffee beans pouring
+      video_url: https://cdn.pixabay.com/video/2016/08/08/4315-178218581_large.mp4
+      thumb: https://cdn.pixabay.com/video/2016/08/08/4315-178218581_large.jpg
+    - title: أنار الله يومك بالخير ووهب فؤادك سكوناً لا ينتهي.
+      seconds: 5.5
+      photo_query: calm lake morning
+      body: صباحكم هدوء وتوفيق
+      video_url: https://cdn.pixabay.com/video/2024/10/18/236892_large.mp4
+      thumb: https://cdn.pixabay.com/video/2024/10/18/236892_large.jpg
+  platforms:
+    facebook: 'صباح الأربعاء الجميل، حيث يبدأ اليوم بهدوء يبعث الراحة في النفوس. ما هو الشيء اللطيف الذي تصنع به بداية يومك؟ ☕️🌸
+
+
+      #صباح_الخير #صباحيات #تفاؤل #أمل #قهوة_الصباح'
+    instagram: 'بداية جديدة تحمل معها الفرص والطمأنينة. ما هي أول عادة تبدأ بها صباحك لتشعر بالبهجة؟ 🌸☕️✨
+
+
+      #صباح_الخير #صباحيات #تفاؤل #أمل #بداية_جديدة'
+    threads: 'مع كل صباح جديد، تتجدد الطاقة وتنفتح الآفاق. كيف تحب أن تبدأ صباحك اليوم؟ ☀️☕️
+
+
+      #صباح_الخير #صباحيات #تفاؤل #أمل'
