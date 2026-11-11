@@ -1,19 +1,39 @@
 {
- "2026-11-10-morning": {
+ "2026-11-11-morning": {
   "threads": {
-   "fetched_at": "2026-11-10T13:09+00:00",
-   "views": 2,
+   "fetched_at": "2026-11-11T12:19+00:00",
+   "views": 1,
    "likes": 0,
    "comments": 0,
    "shares": 0
   },
   "instagram": {
-   "fetched_at": "2026-11-10T13:09+00:00",
-   "likes": 0,
+   "fetched_at": "2026-11-11T12:19+00:00",
+   "likes": 1,
    "comments": 0
   },
   "facebook": {
-   "fetched_at": "2026-11-10T13:09+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
+   "likes": 0,
+   "comments": 0,
+   "shares": 0
+  }
+ },
+ "2026-11-10-morning": {
+  "threads": {
+   "fetched_at": "2026-11-11T12:19+00:00",
+   "views": 4,
+   "likes": 0,
+   "comments": 0,
+   "shares": 0
+  },
+  "instagram": {
+   "fetched_at": "2026-11-11T12:19+00:00",
+   "likes": 1,
+   "comments": 0
+  },
+  "facebook": {
+   "fetched_at": "2026-11-11T12:19+00:00",
    "likes": 0,
    "comments": 0,
    "shares": 0
@@ -21,19 +41,19 @@
  },
  "2026-11-09-morning": {
   "threads": {
-   "fetched_at": "2026-11-10T13:09+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "views": 5,
    "likes": 0,
    "comments": 0,
    "shares": 0
   },
   "instagram": {
-   "fetched_at": "2026-11-10T13:09+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "likes": 1,
    "comments": 0
   },
   "facebook": {
-   "fetched_at": "2026-11-10T13:09+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "likes": 0,
    "comments": 0,
    "shares": 0
@@ -41,23 +61,23 @@
  },
  "2026-11-02-g2": {
   "linkedin": {
-   "fetched_at": "2026-11-10T13:09+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "error": "المنصة لا تدعم الإحصاءات بعد"
   },
   "threads": {
-   "fetched_at": "2026-11-10T13:09+00:00",
-   "views": 2,
+   "fetched_at": "2026-11-11T12:19+00:00",
+   "views": 3,
    "likes": 0,
    "comments": 0,
    "shares": 0
   },
   "instagram": {
-   "fetched_at": "2026-11-10T13:09+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "likes": 0,
    "comments": 0
   },
   "facebook": {
-   "fetched_at": "2026-11-10T13:09+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "likes": 0,
    "comments": 0,
    "shares": 0
@@ -65,19 +85,19 @@
  },
  "2026-11-08-morning": {
   "threads": {
-   "fetched_at": "2026-11-10T13:09+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "views": 2,
    "likes": 0,
    "comments": 0,
    "shares": 0
   },
   "instagram": {
-   "fetched_at": "2026-11-10T13:09+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "likes": 0,
    "comments": 0
   },
   "facebook": {
-   "fetched_at": "2026-11-10T13:09+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "likes": 0,
    "comments": 0,
    "shares": 0
@@ -85,23 +105,23 @@
  },
  "2026-11-02-g1": {
   "linkedin": {
-   "fetched_at": "2026-11-10T13:09+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "error": "المنصة لا تدعم الإحصاءات بعد"
   },
   "threads": {
-   "fetched_at": "2026-11-10T13:09+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "views": 0,
    "likes": 0,
    "comments": 0,
    "shares": 0
   },
   "instagram": {
-   "fetched_at": "2026-11-10T13:10+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "likes": 0,
    "comments": 0
   },
   "facebook": {
-   "fetched_at": "2026-11-10T13:10+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "likes": 0,
    "comments": 0,
    "shares": 0
@@ -109,19 +129,19 @@
  },
  "2026-11-07-morning": {
   "threads": {
-   "fetched_at": "2026-11-10T13:10+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "views": 2,
    "likes": 0,
    "comments": 0,
    "shares": 0
   },
   "instagram": {
-   "fetched_at": "2026-11-10T13:10+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "likes": 0,
    "comments": 0
   },
   "facebook": {
-   "fetched_at": "2026-11-10T13:10+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "likes": 0,
    "comments": 0,
    "shares": 0
@@ -129,19 +149,19 @@
  },
  "2026-11-06-morning": {
   "threads": {
-   "fetched_at": "2026-11-10T13:10+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "views": 4,
    "likes": 0,
    "comments": 0,
    "shares": 0
   },
   "instagram": {
-   "fetched_at": "2026-11-10T13:10+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "likes": 0,
    "comments": 0
   },
   "facebook": {
-   "fetched_at": "2026-11-10T13:10+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "likes": 0,
    "comments": 0,
    "shares": 0
@@ -149,23 +169,23 @@
  },
  "2026-11-01-g2": {
   "linkedin": {
-   "fetched_at": "2026-11-10T13:10+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "error": "المنصة لا تدعم الإحصاءات بعد"
   },
   "threads": {
-   "fetched_at": "2026-11-10T13:10+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "views": 0,
    "likes": 0,
    "comments": 0,
    "shares": 0
   },
   "instagram": {
-   "fetched_at": "2026-11-10T13:10+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "likes": 0,
    "comments": 0
   },
   "facebook": {
-   "fetched_at": "2026-11-10T13:10+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "likes": 0,
    "comments": 0,
    "shares": 0
@@ -173,19 +193,19 @@
  },
  "2026-11-05-morning": {
   "threads": {
-   "fetched_at": "2026-11-10T13:10+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "views": 2,
    "likes": 0,
    "comments": 0,
    "shares": 0
   },
   "instagram": {
-   "fetched_at": "2026-11-10T13:10+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "likes": 0,
    "comments": 0
   },
   "facebook": {
-   "fetched_at": "2026-11-10T13:10+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "likes": 0,
    "comments": 0,
    "shares": 0
@@ -193,23 +213,23 @@
  },
  "2026-11-01-g1": {
   "linkedin": {
-   "fetched_at": "2026-11-10T13:10+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "error": "المنصة لا تدعم الإحصاءات بعد"
   },
   "threads": {
-   "fetched_at": "2026-11-10T13:10+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "views": 7,
    "likes": 0,
    "comments": 0,
    "shares": 0
   },
   "instagram": {
-   "fetched_at": "2026-11-10T13:10+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "likes": 0,
    "comments": 0
   },
   "facebook": {
-   "fetched_at": "2026-11-10T13:10+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "likes": 0,
    "comments": 0,
    "shares": 0
@@ -217,23 +237,23 @@
  },
  "2026-10-31-g2": {
   "linkedin": {
-   "fetched_at": "2026-11-10T13:10+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "error": "المنصة لا تدعم الإحصاءات بعد"
   },
   "threads": {
-   "fetched_at": "2026-11-10T13:10+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "views": 0,
    "likes": 0,
    "comments": 0,
    "shares": 0
   },
   "instagram": {
-   "fetched_at": "2026-11-10T13:10+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "likes": 0,
    "comments": 0
   },
   "facebook": {
-   "fetched_at": "2026-11-10T13:10+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "likes": 0,
    "comments": 0,
    "shares": 0
@@ -241,19 +261,19 @@
  },
  "2026-11-04-morning": {
   "threads": {
-   "fetched_at": "2026-11-10T13:10+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "views": 6,
    "likes": 0,
    "comments": 0,
    "shares": 0
   },
   "instagram": {
-   "fetched_at": "2026-11-10T13:10+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "likes": 0,
    "comments": 0
   },
   "facebook": {
-   "fetched_at": "2026-11-10T13:10+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "likes": 0,
    "comments": 0,
    "shares": 0
@@ -261,19 +281,19 @@
  },
  "2026-11-03-morning": {
   "threads": {
-   "fetched_at": "2026-11-10T13:10+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "views": 3,
    "likes": 0,
    "comments": 0,
    "shares": 0
   },
   "instagram": {
-   "fetched_at": "2026-11-10T13:10+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "likes": 1,
    "comments": 0
   },
   "facebook": {
-   "fetched_at": "2026-11-10T13:10+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "likes": 0,
    "comments": 0,
    "shares": 0
@@ -281,19 +301,19 @@
  },
  "2026-11-02-morning": {
   "threads": {
-   "fetched_at": "2026-11-10T13:10+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "views": 4,
    "likes": 0,
    "comments": 0,
    "shares": 0
   },
   "instagram": {
-   "fetched_at": "2026-11-10T13:10+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "likes": 0,
    "comments": 0
   },
   "facebook": {
-   "fetched_at": "2026-11-10T13:10+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "likes": 0,
    "comments": 0,
    "shares": 0
@@ -301,23 +321,23 @@
  },
  "2026-10-31-g1": {
   "linkedin": {
-   "fetched_at": "2026-11-10T13:10+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "error": "المنصة لا تدعم الإحصاءات بعد"
   },
   "threads": {
-   "fetched_at": "2026-11-10T13:10+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "views": 29,
    "likes": 0,
    "comments": 0,
    "shares": 0
   },
   "instagram": {
-   "fetched_at": "2026-11-10T13:10+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "likes": 0,
    "comments": 0
   },
   "facebook": {
-   "fetched_at": "2026-11-10T13:10+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "likes": 0,
    "comments": 0,
    "shares": 0
@@ -325,23 +345,23 @@
  },
  "2026-10-30-g2": {
   "linkedin": {
-   "fetched_at": "2026-11-10T13:10+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "error": "المنصة لا تدعم الإحصاءات بعد"
   },
   "threads": {
-   "fetched_at": "2026-11-10T13:10+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "views": 1,
    "likes": 0,
    "comments": 0,
    "shares": 0
   },
   "instagram": {
-   "fetched_at": "2026-11-10T13:10+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "likes": 0,
    "comments": 0
   },
   "facebook": {
-   "fetched_at": "2026-11-10T13:10+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "likes": 0,
    "comments": 0,
    "shares": 0
@@ -349,35 +369,16 @@
  },
  "2026-10-31-morning": {
   "threads": {
-   "fetched_at": "2026-11-10T13:10+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "views": 7,
    "likes": 0,
    "comments": 0,
    "shares": 0
   },
   "instagram": {
-   "fetched_at": "2026-11-10T13:10+00:00",
+   "fetched_at": "2026-11-11T12:19+00:00",
    "likes": 0,
    "comments": 0
-  },
-  "facebook": {
-   "fetched_at": "2026-11-10T13:10+00:00",
-   "likes": 0,
-   "comments": 0,
-   "shares": 0
-  }
- },
- "2026-10-30-g1": {
-  "linkedin": {
-   "fetched_at": "2026-11-10T13:10+00:00",
-   "error": "المنصة لا تدعم الإحصاءات بعد"
-  },
-  "threads": {
-   "fetched_at": "2026-11-10T13:10+00:00",
-   "views": 82,
-   "likes": 1,
-   "comments": 0,
-   "shares": 0
   }
  }
 }
