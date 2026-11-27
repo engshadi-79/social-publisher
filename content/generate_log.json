@@ -1,8 +1,8 @@
 {
   "id": "daily-2026-12-04",
-  "ok": false,
-  "count": 0,
+  "ok": true,
+  "count": 2,
   "topic": "كل المواضيع",
   "method": "daily",
-  "message": "يومي 2026-12-04: وُلِّد 0 مسودة، وفشل 2. ريل الصباح: Gemini gemini-3.8-flash: gemini-3.8-flash (interactions) HTTP 503: gemini-3.8-flash is currently experiencing high deman | الذكاء الاصطناعي العملي لأصحاب الأعمال: Gemini gemini-3.8-flash: gemini-3.8-flash (interactions) HTTP 503: gemini-3.8-flash is currently experiencing high deman"
+  "message": "يومي 2026-12-04: وُلِّد 2 مسودة."
 }
